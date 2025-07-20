@@ -17,6 +17,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
+import java.time.LocalDate;
 import java.util.function.Function;
 
 import static com.loopers.domain.user.type.GenderType.MALE;
@@ -80,7 +81,7 @@ class UserV1ApiE2ETest {
                 () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateData.userId()),
                 () -> assertThat(response.getBody().data().name()).isEqualTo(userCreateData.name()),
                 () -> assertThat(response.getBody().data().email()).isEqualTo(userCreateData.email()),
-                () -> assertThat(response.getBody().data().birthDate()).isEqualTo(DateConverter.convertToLocalDate(userCreateData.birthDateString()))
+                () -> assertThat(response.getBody().data().birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
             );
         }
 
@@ -140,7 +141,7 @@ class UserV1ApiE2ETest {
                     () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateData.userId()),
                     () -> assertThat(response.getBody().data().name()).isEqualTo(userCreateData.name()),
                     () -> assertThat(response.getBody().data().email()).isEqualTo(userCreateData.email()),
-                    () -> assertThat(response.getBody().data().birthDate()).isEqualTo(DateConverter.convertToLocalDate(userCreateData.birthDateString()))
+                    () -> assertThat(response.getBody().data().birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
             );
         }
 
