@@ -21,7 +21,7 @@ public interface PointV1ApiSpec {
         description = "ID로 포인트 정보를 조회합니다."
     )
     ApiResponse<PointV1Dto.InfoResponse> get(
-            @Schema(name = "유저 ID", description = "조회할 유저 ID")
-            String userId
+//            @Schema(name = "유저 ID", description = "조회할 유저 ID")
+//            String userId
     );
 }
