@@ -2,9 +2,8 @@ package com.loopers.domain.user;
 
 import com.loopers.application.user.UserFacade;
 import com.loopers.application.user.UserInfo;
-import com.loopers.domain.user.dto.data.UserCreateData;
+import com.loopers.domain.user.dto.data.UserCreateCommand;
 import com.loopers.domain.user.type.GenderType;
-import com.loopers.support.validation.DateConverter;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,18 +52,18 @@ class UserServiceIntegrationTest {
             String email = "user@domain.com";
             String birthDateString = "2000-01-01";
             GenderType gender = MALE;
-            UserCreateData userCreateData = new UserCreateData(userId, name, email, birthDateString, gender);
+            UserCreateCommand userCreateCommand = new UserCreateCommand(userId, name, email, birthDateString, gender);
 
             // act
-            UserInfo userInfo = userFacade.create(userCreateData);
+            UserInfo userInfo = userFacade.create(userCreateCommand);
 
             // assert
             assertAll(
                 () -> assertThat(userInfo).isNotNull(),
                 () -> assertThat(userInfo.id()).isNotNull(),
-                () -> assertThat(userInfo.userId()).isEqualTo(userCreateData.userId()),
-                () -> assertThat(userInfo.name()).isEqualTo(userCreateData.name()),
-                () -> assertThat(userInfo.email()).isEqualTo(userCreateData.email()),
+                () -> assertThat(userInfo.userId()).isEqualTo(userCreateCommand.userId()),
+                () -> assertThat(userInfo.name()).isEqualTo(userCreateCommand.name()),
+                () -> assertThat(userInfo.email()).isEqualTo(userCreateCommand.email()),
                 () -> assertThat(userInfo.birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
             );
 
@@ -80,12 +79,12 @@ class UserServiceIntegrationTest {
             String email = "user@domain.com";
             String birthDateString = "2000-01-01";
             GenderType gender = MALE;
-            UserCreateData userCreateData = new UserCreateData(userId, name, email, birthDateString, gender);
-            userFacade.create(userCreateData);
+            UserCreateCommand userCreateCommand = new UserCreateCommand(userId, name, email, birthDateString, gender);
+            userFacade.create(userCreateCommand);
 
             // act
             // assert
-            assertThatThrownBy(() -> userFacade.create(userCreateData))
+            assertThatThrownBy(() -> userFacade.create(userCreateCommand))
                     .isInstanceOf(Exception.class); // exception 뭘로 만들 지 고민해보기
         }
     }
@@ -98,13 +97,13 @@ class UserServiceIntegrationTest {
         void returnsUserInfoWhenUserExists() {
             // arrange
             String userId = "user1234";
-            UserCreateData userCreateData = new UserCreateData(
+            UserCreateCommand userCreateCommand = new UserCreateCommand(
                     userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateData));
+            userRepository.save(User.create(userCreateCommand));
 
             // act
             UserInfo userInfo = userFacade.get(userId);
@@ -113,9 +112,9 @@ class UserServiceIntegrationTest {
             assertAll(
                     () -> assertThat(userInfo).isNotNull(),
                     () -> assertThat(userInfo.id()).isNotNull(),
-                    () -> assertThat(userInfo.userId()).isEqualTo(userCreateData.userId()),
-                    () -> assertThat(userInfo.name()).isEqualTo(userCreateData.name()),
-                    () -> assertThat(userInfo.email()).isEqualTo(userCreateData.email()),
+                    () -> assertThat(userInfo.userId()).isEqualTo(userCreateCommand.userId()),
+                    () -> assertThat(userInfo.name()).isEqualTo(userCreateCommand.name()),
+                    () -> assertThat(userInfo.email()).isEqualTo(userCreateCommand.email()),
                     () -> assertThat(userInfo.birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
             );
         }

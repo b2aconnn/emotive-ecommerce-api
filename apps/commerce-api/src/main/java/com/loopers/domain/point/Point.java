@@ -19,21 +19,19 @@ public class Point extends BaseEntity {
 
     private Integer amount;
 
-    private Point(String userId, Integer amount) {
-        validateChargeAmount(amount);
-
+    private Point(String userId) {
         this.userId = userId;
-        this.amount = amount;
+        this.amount = 0;
     }
 
-    private static void validateChargeAmount(Integer amount) {
+    public static Point create(String userId) {
+        return new Point(userId);
+    }
+
+    private void validateChargeAmount(Integer amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("0 이하의 포인트는 충전할 수 없습니다.");
         }
-    }
-
-    public static Point create(String userId, Integer amount) {
-        return new Point(userId, amount);
     }
 
 

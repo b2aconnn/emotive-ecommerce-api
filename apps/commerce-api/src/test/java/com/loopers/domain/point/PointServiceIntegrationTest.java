@@ -4,7 +4,7 @@ import com.loopers.application.point.PointFacade;
 import com.loopers.application.point.PointInfo;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.data.UserCreateData;
+import com.loopers.domain.user.dto.data.UserCreateCommand;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,15 +63,17 @@ class PointServiceIntegrationTest {
         void returnsUserPointsWhenUserExists() {
             // arrange
             String userId = "user1234";
-            UserCreateData userCreateData = new UserCreateData(
+            UserCreateCommand userCreateCommand = new UserCreateCommand(
                     userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateData));
+            userRepository.save(User.create(userCreateCommand));
 
-            pointRepository.save(Point.create(userId, 10_000));
+            Point point = Point.create(userId);
+            point.charge(10_000);
+            pointRepository.save(point);
 
             // act
             PointInfo pointInfo = pointFacade.get(userId);
@@ -80,7 +82,7 @@ class PointServiceIntegrationTest {
             assertAll(
                 () -> assertThat(pointInfo).isNotNull(),
                 () -> assertThat(pointInfo.id()).isNotNull(),
-                () -> assertThat(pointInfo.userId()).isEqualTo(userCreateData.userId()),
+                () -> assertThat(pointInfo.userId()).isEqualTo(userCreateCommand.userId()),
                 () -> assertThat(pointInfo.amount()).isEqualTo(10_000)
             );
         }

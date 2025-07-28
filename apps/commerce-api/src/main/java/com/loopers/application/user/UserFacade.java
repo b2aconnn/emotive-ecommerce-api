@@ -2,7 +2,7 @@ package com.loopers.application.user;
 
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserService;
-import com.loopers.domain.user.dto.data.UserCreateData;
+import com.loopers.domain.user.dto.data.UserCreateCommand;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 public class UserFacade {
     private final UserService userService;
 
-    public UserInfo create(UserCreateData userCreateData) {
-        User user = userService.create(userCreateData);
+    public UserInfo create(UserCreateCommand userCreateCommand) {
+        User user = userService.create(userCreateCommand);
         return UserInfo.from(user);
     }
 

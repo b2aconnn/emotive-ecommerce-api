@@ -1,6 +1,6 @@
 package com.loopers.domain.user;
 
-import com.loopers.domain.user.dto.data.UserCreateData;
+import com.loopers.domain.user.dto.data.UserCreateCommand;
 import com.loopers.domain.user.type.GenderType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,10 +29,10 @@ class UserTest {
             String email = "abc@abc.com";
             String birthDateString = "2000-01-01";
             GenderType gender = MALE;
-            UserCreateData userCreateData = new UserCreateData(userId, name, email, birthDateString, gender);
+            UserCreateCommand userCreateCommand = new UserCreateCommand(userId, name, email, birthDateString, gender);
 
             // assert
-            assertThatThrownBy(() -> User.create(userCreateData))
+            assertThatThrownBy(() -> User.create(userCreateCommand))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -53,10 +53,10 @@ class UserTest {
             String userId = "user1234";
             String birthDateString = "2000-01-01";
             GenderType gender = MALE;
-            UserCreateData userCreateData = new UserCreateData(userId, name, email, birthDateString, gender);
+            UserCreateCommand userCreateCommand = new UserCreateCommand(userId, name, email, birthDateString, gender);
 
             // assert
-            assertThatThrownBy(() -> User.create(userCreateData))
+            assertThatThrownBy(() -> User.create(userCreateCommand))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -79,10 +79,10 @@ class UserTest {
             String email = "user@abc.com";
             String userId = "user1234";
             GenderType gender = MALE;
-            UserCreateData userCreateData = new UserCreateData(userId, name, email, birthDateString, gender);
+            UserCreateCommand userCreateCommand = new UserCreateCommand(userId, name, email, birthDateString, gender);
 
             // assert
-            assertThatThrownBy(() -> User.create(userCreateData))
+            assertThatThrownBy(() -> User.create(userCreateCommand))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }

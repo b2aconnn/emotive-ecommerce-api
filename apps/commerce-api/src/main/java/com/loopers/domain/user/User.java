@@ -1,7 +1,7 @@
 package com.loopers.domain.user;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.user.dto.data.UserCreateData;
+import com.loopers.domain.user.dto.data.UserCreateCommand;
 import com.loopers.domain.user.type.GenderType;
 import com.loopers.support.validation.DateConverter;
 import jakarta.persistence.*;
@@ -47,12 +47,12 @@ public class User extends BaseEntity {
         this.birthDate = birthDateTime;
     }
 
-    public static User create(UserCreateData userCreateData) {
+    public static User create(UserCreateCommand userCreateCommand) {
         return User.builder()
-                .userId(userCreateData.userId())
-                .name(userCreateData.name())
-                .email(userCreateData.email())
-                .birthDateString(userCreateData.birthDateString())
+                .userId(userCreateCommand.userId())
+                .name(userCreateCommand.name())
+                .email(userCreateCommand.email())
+                .birthDateString(userCreateCommand.birthDateString())
                 .build();
     }
 

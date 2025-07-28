@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.user;
 
-import com.loopers.domain.user.dto.data.UserCreateData;
+import com.loopers.domain.user.dto.data.UserCreateCommand;
 import com.loopers.interfaces.api.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,7 +14,7 @@ public interface UserV1ApiSpec {
     )
     ApiResponse<UserV1Dto.CreateResponse> create(
         @Schema(name = "유저 정보", description = "유저 정보")
-        UserCreateData memberCreateRequest
+        UserCreateCommand memberCreateRequest
     );
 
     @Operation(

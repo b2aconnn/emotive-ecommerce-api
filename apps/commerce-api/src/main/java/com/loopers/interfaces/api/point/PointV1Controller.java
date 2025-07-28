@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class PointV1Controller implements PointV1ApiSpec {
     private final PointFacade pointFacade;
 
-    @PostMapping("")
+    @PostMapping("/charge")
     @Override
     public ApiResponse<PointV1Dto.ChargeResponse> charge(
 //            @CurrentUser String userId,
