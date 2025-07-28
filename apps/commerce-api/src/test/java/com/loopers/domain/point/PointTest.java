@@ -14,12 +14,13 @@ class PointTest {
         @ValueSource(ints = {0, -1, -1000})
         @ParameterizedTest
         @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
-        void failsWhenChargingWithZeroOrNegativePoints(Integer point) {
-            // act
+        void failsWhenChargingWithZeroOrNegativePoints(Integer amount) {
+            // arrange
             String userId = "abcd1234";
+            Point point = Point.create(userId);
 
             // assert
-            assertThatThrownBy(() -> Point.create(userId, point))
+            assertThatThrownBy(() -> point.charge(amount))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }

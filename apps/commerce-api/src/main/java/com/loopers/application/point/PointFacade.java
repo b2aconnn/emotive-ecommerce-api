@@ -1,31 +1,38 @@
 package com.loopers.application.point;
 
 import com.loopers.domain.point.Point;
-import com.loopers.domain.point.PointService;
+import com.loopers.domain.point.PointRepository;
+import com.loopers.domain.user.User;
+import com.loopers.domain.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
 public class PointFacade {
-    private final PointService pointService;
 
+    private final UserRepository userRepository;
+    private final PointRepository pointRepository;
+
+    @Transactional(rollbackFor = Exception.class)
     public PointInfo charge(String userId, Integer amount) {
-        try {
-            Point point = pointService.charge(userId, amount);
-            return PointInfo.from(point);
-        } catch (EntityNotFoundException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("[userId = " + userId + "] 를 찾을 수 없습니다."));
+
+        Point point = pointRepository.findByUserId(user.getUserId())
+                .orElse(Point.create(user.getUserId()));
+
+        point.charge(amount);
+
+        return PointInfo.from(point);
     }
 
     public PointInfo get(String userId) {
-        try {
-            Point point = pointService.get(userId);
-            return PointInfo.from(point);
-        } catch (EntityNotFoundException e) {
-            return null;
-        }
+        Optional<Point> pointOptional = pointRepository.findByUserId(userId);
+        return pointOptional.map(PointInfo::from).orElse(null);
     }
 }

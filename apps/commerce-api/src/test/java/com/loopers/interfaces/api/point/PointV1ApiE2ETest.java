@@ -4,8 +4,7 @@ import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.data.UserCreateData;
-import com.loopers.domain.user.type.GenderType;
+import com.loopers.domain.user.dto.data.UserCreateCommand;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.user.UserV1Dto;
 import com.loopers.utils.DatabaseCleanUp;
@@ -28,8 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PointV1ApiE2ETest {
-    private static final String ENDPOINT_CREATE = "/api/v1/points";
-    private static final Function<String, String> ENDPOINT_GET = id -> "/api/v1/points/" + id;
+    private static final String ENDPOINT_CREATE = "/api/v1/points/charge";
+    private static final Function<String, String> ENDPOINT_GET = id -> "/api/v1/points";
 
     private final TestRestTemplate testRestTemplate;
     private final UserRepository userRepository;
@@ -54,7 +53,7 @@ class PointV1ApiE2ETest {
         databaseCleanUp.truncateAllTables();
     }
 
-    @DisplayName("POST /api/v1/points")
+    @DisplayName("POST /api/v1/points/chage")
     @Nested
     class POST {
         @DisplayName("존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.")
@@ -62,13 +61,13 @@ class PointV1ApiE2ETest {
         void returnsTotalPointsAfterSuccessfulCharge() {
             // arrange
             String userId = "user1234";
-            UserCreateData userCreateData = new UserCreateData(
+            UserCreateCommand userCreateCommand = new UserCreateCommand(
                     userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateData));
+            userRepository.save(User.create(userCreateCommand));
 
             Integer amount = 10_000;
             PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(amount);
@@ -118,7 +117,7 @@ class PointV1ApiE2ETest {
         }
     }
 
-    @DisplayName("GET /api/v1/points/{userId}")
+    @DisplayName("GET /api/v1/points")
     @Nested
     class GET {
         @DisplayName("포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다.")
@@ -126,16 +125,17 @@ class PointV1ApiE2ETest {
         void returnsUserPointsOnSuccessfulRetrieval() {
             // arrange
             String userId = "user1234";
-            UserCreateData userCreateData = new UserCreateData(
+            UserCreateCommand userCreateCommand = new UserCreateCommand(
                     userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateData));
+            userRepository.save(User.create(userCreateCommand));
 
-            Integer point = 10_000;
-            pointRepository.save(Point.create(userId, point));
+            Point point = Point.create(userId);
+            point.charge(10_000);
+            pointRepository.save(point);
 
             String requestUrl = ENDPOINT_GET.apply(userId);
 
@@ -151,8 +151,8 @@ class PointV1ApiE2ETest {
             // assert
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateData.userId()),
-                    () -> assertThat(response.getBody().data().amount()).isEqualTo(point)
+                    () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateCommand.userId()),
+                    () -> assertThat(response.getBody().data().amount()).isEqualTo(point.getAmount())
             );
         }
 

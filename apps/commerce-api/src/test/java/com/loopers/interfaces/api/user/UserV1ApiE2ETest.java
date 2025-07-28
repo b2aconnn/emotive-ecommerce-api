@@ -2,10 +2,9 @@ package com.loopers.interfaces.api.user;
 
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.data.UserCreateData;
+import com.loopers.domain.user.dto.data.UserCreateCommand;
 import com.loopers.domain.user.type.GenderType;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.support.validation.DateConverter;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -62,14 +61,14 @@ class UserV1ApiE2ETest {
             String email = "user@domain.com";
             String birthDateString = "2000-01-01";
             GenderType gender = MALE;
-            UserCreateData userCreateData = new UserCreateData(userId, name, email, birthDateString, gender);
+            UserCreateCommand userCreateCommand = new UserCreateCommand(userId, name, email, birthDateString, gender);
 
             String requestUrl = ENDPOINT_CREATE;
 
             // act
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<UserCreateData> requestEntity = new HttpEntity<>(userCreateData, headers);
+            HttpEntity<UserCreateCommand> requestEntity = new HttpEntity<>(userCreateCommand, headers);
 
             ParameterizedTypeReference<ApiResponse<UserV1Dto.CreateResponse>> responseType = new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<UserV1Dto.CreateResponse>> response =
@@ -78,9 +77,9 @@ class UserV1ApiE2ETest {
             // assert
             assertAll(
                 () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateData.userId()),
-                () -> assertThat(response.getBody().data().name()).isEqualTo(userCreateData.name()),
-                () -> assertThat(response.getBody().data().email()).isEqualTo(userCreateData.email()),
+                () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateCommand.userId()),
+                () -> assertThat(response.getBody().data().name()).isEqualTo(userCreateCommand.name()),
+                () -> assertThat(response.getBody().data().email()).isEqualTo(userCreateCommand.email()),
                 () -> assertThat(response.getBody().data().birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
             );
         }
@@ -94,14 +93,14 @@ class UserV1ApiE2ETest {
             String email = "user@domain.com";
             String birthDateString = "2000-01-01";
             GenderType gender = null;
-            UserCreateData userCreateData = new UserCreateData(userId, name, email, birthDateString, gender);
+            UserCreateCommand userCreateCommand = new UserCreateCommand(userId, name, email, birthDateString, gender);
 
             String requestUrl = ENDPOINT_CREATE;
 
             // act
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<UserCreateData> requestEntity = new HttpEntity<>(userCreateData, headers);
+            HttpEntity<UserCreateCommand> requestEntity = new HttpEntity<>(userCreateCommand, headers);
 
             ParameterizedTypeReference<ApiResponse<UserV1Dto.CreateResponse>> responseType = new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<UserV1Dto.CreateResponse>> response =
@@ -120,13 +119,13 @@ class UserV1ApiE2ETest {
         void returnsUserInfoOnSuccessfulRetrievalOfMyInfo() {
             // arrange
             String userId = "user1234";
-            UserCreateData userCreateData = new UserCreateData(
+            UserCreateCommand userCreateCommand = new UserCreateCommand(
                     userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateData));
+            userRepository.save(User.create(userCreateCommand));
 
             String requestUrl = ENDPOINT_GET.apply(userId);
 
@@ -138,9 +137,9 @@ class UserV1ApiE2ETest {
             // assert
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateData.userId()),
-                    () -> assertThat(response.getBody().data().name()).isEqualTo(userCreateData.name()),
-                    () -> assertThat(response.getBody().data().email()).isEqualTo(userCreateData.email()),
+                    () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateCommand.userId()),
+                    () -> assertThat(response.getBody().data().name()).isEqualTo(userCreateCommand.name()),
+                    () -> assertThat(response.getBody().data().email()).isEqualTo(userCreateCommand.email()),
                     () -> assertThat(response.getBody().data().birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
             );
         }
