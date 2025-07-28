@@ -3,6 +3,7 @@ package com.loopers.interfaces.api.point;
 import com.loopers.application.point.PointFacade;
 import com.loopers.application.point.PointInfo;
 import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.support.resolver.CurrentUser;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +26,12 @@ public class PointV1Controller implements PointV1ApiSpec {
         return ApiResponse.success(response);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("")
     @Override
     public ApiResponse<PointV1Dto.InfoResponse> get(
-            @PathVariable(value = "userId") String userId
+//            @CurrentUser String userId
     ) {
+        String userId = "user1234";
         PointInfo info = pointFacade.get(userId);
         if (info == null) {
             throw new EntityNotFoundException("사용자가 존재하지 않습니다.");
