@@ -19,7 +19,6 @@ public class Point extends BaseEntity {
 
     private Integer amount;
 
-    @Builder
     private Point(String userId, Integer amount) {
         validateChargeAmount(amount);
 
@@ -34,10 +33,7 @@ public class Point extends BaseEntity {
     }
 
     public static Point create(String userId, Integer amount) {
-        return Point.builder()
-                .userId(userId)
-                .amount(amount)
-                .build();
+        return new Point(userId, amount);
     }
 
 
