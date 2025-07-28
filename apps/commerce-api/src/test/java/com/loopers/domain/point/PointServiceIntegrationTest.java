@@ -27,11 +27,9 @@ class PointServiceIntegrationTest {
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
-    @Autowired
     @MockitoSpyBean
     private PointRepository pointRepository;
 
-    @Autowired
     @MockitoSpyBean
     private UserRepository userRepository;
 
