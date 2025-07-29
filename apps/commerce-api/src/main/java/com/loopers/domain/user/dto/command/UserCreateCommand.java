@@ -1,4 +1,4 @@
-package com.loopers.domain.user.dto.data;
+package com.loopers.domain.user.dto.command;
 
 import com.loopers.domain.user.type.GenderType;
 import jakarta.validation.constraints.NotNull;
