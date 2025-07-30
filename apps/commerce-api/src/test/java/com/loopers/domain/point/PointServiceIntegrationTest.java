@@ -4,8 +4,9 @@ import com.loopers.application.point.PointFacade;
 import com.loopers.application.point.PointInfo;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.data.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateCommand;
 import com.loopers.utils.DatabaseCleanUp;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -51,7 +52,7 @@ class PointServiceIntegrationTest {
             // act
             // assert
             assertThatThrownBy(() -> pointFacade.charge(userId, point))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(EntityNotFoundException.class);
         }
     }
 
