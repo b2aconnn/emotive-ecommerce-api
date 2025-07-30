@@ -1,7 +1,7 @@
 package com.loopers.interfaces.api.brand;
 
 import com.loopers.domain.brand.Brand;
-import com.loopers.domain.brand.dto.BrandCreateCommand;
+import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;

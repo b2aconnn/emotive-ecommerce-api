@@ -1,7 +1,7 @@
 package com.loopers.domain.brand;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.brand.dto.BrandCreateCommand;
+import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;

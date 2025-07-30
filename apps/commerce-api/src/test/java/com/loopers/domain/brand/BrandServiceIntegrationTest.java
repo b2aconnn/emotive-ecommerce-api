@@ -2,7 +2,7 @@ package com.loopers.domain.brand;
 
 import com.loopers.application.brand.BrandFacade;
 import com.loopers.application.brand.BrandInfo;
-import com.loopers.domain.brand.dto.BrandCreateCommand;
+import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

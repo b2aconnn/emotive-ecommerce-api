@@ -4,7 +4,7 @@ import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.data.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateCommand;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.user.UserV1Dto;
 import com.loopers.utils.DatabaseCleanUp;
@@ -31,19 +31,19 @@ class PointV1ApiE2ETest {
     private static final Function<String, String> ENDPOINT_GET = id -> "/api/v1/points";
 
     private final TestRestTemplate testRestTemplate;
-    private final UserRepository userRepository;
+    private final UserRepository brandRepository;
     private final PointRepository pointRepository;
     private final DatabaseCleanUp databaseCleanUp;
 
     @Autowired
     public PointV1ApiE2ETest(
         TestRestTemplate testRestTemplate,
-        UserRepository userRepository,
+        UserRepository brandRepository,
         PointRepository pointRepository,
         DatabaseCleanUp databaseCleanUp
     ) {
         this.testRestTemplate = testRestTemplate;
-        this.userRepository = userRepository;
+        this.brandRepository = brandRepository;
         this.pointRepository = pointRepository;
         this.databaseCleanUp = databaseCleanUp;
     }
@@ -67,7 +67,7 @@ class PointV1ApiE2ETest {
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateCommand));
+            brandRepository.save(User.create(userCreateCommand));
 
             Integer amount = 10_000;
             PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(amount);
@@ -131,7 +131,7 @@ class PointV1ApiE2ETest {
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateCommand));
+            brandRepository.save(User.create(userCreateCommand));
 
             Point point = Point.create(userId);
             point.charge(10_000);
