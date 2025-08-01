@@ -2,7 +2,7 @@ package com.loopers.domain.user;
 
 import com.loopers.application.user.UserFacade;
 import com.loopers.application.user.UserInfo;
-import com.loopers.domain.user.dto.data.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateCommand;
 import com.loopers.domain.user.type.GenderType;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;

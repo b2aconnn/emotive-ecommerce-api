@@ -2,7 +2,7 @@ package com.loopers.interfaces.api.user;
 
 import com.loopers.application.user.UserFacade;
 import com.loopers.application.user.UserInfo;
-import com.loopers.domain.user.dto.data.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateCommand;
 import com.loopers.interfaces.api.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;

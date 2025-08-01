@@ -39,9 +39,10 @@ classDiagram
     }
 
     class OrderItem {
+        - order: Order
         - product: Product
         - quantity: Integer
-        - unitPrice: Integer
+        - price: Integer
     }
 
     class Order {

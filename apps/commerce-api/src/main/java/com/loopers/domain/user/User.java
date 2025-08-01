@@ -1,9 +1,9 @@
 package com.loopers.domain.user;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.user.dto.data.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateCommand;
 import com.loopers.domain.user.type.GenderType;
-import com.loopers.support.validation.DateConverter;
+import com.loopers.support.converter.DateConverter;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

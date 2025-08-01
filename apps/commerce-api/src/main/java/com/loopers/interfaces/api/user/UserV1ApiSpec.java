@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.user;
 
-import com.loopers.domain.user.dto.data.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateCommand;
 import com.loopers.interfaces.api.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
