@@ -1,4 +1,4 @@
-package com.loopers.support.validation;
+package com.loopers.support.converter;
 
 import lombok.NoArgsConstructor;
 
