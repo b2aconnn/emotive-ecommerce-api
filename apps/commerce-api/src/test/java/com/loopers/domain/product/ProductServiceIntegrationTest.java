@@ -1,13 +1,12 @@
 package com.loopers.domain.product;
 
-import com.loopers.application.product.ProductInfo;
-import com.loopers.application.product.ProductService;
-import com.loopers.application.product.ProductsCond;
-import com.loopers.application.product.ProductsInfo;
+import com.loopers.application.product.*;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 import com.loopers.domain.product.dto.command.ProductCreateCommand;
+import com.loopers.domain.productlike.ProductLikeCount;
+import com.loopers.domain.productlike.ProductLikeCountRepository;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
+import static com.loopers.application.product.ProductsSortType.LIKES_DESC;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,6 +31,9 @@ public class ProductServiceIntegrationTest {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductLikeCountRepository productLikeCountRepository;
 
     @Autowired
     private BrandRepository brandRepository;
@@ -87,6 +90,54 @@ public class ProductServiceIntegrationTest {
                     .containsExactlyInAnyOrder(
                             tuple("Test Product 1", "Test Brand", 10_000, "http://example.com/product1.png"),
                             tuple("Test Product 2", "Test Brand", 20_000, "http://example.com/product2.png")
+                    );
+        }
+
+        @DisplayName("모든 상품 목록이 높은 좋아요 수 순으로 조회된다.")
+        @Test
+        void returnsAllProductsSortedByLikeCount() {
+            // arrange
+            Brand saveBrand = brandRepository.save(Brand.create(new BrandCreateCommand(
+                    "Test Brand",
+                    "http://example.com/logo.png",
+                    "This is a test brand.")));
+
+            Product saveProduct1 = productRepository.save(Product.create(new ProductCreateCommand(
+                    "Test Product 1",
+                    "http://example.com/product1.png",
+                    "This is a test product 1.",
+                    10_000,
+                    10,
+                    saveBrand)));
+
+            ProductLikeCount productLikeCount1 = ProductLikeCount.create(saveProduct1);
+            productLikeCount1.increase();
+            ProductLikeCount saveLikeCount1 = productLikeCountRepository.save(productLikeCount1);
+            saveProduct1.setProductLikeCount(saveLikeCount1);
+
+            Product saveProduct2 = productRepository.save(Product.create(new ProductCreateCommand(
+                    "Test Product 2",
+                    "http://example.com/product2.png",
+                    "This is a test product 2.",
+                    20_000,
+                    20,
+                    saveBrand)));
+
+            ProductLikeCount productLikeCount2 = ProductLikeCount.create(saveProduct2);
+            productLikeCount2.increase();
+            productLikeCount2.increase();
+            ProductLikeCount saveLikeCount2 = productLikeCountRepository.save(productLikeCount2);
+            saveProduct2.setProductLikeCount(saveLikeCount2);
+
+            // act
+            List<ProductsInfo> productsInfo = productService.getAll(new ProductsCond(LIKES_DESC));
+
+            // assert
+            assertThat(productsInfo).hasSize(2)
+                    .extracting("productName", "brandName", "price", "mainImageUrl")
+                    .containsExactly(
+                            tuple("Test Product 2", "Test Brand", 20_000, "http://example.com/product2.png"),
+                            tuple("Test Product 1", "Test Brand", 10_000, "http://example.com/product1.png")
                     );
         }
 
@@ -155,6 +206,9 @@ public class ProductServiceIntegrationTest {
                     50,
                     saveBrand)));
 
+            ProductLikeCount saveLikeCount = productLikeCountRepository.save(ProductLikeCount.create(saveProduct));
+            saveProduct.setProductLikeCount(saveLikeCount);
+
             // act
             ProductInfo productInfo = productService.getProduct(saveProduct.getId());
 
@@ -166,7 +220,7 @@ public class ProductServiceIntegrationTest {
             assertThat(productInfo.description()).isEqualTo(saveProduct.getDescription());
             assertThat(productInfo.price()).isEqualTo(saveProduct.getPrice());
             assertThat(productInfo.stockQuantity()).isEqualTo(saveProduct.getStockQuantity());
-            assertThat(productInfo.likeCount()).isEqualTo(saveProduct.getLikeCount());
+            assertThat(productInfo.likeCount()).isEqualTo(saveProduct.getProductLikeCount().getLikeCount());
         }
     }
 }

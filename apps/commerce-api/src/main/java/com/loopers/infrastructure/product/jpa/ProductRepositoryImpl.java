@@ -39,7 +39,6 @@ public class ProductRepositoryImpl implements ProductRepository {
     public List<Product> findAll(ProductsCond condition) {
         return queryFactory.select(product)
                 .from(product)
-                .orderBy(product.createdAt.desc())
                 .where(searchKeywordContains(condition.searchKeyword()))
                 .orderBy(createOrderSpecifiers(condition.sortBy()))
                 .offset(condition.pageCond().offset())
@@ -57,7 +56,7 @@ public class ProductRepositoryImpl implements ProductRepository {
         return switch (sortType) {
             case LASTEST -> product.createdAt.desc();
             case PRICE_ASC -> product.price.asc();
-            case LIKES_DESC -> product.likeCount.desc();
+            case LIKES_DESC -> product.productLikeCount.likeCount.desc();
         };
     }
 

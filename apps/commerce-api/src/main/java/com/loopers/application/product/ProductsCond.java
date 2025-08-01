@@ -14,4 +14,8 @@ public record ProductsCond(
     public ProductsCond(String searchKeyword, ProductsSortType sortBy) {
         this(searchKeyword, sortBy, new PageCond());
     }
+
+    public ProductsCond(ProductsSortType sortBy) {
+        this(null, sortBy, new PageCond());
+    }
 }

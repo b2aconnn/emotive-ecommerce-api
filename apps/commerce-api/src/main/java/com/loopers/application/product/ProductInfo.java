@@ -19,7 +19,7 @@ public record ProductInfo(Long id,
             product.getMainImageUrl(),
             product.getDescription(),
             product.getStockQuantity(),
-            product.getLikeCount()
+            product.getProductLikeCount().getLikeCount()
         );
     }
 }

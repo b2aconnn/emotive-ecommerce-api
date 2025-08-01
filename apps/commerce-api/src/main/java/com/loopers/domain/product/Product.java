@@ -4,11 +4,13 @@ import com.loopers.domain.BaseEntity;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 import com.loopers.domain.product.dto.command.ProductCreateCommand;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.loopers.domain.productlike.ProductLikeCount;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.ArrayList;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
@@ -30,9 +32,12 @@ public class Product extends BaseEntity {
     private Integer stockQuantity;
 
     @ManyToOne
+    @JoinColumn(name = "brand_id")
     private Brand brand;
 
-    private Integer likeCount;
+    @Setter
+    @OneToOne(mappedBy = "product")
+    private ProductLikeCount productLikeCount;
 
     public Product(ProductCreateCommand createCommand) {
         this.name = createCommand.name();
@@ -41,7 +46,6 @@ public class Product extends BaseEntity {
         this.price = createCommand.price();
         this.stockQuantity = createCommand.stockQuantity();
         this.brand = createCommand.brand();
-        this.likeCount = 0;
     }
 
     public static Product create(ProductCreateCommand createCommand) {
