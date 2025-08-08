@@ -2,9 +2,7 @@ package com.loopers.domain.order;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.order.dto.OrderCreateInfo;
-import com.loopers.support.validation.TextValidator;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -12,10 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static com.loopers.domain.order.OrderStatus.CREATED;
-import static com.loopers.domain.order.PaymentStatus.COMPLETE;
 import static com.loopers.support.validation.TextValidator.requireText;
 import static jakarta.persistence.EnumType.STRING;
 import static java.util.Objects.requireNonNull;
@@ -50,7 +46,6 @@ public class Order extends BaseEntity {
         this.orderItems = createInfo.orderItems();
 
         this.status = CREATED;
-        this.paymentStatus = COMPLETE;
     }
 
     public static Order create(OrderCreateInfo createInfo) {
