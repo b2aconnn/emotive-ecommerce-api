@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static com.loopers.domain.order.OrderStatus.CREATED;
-import static com.loopers.domain.order.PaymentStatus.COMPLETE;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -24,9 +22,6 @@ public class OrderTest {
         @DisplayName("주문 상품이 없는 경우 주문 생성이 실패한다.")
         @Test
         void createOrderWithoutProducts() {
-            // arrange
-            List<OrderItem> orderItems = List.of();
-
             // act
             // assert
             assertThatThrownBy(() -> Order.create(new OrderCreateInfo(
@@ -34,7 +29,7 @@ public class OrderTest {
                     "홍길동",
                     "서울시 강남구",
                     "010-1234-5678",
-                    orderItems)))
+                    List.of())))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -88,7 +83,7 @@ public class OrderTest {
             );
         }
 
-        @DisplayName("주문 항목이 비어있지 않은 경우 주문 생성이 되고 결제 완료가 된다.")
+        @DisplayName("주문 항목이 비어있지 않은 경우 주문 생성된다.")
         @MethodSource("validOrderParameters")
         @ParameterizedTest
         void createOrderWithValidParameters(Long userId, String userName, String deliveryAddress, String contactNumber) {
@@ -104,7 +99,6 @@ public class OrderTest {
             // assert
             assertThat(order).isNotNull();
             assertThat(order.getStatus()).isEqualTo(CREATED);
-            assertThat(order.getPaymentStatus()).isEqualTo(COMPLETE);
         }
     }
 }
