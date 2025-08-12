@@ -19,12 +19,12 @@ public class PointFacade {
     private final PointRepository pointRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public PointInfo charge(String userId, Integer amount) {
+    public PointInfo charge(String userId, Long amount) {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("[userId = " + userId + "] 를 찾을 수 없습니다."));
 
-        Point point = pointRepository.findByUserId(user.getUserId())
-                .orElse(Point.create(user.getUserId()));
+        Point point = pointRepository.findByUserId(user.getId())
+                .orElse(Point.create(user.getId()));
 
         point.charge(amount);
 
@@ -32,7 +32,10 @@ public class PointFacade {
     }
 
     public PointInfo get(String userId) {
-        Optional<Point> pointOptional = pointRepository.findByUserId(userId);
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("[userId = " + userId + "] 를 찾을 수 없습니다."));
+
+        Optional<Point> pointOptional = pointRepository.findByUserId(user.getId());
         return pointOptional.map(PointInfo::from).orElse(null);
     }
 }

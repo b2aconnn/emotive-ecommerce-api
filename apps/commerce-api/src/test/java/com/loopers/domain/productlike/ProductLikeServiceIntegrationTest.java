@@ -9,11 +9,8 @@ import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.product.dto.command.ProductCreateCommand;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.command.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
 import com.loopers.utils.DatabaseCleanUp;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
-import org.hibernate.AssertionFailure;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static com.loopers.domain.user.type.GenderType.MALE;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -78,13 +74,13 @@ class ProductLikeServiceIntegrationTest {
         @Test
         void productNotFound() {
             // arrange
-            UserCreateCommand userCreateCommand = new UserCreateCommand(
+            UserCreateInfo userCreateInfo = new UserCreateInfo(
                     "user1234",
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateCommand));
+            userRepository.save(User.create(userCreateInfo));
 
             // act
             assertThatThrownBy(() -> productLikeAppService.likeProduct("user1234", 1L))
@@ -96,7 +92,7 @@ class ProductLikeServiceIntegrationTest {
         @Test
         void createProductLike() {
             // arrange
-            User saveUser = userRepository.save(User.create(new UserCreateCommand(
+            User saveUser = userRepository.save(User.create(new UserCreateInfo(
                     "user1234",
                     "park",
                     "user@domain.com",
@@ -112,8 +108,7 @@ class ProductLikeServiceIntegrationTest {
                     "product1234",
                     "Product Name",
                     "Product Description",
-                    10_000,
-                    10,
+                    10_000L,
                     saveBrand)));
 
             // act
@@ -137,7 +132,7 @@ class ProductLikeServiceIntegrationTest {
         @Test
         void userCannotLikeProductTwice() {
             // arrange
-            User saveUser = userRepository.save(User.create(new UserCreateCommand(
+            User saveUser = userRepository.save(User.create(new UserCreateInfo(
                     "user1234",
                     "park",
                     "user@domain.com",
@@ -153,8 +148,7 @@ class ProductLikeServiceIntegrationTest {
                     "product1234",
                     "Product Name",
                     "Product Description",
-                    10_000,
-                    10,
+                    10_000L,
                     saveBrand)));
 
             productLikeRepository.save(ProductLike.create(saveUser, saveProduct));
@@ -184,7 +178,7 @@ class ProductLikeServiceIntegrationTest {
         @Transactional
         void deleteProductLike() {
             // arrange
-            User saveUser = userRepository.save(User.create(new UserCreateCommand(
+            User saveUser = userRepository.save(User.create(new UserCreateInfo(
                     "user1234",
                     "park",
                     "user@domain.com",
@@ -200,8 +194,7 @@ class ProductLikeServiceIntegrationTest {
                     "product1234",
                     "Product Name",
                     "Product Description",
-                    10_000,
-                    10,
+                    10_000L,
                     saveBrand)));
 
             productLikeRepository.save(ProductLike.create(saveUser, saveProduct));
@@ -230,7 +223,7 @@ class ProductLikeServiceIntegrationTest {
         @Test
         void deleteProductLikeWhenNotLiked() {
             // arrange
-            User saveUser = userRepository.save(User.create(new UserCreateCommand(
+            User saveUser = userRepository.save(User.create(new UserCreateInfo(
                     "user1234",
                     "park",
                     "user@domain.com",
@@ -246,8 +239,7 @@ class ProductLikeServiceIntegrationTest {
                     "product1234",
                     "Product Name",
                     "Product Description",
-                    10_000,
-                    10,
+                    10_000L,
                     saveBrand)));
 
             assertThat(productLikeRepository.hasUserLikedProduct(saveUser.getId(), saveProduct.getId())).isFalse();

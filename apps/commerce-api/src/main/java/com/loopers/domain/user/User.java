@@ -1,11 +1,10 @@
 package com.loopers.domain.user;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.user.dto.command.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
 import com.loopers.domain.user.type.GenderType;
 import com.loopers.support.converter.DateConverter;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,28 +31,24 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private GenderType gender;
 
+    @Transient
     private final String VALID_USER_ID_PATTERN = "^[A-Za-z0-9]{1,10}$";
+    @Transient
     private final String VALID_EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
 
-    @Builder
-    private User(String userId, String name, String email, String birthDateString) {
-        validateIdFormat(userId);
-        validateEmailFormat(email);
-        LocalDate birthDateTime = convertBirthDateFormat(birthDateString);
+    private User(UserCreateInfo userCreateInfo) {
+        validateIdFormat(userCreateInfo.userId());
+        validateEmailFormat(userCreateInfo.email());
+        LocalDate birthDateTime = convertBirthDateFormat(userCreateInfo.birthDateString());
 
-        this.userId = userId;
-        this.name = name;
-        this.email = email;
+        this.userId = userCreateInfo.userId();
+        this.name = userCreateInfo.name();
+        this.email = userCreateInfo.email();
         this.birthDate = birthDateTime;
     }
 
-    public static User create(UserCreateCommand userCreateCommand) {
-        return User.builder()
-                .userId(userCreateCommand.userId())
-                .name(userCreateCommand.name())
-                .email(userCreateCommand.email())
-                .birthDateString(userCreateCommand.birthDateString())
-                .build();
+    public static User create(UserCreateInfo userCreateInfo) {
+        return new User(userCreateInfo);
     }
 
     private void validateIdFormat(String id) {

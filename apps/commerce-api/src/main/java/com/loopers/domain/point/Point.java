@@ -3,7 +3,6 @@ package com.loopers.domain.point;
 import com.loopers.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,28 +14,42 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 public class Point extends BaseEntity {
 
-    private String userId;
+    private Long userId;
 
-    private Integer amount;
+    private Long balance;
 
-    private Point(String userId) {
+    private Point(Long userId) {
         this.userId = userId;
-        this.amount = 0;
+        this.balance = 0L;
     }
 
-    public static Point create(String userId) {
+    public static Point create(Long userId) {
         return new Point(userId);
     }
 
-    private void validateChargeAmount(Integer amount) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("0 이하의 포인트는 충전할 수 없습니다.");
+    public void charge(Long amount) {
+        validateChargeAmount(amount);
+        this.balance += amount;
+    }
+
+    private void validateChargeAmount(Long amount) {
+        if (amount < 100) {
+            throw new IllegalArgumentException("100 이상의 포인트를 충전할 수 있습니다.");
         }
     }
 
+    public void use(Long amount) {
+        validateUseAmount(amount);
+        this.balance -= amount;
+    }
 
-    public void charge(Integer amount) {
-        validateChargeAmount(amount);
-        this.amount += amount;
+    private void validateUseAmount(Long amount) {
+        if (amount < 100) {
+            throw new IllegalArgumentException("포인트는 100원 이상 사용할 수 있습니다.");
+        }
+
+        if (this.balance < amount) {
+            throw new IllegalArgumentException("포인트가 부족합니다.");
+        }
     }
 }

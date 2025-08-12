@@ -1,6 +1,9 @@
 package com.loopers.domain.product;
 
-import com.loopers.application.product.*;
+import com.loopers.application.product.ProductAppService;
+import com.loopers.application.product.ProductInfo;
+import com.loopers.application.product.ProductsCond;
+import com.loopers.application.product.ProductsInfo;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.brand.dto.command.BrandCreateCommand;
@@ -18,16 +21,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static com.loopers.application.product.ProductsSortType.LIKES_DESC;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 @SpringBootTest
-public class ProductServiceIntegrationTest {
+public class ProductAppServiceIntegrationTest {
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
     @Autowired
-    private ProductService productService;
+    private ProductAppService productAppService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -50,7 +53,7 @@ public class ProductServiceIntegrationTest {
         @Test
         void returnsEmptyListIfNoProductsFound() {
             // act
-            List<ProductsInfo> productsInfo = productService.getAll(new ProductsCond());
+            List<ProductsInfo> productsInfo = productAppService.getAll(new ProductsCond());
 
             // assert
             assertThat(productsInfo).isEmpty();
@@ -69,20 +72,18 @@ public class ProductServiceIntegrationTest {
                     "Test Product 1",
                     "http://example.com/product1.png",
                     "This is a test product 1.",
-                    10_000,
-                    10,
+                    10_000L,
                     saveBrand)));
 
             productRepository.save(Product.create(new ProductCreateCommand(
                     "Test Product 2",
                     "http://example.com/product2.png",
                     "This is a test product 2.",
-                    20_000,
-                    20,
+                    20_000L,
                     saveBrand)));
 
             // act
-            List<ProductsInfo> productsInfo = productService.getAll(new ProductsCond());
+            List<ProductsInfo> productsInfo = productAppService.getAll(new ProductsCond());
 
             // assert
             assertThat(productsInfo).hasSize(2)
@@ -106,8 +107,7 @@ public class ProductServiceIntegrationTest {
                     "Test Product 1",
                     "http://example.com/product1.png",
                     "This is a test product 1.",
-                    10_000,
-                    10,
+                    10_000L,
                     saveBrand)));
 
             ProductLikeCount productLikeCount1 = ProductLikeCount.create(saveProduct1);
@@ -119,8 +119,7 @@ public class ProductServiceIntegrationTest {
                     "Test Product 2",
                     "http://example.com/product2.png",
                     "This is a test product 2.",
-                    20_000,
-                    20,
+                    20_000L,
                     saveBrand)));
 
             ProductLikeCount productLikeCount2 = ProductLikeCount.create(saveProduct2);
@@ -130,7 +129,7 @@ public class ProductServiceIntegrationTest {
             saveProduct2.setProductLikeCount(saveLikeCount2);
 
             // act
-            List<ProductsInfo> productsInfo = productService.getAll(new ProductsCond(LIKES_DESC));
+            List<ProductsInfo> productsInfo = productAppService.getAll(new ProductsCond(LIKES_DESC));
 
             // assert
             assertThat(productsInfo).hasSize(2)
@@ -154,23 +153,21 @@ public class ProductServiceIntegrationTest {
                     "Test Product 1",
                     "http://example.com/product1.png",
                     "This is a test product 1.",
-                    10_000,
-                    10,
+                    10_000L,
                     saveBrand)));
 
             productRepository.save(Product.create(new ProductCreateCommand(
                     "Test Product 2",
                     "http://example.com/product2.png",
                     "This is a test product 2.",
-                    20_000,
-                    20,
+                    20_000L,
                     saveBrand)));
 
             String nonExistentBrandName = "notExistBrand";
             ProductsCond productsCond = new ProductsCond(nonExistentBrandName, null);
 
             // act
-            List<ProductsInfo> productsInfo = productService.getAll(productsCond);
+            List<ProductsInfo> productsInfo = productAppService.getAll(productsCond);
 
             // assert
             assertThat(productsInfo).isEmpty();
@@ -183,7 +180,7 @@ public class ProductServiceIntegrationTest {
             Long nonExistId = 999L;
 
             // act
-            ProductInfo productInfo = productService.getProduct(nonExistId);
+            ProductInfo productInfo = productAppService.getProduct(nonExistId);
 
             // assert
             assertThat(productInfo).isNull();
@@ -202,15 +199,14 @@ public class ProductServiceIntegrationTest {
                     "Test Product",
                     "http://example.com/product.png",
                     "This is a test product.",
-                    10_000,
-                    50,
+                    10_000L,
                     saveBrand)));
 
             ProductLikeCount saveLikeCount = productLikeCountRepository.save(ProductLikeCount.create(saveProduct));
             saveProduct.setProductLikeCount(saveLikeCount);
 
             // act
-            ProductInfo productInfo = productService.getProduct(saveProduct.getId());
+            ProductInfo productInfo = productAppService.getProduct(saveProduct.getId());
 
             // assert
             assertThat(productInfo.id()).isNotNull();
@@ -219,7 +215,7 @@ public class ProductServiceIntegrationTest {
             assertThat(productInfo.mainImageUrl()).isEqualTo(saveProduct.getMainImageUrl());
             assertThat(productInfo.description()).isEqualTo(saveProduct.getDescription());
             assertThat(productInfo.price()).isEqualTo(saveProduct.getPrice());
-            assertThat(productInfo.stockQuantity()).isEqualTo(saveProduct.getStockQuantity());
+            assertThat(productInfo.stockQuantity()).isEqualTo(saveProduct.getProductStock().getQuantity());
             assertThat(productInfo.likeCount()).isEqualTo(saveProduct.getProductLikeCount().getLikeCount());
         }
     }

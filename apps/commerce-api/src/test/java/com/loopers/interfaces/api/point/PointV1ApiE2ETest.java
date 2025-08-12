@@ -4,7 +4,7 @@ import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.command.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.user.UserV1Dto;
 import com.loopers.utils.DatabaseCleanUp;
@@ -31,19 +31,19 @@ class PointV1ApiE2ETest {
     private static final Function<String, String> ENDPOINT_GET = id -> "/api/v1/points";
 
     private final TestRestTemplate testRestTemplate;
-    private final UserRepository brandRepository;
+    private final UserRepository userRepository;
     private final PointRepository pointRepository;
     private final DatabaseCleanUp databaseCleanUp;
 
     @Autowired
     public PointV1ApiE2ETest(
         TestRestTemplate testRestTemplate,
-        UserRepository brandRepository,
+        UserRepository userRepository,
         PointRepository pointRepository,
         DatabaseCleanUp databaseCleanUp
     ) {
         this.testRestTemplate = testRestTemplate;
-        this.brandRepository = brandRepository;
+        this.userRepository = userRepository;
         this.pointRepository = pointRepository;
         this.databaseCleanUp = databaseCleanUp;
     }
@@ -61,15 +61,15 @@ class PointV1ApiE2ETest {
         void returnsTotalPointsAfterSuccessfulCharge() {
             // arrange
             String userId = "user1234";
-            UserCreateCommand userCreateCommand = new UserCreateCommand(
+            UserCreateInfo userCreateInfo = new UserCreateInfo(
                     userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            brandRepository.save(User.create(userCreateCommand));
+            userRepository.save(User.create(userCreateInfo));
 
-            Integer amount = 10_000;
+            Long amount = 10_000L;
             PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(amount);
 
             String requestUrl = ENDPOINT_CREATE;
@@ -97,7 +97,7 @@ class PointV1ApiE2ETest {
             // arrange
             String userId = "invalidUserId";
 
-            Integer amount = 10_000;
+            Long amount = 10_000L;
             PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(amount);
 
             String requestUrl = ENDPOINT_CREATE;
@@ -125,16 +125,16 @@ class PointV1ApiE2ETest {
         void returnsUserPointsOnSuccessfulRetrieval() {
             // arrange
             String userId = "user1234";
-            UserCreateCommand userCreateCommand = new UserCreateCommand(
+            UserCreateInfo userCreateInfo = new UserCreateInfo(
                     userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            brandRepository.save(User.create(userCreateCommand));
+            User saveUser = userRepository.save(User.create(userCreateInfo));
 
-            Point point = Point.create(userId);
-            point.charge(10_000);
+            Point point = Point.create(saveUser.getId());
+            point.charge(10_000L);
             pointRepository.save(point);
 
             String requestUrl = ENDPOINT_GET.apply(userId);
@@ -151,8 +151,8 @@ class PointV1ApiE2ETest {
             // assert
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateCommand.userId()),
-                    () -> assertThat(response.getBody().data().amount()).isEqualTo(point.getAmount())
+                    () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateInfo.userId()),
+                    () -> assertThat(response.getBody().data().amount()).isEqualTo(point.getBalance())
             );
         }
 

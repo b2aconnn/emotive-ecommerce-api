@@ -5,7 +5,7 @@ import com.loopers.domain.product.Product;
 public record ProductInfo(Long id,
                           String brandName,
                           String productName,
-                          Integer price,
+                          Long price,
                           String mainImageUrl,
                           String description,
                           Integer stockQuantity,
@@ -18,7 +18,7 @@ public record ProductInfo(Long id,
             product.getPrice(),
             product.getMainImageUrl(),
             product.getDescription(),
-            product.getStockQuantity(),
+            product.getProductStock().getQuantity(),
             product.getProductLikeCount().getLikeCount()
         );
     }

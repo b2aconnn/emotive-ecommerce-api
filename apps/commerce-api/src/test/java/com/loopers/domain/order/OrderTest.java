@@ -8,7 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 import static com.loopers.domain.order.OrderStatus.CREATED;
@@ -19,20 +18,6 @@ public class OrderTest {
     @DisplayName("주문을 생성할 때, ")
     @Nested
     class Create {
-        @DisplayName("주문 상품이 없는 경우 주문 생성이 실패한다.")
-        @Test
-        void createOrderWithoutProducts() {
-            // act
-            // assert
-            assertThatThrownBy(() -> Order.create(new OrderCreateInfo(
-                    1L,
-                    "홍길동",
-                    "서울시 강남구",
-                    "010-1234-5678",
-                    List.of())))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
         @DisplayName("주문한 사용자 정보가 누락된 경우 주문 생성이 실패한다.")
         @Test
         void createOrderWithMissingUserInfo() {
@@ -42,8 +27,7 @@ public class OrderTest {
                     null,
                     "홍길동",
                     "서울시 강남구",
-                    "010-1234-5678",
-                    List.of())))
+                    "010-1234-5678")))
                     .isInstanceOf(NullPointerException.class);
         }
 
@@ -62,17 +46,13 @@ public class OrderTest {
         @MethodSource("invalidOrderParameters")
         @ParameterizedTest
         void createOrderWithMissingUserInfo(Long userId, String userName, String deliveryAddress, String contactNumber) {
-            // arrange
-            List<OrderItem> orderItems = List.of(new OrderItem());
-
             // act
             // assert
             assertThatThrownBy(() -> Order.create(new OrderCreateInfo(
                     userId,
                     userName,
                     deliveryAddress,
-                    contactNumber,
-                    orderItems
+                    contactNumber
             ))).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -92,8 +72,7 @@ public class OrderTest {
                     userId,
                     userName,
                     deliveryAddress,
-                    contactNumber,
-                    List.of(new OrderItem())
+                    contactNumber
             ));
 
             // assert

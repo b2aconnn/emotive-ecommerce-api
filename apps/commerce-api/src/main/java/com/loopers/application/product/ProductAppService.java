@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class ProductService {
+public class ProductAppService {
     private final ProductRepository productRepository;
 
     public ProductInfo getProduct(Long id) {

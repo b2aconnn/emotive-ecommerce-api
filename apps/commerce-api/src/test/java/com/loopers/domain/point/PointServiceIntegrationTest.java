@@ -4,7 +4,7 @@ import com.loopers.application.point.PointFacade;
 import com.loopers.application.point.PointInfo;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.command.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
 import com.loopers.utils.DatabaseCleanUp;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
@@ -47,7 +47,7 @@ class PointServiceIntegrationTest {
         void failsWhenChargingPointsToNonExistentUser() {
             // arrange
             String userId = "user1234";
-            Integer point = 10_000;
+            Long point = 10_000L;
 
             // act
             // assert
@@ -64,16 +64,16 @@ class PointServiceIntegrationTest {
         void returnsUserPointsWhenUserExists() {
             // arrange
             String userId = "user1234";
-            UserCreateCommand userCreateCommand = new UserCreateCommand(
+            UserCreateInfo userCreateInfo = new UserCreateInfo(
                     userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateCommand));
+            User saveUser = userRepository.save(User.create(userCreateInfo));
 
-            Point point = Point.create(userId);
-            point.charge(10_000);
+            Point point = Point.create(saveUser.getId());
+            point.charge(10_000L);
             pointRepository.save(point);
 
             // act
@@ -83,7 +83,7 @@ class PointServiceIntegrationTest {
             assertAll(
                 () -> assertThat(pointInfo).isNotNull(),
                 () -> assertThat(pointInfo.id()).isNotNull(),
-                () -> assertThat(pointInfo.userId()).isEqualTo(userCreateCommand.userId()),
+                () -> assertThat(pointInfo.userId()).isEqualTo(userCreateInfo.userId()),
                 () -> assertThat(pointInfo.amount()).isEqualTo(10_000)
             );
         }

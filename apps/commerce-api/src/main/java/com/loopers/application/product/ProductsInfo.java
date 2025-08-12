@@ -5,7 +5,7 @@ import com.loopers.domain.product.Product;
 public record ProductsInfo(Long id,
                            String productName,
                            String brandName,
-                           Integer price,
+                           Long price,
                            String mainImageUrl) {
     public static ProductsInfo from(Product product) {
         return new ProductsInfo(

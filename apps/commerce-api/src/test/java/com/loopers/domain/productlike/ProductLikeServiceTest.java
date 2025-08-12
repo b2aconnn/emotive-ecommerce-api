@@ -5,7 +5,7 @@ import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.dto.command.ProductCreateCommand;
 import com.loopers.domain.user.User;
-import com.loopers.domain.user.dto.command.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,13 +35,13 @@ public class ProductLikeServiceTest {
     @DisplayName("특정 사용자는 좋아요를 하지 않은 하나의 상품에 대해 좋아요를 할 수 있다.")
     void userCanLikeProductOnce() {
         // arrange
-        UserCreateCommand userCreateCommand = new UserCreateCommand(
+        UserCreateInfo userCreateInfo = new UserCreateInfo(
                 "user1234",
                 "park",
                 "user@domain.com",
                 "2000-01-01",
                 MALE);
-        User user = User.create(userCreateCommand);
+        User user = User.create(userCreateInfo);
 
         Brand brand = Brand.create(new BrandCreateCommand(
                 "Test Brand",
@@ -52,8 +52,7 @@ public class ProductLikeServiceTest {
                 "Test Product 1",
                 "http://example.com/product1.png",
                 "This is a test product 1.",
-                10_000,
-                10,
+                10_000L,
                 brand));
 
         when(productLikeRepository.hasUserLikedProduct(user.getId(), product.getId())).thenReturn(false);
@@ -79,13 +78,13 @@ public class ProductLikeServiceTest {
     @DisplayName("특정 사용자는 좋아요를 한 하나의 상품에 대해 다시 좋아요를 할 수 없다.")
     void userCannotLikeProductTwice() {
         // arrange
-        UserCreateCommand userCreateCommand = new UserCreateCommand(
+        UserCreateInfo userCreateInfo = new UserCreateInfo(
                 "user1234",
                 "park",
                 "user@domain.com",
                 "2000-01-01",
                 MALE);
-        User user = User.create(userCreateCommand);
+        User user = User.create(userCreateInfo);
 
         Brand brand = Brand.create(new BrandCreateCommand(
                 "Test Brand",
@@ -96,8 +95,7 @@ public class ProductLikeServiceTest {
                 "Test Product 1",
                 "http://example.com/product1.png",
                 "This is a test product 1.",
-                10_000,
-                10,
+                10_000L,
                 brand));
 
         when(productLikeRepository.hasUserLikedProduct(user.getId(), product.getId())).thenReturn(true);
@@ -115,13 +113,13 @@ public class ProductLikeServiceTest {
     @DisplayName("특정 사용자는 좋아요를 한 하나의 상품에 대해 좋아요를 취소할 수 있다.")
     void userCanUnlikeProduct() {
         // arrange
-        UserCreateCommand userCreateCommand = new UserCreateCommand(
+        UserCreateInfo userCreateInfo = new UserCreateInfo(
                 "user1234",
                 "park",
                 "user@domain.com",
                 "2000-01-01",
                 MALE);
-        User user = User.create(userCreateCommand);
+        User user = User.create(userCreateInfo);
 
         Brand brand = Brand.create(new BrandCreateCommand(
                 "Test Brand",
@@ -132,8 +130,7 @@ public class ProductLikeServiceTest {
                 "Test Product 1",
                 "http://example.com/product1.png",
                 "This is a test product 1.",
-                10_000,
-                10,
+                10_000L,
                 brand));
 
         // arrange
@@ -158,13 +155,13 @@ public class ProductLikeServiceTest {
     @DisplayName("특정 사용자는 좋아요를 취소하지 않은 하나의 상품에 대해 좋아요를 취소할 수 없다.")
     void userCannotUnlikeProductIfNotLiked() {
         // arrange
-        UserCreateCommand userCreateCommand = new UserCreateCommand(
+        UserCreateInfo userCreateInfo = new UserCreateInfo(
                 "user1234",
                 "park",
                 "user@domain.com",
                 "2000-01-01",
                 MALE);
-        User user = User.create(userCreateCommand);
+        User user = User.create(userCreateInfo);
 
         Brand brand = Brand.create(new BrandCreateCommand(
                 "Test Brand",
@@ -175,8 +172,7 @@ public class ProductLikeServiceTest {
                 "Test Product 1",
                 "http://example.com/product1.png",
                 "This is a test product 1.",
-                10_000,
-                10,
+                10_000L,
                 brand));
 
         ProductLikeCount spyProductLikeCount = spy(ProductLikeCount.class);

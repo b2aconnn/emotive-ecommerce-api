@@ -5,7 +5,7 @@ import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.command.UserCreateCommand;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.point.PointV1Dto;
 import com.loopers.utils.DatabaseCleanUp;
@@ -61,13 +61,13 @@ class BrandV1ApiE2ETest {
         void returnsBrandInfoOnSuccessfulRetrievalOfBrandInfo() {
             // arrange
             String userId = "user1234";
-            UserCreateCommand userCreateCommand = new UserCreateCommand(
+            UserCreateInfo userCreateInfo = new UserCreateInfo(
                     userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateCommand));
+            userRepository.save(User.create(userCreateInfo));
 
             String brandName = "Test Brand";
             String logoUrl = "http://example.com/logo.png";
@@ -103,13 +103,13 @@ class BrandV1ApiE2ETest {
         void returnsNotFoundResponseWhenIdDoesNotExist() {
             // arrange
             String userId = "user1234";
-            UserCreateCommand userCreateCommand = new UserCreateCommand(
+            UserCreateInfo userCreateInfo = new UserCreateInfo(
                     userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateCommand));
+            userRepository.save(User.create(userCreateInfo));
 
             Long brandId = 999L;
 

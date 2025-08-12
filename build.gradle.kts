@@ -67,6 +67,8 @@ subprojects {
         testImplementation("org.springframework.boot:spring-boot-testcontainers")
         testImplementation("org.testcontainers:testcontainers")
         testImplementation("org.testcontainers:junit-jupiter")
+        // fixture-monkey
+        testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.14")
     }
 
     tasks.withType(Jar::class) { enabled = true }

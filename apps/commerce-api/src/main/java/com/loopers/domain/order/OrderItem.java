@@ -8,6 +8,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
@@ -17,25 +18,26 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "order_item")
 @Entity
 public class OrderItem extends BaseEntity {
+    @Setter
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "order_id")
     private Order order;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "product_id")
     private Product product;
 
-    private Integer quantity;
-    private Integer price;
+    private Long quantity;
+    private Long totalPrice;
 
-    private OrderItem(Order order, Product product, Integer quantity, Integer price) {
+    private OrderItem(Order order, Product product, Long quantity, Long totalPrice) {
         this.order = order;
         this.product = product;
         this.quantity = quantity;
-        this.price = price;
+        this.totalPrice = totalPrice;
     }
 
-    public static OrderItem create(Order order, Product product, Integer quantity, Integer price) {
-        return new OrderItem(order, product, quantity, price);
+    public static OrderItem create(Order order, Product product, Long quantity, Long totalPrice) {
+        return new OrderItem(order, product, quantity, totalPrice);
     }
 }

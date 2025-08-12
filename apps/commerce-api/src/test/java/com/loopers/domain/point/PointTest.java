@@ -11,12 +11,12 @@ class PointTest {
     @DisplayName("포인트를 충전할 때, ")
     @Nested
     class Create {
-        @ValueSource(ints = {0, -1, -1000})
+        @ValueSource(longs = {99L, -1L, -1000L})
         @ParameterizedTest
-        @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
-        void failsWhenChargingWithZeroOrNegativePoints(Integer amount) {
+        @DisplayName("100 미만의 정수로 포인트를 충전 시 실패한다.")
+        void failsWhenChargingWithZeroOrNegativePoints(Long amount) {
             // arrange
-            String userId = "abcd1234";
+            Long userId = 1L;
             Point point = Point.create(userId);
 
             // assert

@@ -6,7 +6,6 @@ public record ProductCreateCommand(
         String name,
         String mainImageUrl,
         String description,
-        Integer price,
-        Integer stockQuantity,
+        Long price,
         Brand brand
 ) {}

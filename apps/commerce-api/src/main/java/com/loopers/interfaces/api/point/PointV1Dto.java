@@ -6,10 +6,10 @@ import jakarta.validation.constraints.NotNull;
 public class PointV1Dto {
     public record ChargeRequest(
         @NotNull(message = "충전할 포인트 금액을 입력해주세요.")
-        Integer amount
+        Long amount
     ) {}
 
-    public record ChargeResponse(Integer amount) {
+    public record ChargeResponse(Long amount) {
         public static ChargeResponse from(PointInfo info) {
             return new ChargeResponse(
                     info.amount()
@@ -17,8 +17,8 @@ public class PointV1Dto {
         }
     }
 
-    public record InfoResponse(String userId,
-                               Integer amount) {
+    public record InfoResponse(Long userId,
+                               Long amount) {
         public static InfoResponse from(PointInfo info) {
             return new InfoResponse(
                     info.userId(),
