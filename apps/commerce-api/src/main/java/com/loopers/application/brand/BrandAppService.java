@@ -9,12 +9,12 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class BrandFacade {
+public class BrandAppService {
 
     private final BrandRepository brandRepository;
 
-    public BrandInfo getBrand(Long brandId) {
+    public BrandResult getBrand(Long brandId) {
         Optional<Brand> brandOptional = brandRepository.findById(brandId);
-        return brandOptional.map(BrandInfo::from).orElse(null);
+        return brandOptional.map(BrandResult::from).orElse(null);
     }
 }

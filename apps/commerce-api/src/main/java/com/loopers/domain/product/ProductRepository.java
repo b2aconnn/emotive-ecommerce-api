@@ -1,7 +1,7 @@
 package com.loopers.domain.product;
 
 
-import com.loopers.application.product.ProductsCond;
+import com.loopers.application.product.ProductsCondition;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface ProductRepository {
     Product save(Product brand);
 
-    List<Product> findAll(ProductsCond productsCond);
+    List<Product> findAll(ProductsCondition productsCondition);
     Optional<Product> findById(Long id);
     Optional<List<Product>> findByIds(List<Long> id);
 }

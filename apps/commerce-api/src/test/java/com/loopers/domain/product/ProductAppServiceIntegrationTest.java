@@ -1,9 +1,9 @@
 package com.loopers.domain.product;
 
 import com.loopers.application.product.ProductAppService;
-import com.loopers.application.product.ProductInfo;
-import com.loopers.application.product.ProductsCond;
-import com.loopers.application.product.ProductsInfo;
+import com.loopers.application.product.ProductResult;
+import com.loopers.application.product.ProductsCondition;
+import com.loopers.application.product.ProductsResult;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.brand.dto.command.BrandCreateCommand;
@@ -53,10 +53,10 @@ public class ProductAppServiceIntegrationTest {
         @Test
         void returnsEmptyListIfNoProductsFound() {
             // act
-            List<ProductsInfo> productsInfo = productAppService.getAll(new ProductsCond());
+            List<ProductsResult> productsResult = productAppService.getAll(new ProductsCondition());
 
             // assert
-            assertThat(productsInfo).isEmpty();
+            assertThat(productsResult).isEmpty();
         }
 
         @DisplayName("검색어 없이 모든 상품 목록이 최신순으로 조회된다.")
@@ -83,10 +83,10 @@ public class ProductAppServiceIntegrationTest {
                     saveBrand)));
 
             // act
-            List<ProductsInfo> productsInfo = productAppService.getAll(new ProductsCond());
+            List<ProductsResult> productsResult = productAppService.getAll(new ProductsCondition());
 
             // assert
-            assertThat(productsInfo).hasSize(2)
+            assertThat(productsResult).hasSize(2)
                     .extracting("productName", "brandName", "price", "mainImageUrl")
                     .containsExactlyInAnyOrder(
                             tuple("Test Product 1", "Test Brand", 10_000, "http://example.com/product1.png"),
@@ -129,10 +129,10 @@ public class ProductAppServiceIntegrationTest {
             saveProduct2.setProductLikeCount(saveLikeCount2);
 
             // act
-            List<ProductsInfo> productsInfo = productAppService.getAll(new ProductsCond(LIKES_DESC));
+            List<ProductsResult> productsResult = productAppService.getAll(new ProductsCondition(LIKES_DESC));
 
             // assert
-            assertThat(productsInfo).hasSize(2)
+            assertThat(productsResult).hasSize(2)
                     .extracting("productName", "brandName", "price", "mainImageUrl")
                     .containsExactly(
                             tuple("Test Product 2", "Test Brand", 20_000, "http://example.com/product2.png"),
@@ -163,14 +163,14 @@ public class ProductAppServiceIntegrationTest {
                     20_000L,
                     saveBrand)));
 
-            String nonExistentBrandName = "notExistBrand";
-            ProductsCond productsCond = new ProductsCond(nonExistentBrandName, null);
+            Long brandId = 1L;
+            ProductsCondition productsCondition = new ProductsCondition(brandId);
 
             // act
-            List<ProductsInfo> productsInfo = productAppService.getAll(productsCond);
+            List<ProductsResult> productsResult = productAppService.getAll(productsCondition);
 
             // assert
-            assertThat(productsInfo).isEmpty();
+            assertThat(productsResult).isEmpty();
         }
 
         @DisplayName("상품이 존재하지 않은 경우, null이 반환된다.")
@@ -180,10 +180,10 @@ public class ProductAppServiceIntegrationTest {
             Long nonExistId = 999L;
 
             // act
-            ProductInfo productInfo = productAppService.getProduct(nonExistId);
+            ProductResult productResult = productAppService.getProduct(nonExistId);
 
             // assert
-            assertThat(productInfo).isNull();
+            assertThat(productResult).isNull();
         }
 
         @DisplayName("해당 ID 의 상품이 존재할 경우, 상품 정보가 반환된다.")
@@ -206,17 +206,17 @@ public class ProductAppServiceIntegrationTest {
             saveProduct.setProductLikeCount(saveLikeCount);
 
             // act
-            ProductInfo productInfo = productAppService.getProduct(saveProduct.getId());
+            ProductResult productResult = productAppService.getProduct(saveProduct.getId());
 
             // assert
-            assertThat(productInfo.id()).isNotNull();
-            assertThat(productInfo.brandName()).isEqualTo(saveProduct.getBrand().getName());
-            assertThat(productInfo.productName()).isEqualTo(saveProduct.getName());
-            assertThat(productInfo.mainImageUrl()).isEqualTo(saveProduct.getMainImageUrl());
-            assertThat(productInfo.description()).isEqualTo(saveProduct.getDescription());
-            assertThat(productInfo.price()).isEqualTo(saveProduct.getPrice());
-            assertThat(productInfo.stockQuantity()).isEqualTo(saveProduct.getProductStock().getQuantity());
-            assertThat(productInfo.likeCount()).isEqualTo(saveProduct.getProductLikeCount().getLikeCount());
+            assertThat(productResult.id()).isNotNull();
+            assertThat(productResult.brandName()).isEqualTo(saveProduct.getBrand().getName());
+            assertThat(productResult.productName()).isEqualTo(saveProduct.getName());
+            assertThat(productResult.mainImageUrl()).isEqualTo(saveProduct.getMainImageUrl());
+            assertThat(productResult.description()).isEqualTo(saveProduct.getDescription());
+            assertThat(productResult.price()).isEqualTo(saveProduct.getPrice());
+            assertThat(productResult.stockQuantity()).isEqualTo(saveProduct.getProductStock().getQuantity());
+            assertThat(productResult.likeCount()).isEqualTo(saveProduct.getProductLikeCount().getLikeCount());
         }
     }
 }

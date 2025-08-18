@@ -1,7 +1,7 @@
 package com.loopers.domain.brand;
 
-import com.loopers.application.brand.BrandFacade;
-import com.loopers.application.brand.BrandInfo;
+import com.loopers.application.brand.BrandAppService;
+import com.loopers.application.brand.BrandResult;
 import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BrandServiceIntegrationTest {
 
     @Autowired
-    private BrandFacade brandFacade;
+    private BrandAppService brandAppService;
     @Autowired
     private BrandRepository brandRepository;
 
@@ -29,10 +29,10 @@ public class BrandServiceIntegrationTest {
             Long nonExistentBrandId = 999L;
 
             // act
-            BrandInfo brandInfo = brandFacade.getBrand(nonExistentBrandId);
+            BrandResult brandResult = brandAppService.getBrand(nonExistentBrandId);
 
             // assert
-            assertThat(brandInfo).isNull();
+            assertThat(brandResult).isNull();
         }
 
         @DisplayName("해당 ID 의 브랜드가 존재할 경우, 브랜드 정보가 반환된다.")
@@ -47,13 +47,13 @@ public class BrandServiceIntegrationTest {
             Brand saveBrand = brandRepository.save(Brand.create(brandCreateCommand));
 
             // act
-            BrandInfo brandInfo = brandFacade.getBrand(saveBrand.getId());
+            BrandResult brandResult = brandAppService.getBrand(saveBrand.getId());
 
             // assert
-            assertThat(brandInfo.id()).isNotNull();
-            assertThat(brandInfo.brandName()).isEqualTo(saveBrand.getName());
-            assertThat(brandInfo.logoUrl()).isEqualTo(saveBrand.getLogoUrl());
-            assertThat(brandInfo.description()).isEqualTo(saveBrand.getDescription());
+            assertThat(brandResult.id()).isNotNull();
+            assertThat(brandResult.brandName()).isEqualTo(saveBrand.getName());
+            assertThat(brandResult.logoUrl()).isEqualTo(saveBrand.getLogoUrl());
+            assertThat(brandResult.description()).isEqualTo(saveBrand.getDescription());
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.loopers.infrastructure.product.jpa;
 
-import com.loopers.application.product.ProductsCond;
+import com.loopers.application.product.ProductsCondition;
 import com.loopers.application.product.ProductsSortType;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
@@ -11,10 +11,14 @@ import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
+import static com.loopers.domain.brand.QBrand.brand;
 import static com.loopers.domain.product.QProduct.product;
+import static com.loopers.domain.product.QProductStock.productStock;
+import static com.loopers.domain.productlike.QProductLikeCount.productLikeCount;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNullElse;
 import static org.springframework.util.StringUtils.hasText;
 
 @Component
@@ -36,13 +40,17 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public List<Product> findAll(ProductsCond condition) {
+    public List<Product> findAll(ProductsCondition condition) {
         return queryFactory.select(product)
                 .from(product)
-                .where(searchKeywordContains(condition.searchKeyword()))
+                .leftJoin(product.brand, brand).fetchJoin()
+                .where(
+                    brandIdEq(condition.brandId()),
+                    searchKeywordContains(condition.searchKeyword())
+                )
                 .orderBy(createOrderSpecifiers(condition.sortBy()))
-                .offset(condition.pageCond().offset())
-                .limit(condition.pageCond().count())
+                .offset(0)
+                .limit(20)
                 .fetch();
     }
 
@@ -50,8 +58,12 @@ public class ProductRepositoryImpl implements ProductRepository {
         return hasText(searchKeyword) ? product.name.containsIgnoreCase(searchKeyword) : null;
     }
 
+    private BooleanExpression brandIdEq(Long brandId) {
+        return nonNull(brandId) ? brand.id.eq(brandId) : null;
+    }
+
     public OrderSpecifier<?> createOrderSpecifiers(ProductsSortType sortType) {
-        sortType = Objects.requireNonNullElse(sortType, ProductsSortType.LASTEST);
+        sortType = requireNonNullElse(sortType, ProductsSortType.LASTEST);
 
         return switch (sortType) {
             case LASTEST -> product.createdAt.desc();
@@ -62,7 +74,13 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public Optional<Product> findById(Long id) {
-        return productJpaRepository.findById(id);
+        return Optional.ofNullable(queryFactory.select(product)
+                .from(product)
+                .leftJoin(product.brand, brand).fetchJoin()
+                .leftJoin(product.productLikeCount, productLikeCount).fetchJoin()
+                .leftJoin(product.productStock, productStock).fetchJoin()
+                .where(product.id.eq(id))
+                .fetchOne());
     }
 
     @Override
