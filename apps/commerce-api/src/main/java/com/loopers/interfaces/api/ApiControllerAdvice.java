@@ -129,4 +129,13 @@ public class ApiControllerAdvice {
         return ResponseEntity.status(errorType.getStatus())
             .body(ApiResponse.fail(errorType.getCode(), errorMessage != null ? errorMessage : errorType.getMessage()));
     }
+
+    @ExceptionHandler({
+            IllegalArgumentException.class,
+            IllegalStateException.class
+    })
+    public ResponseEntity<ApiResponse<?>> handleBadRequest(RuntimeException e) {
+        log.warn("RuntimeException: {}", e.getMessage(), e);
+        return failureResponse(ErrorType.BAD_REQUEST, e.getMessage());
+    }
 }

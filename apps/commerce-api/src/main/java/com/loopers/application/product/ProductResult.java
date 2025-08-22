@@ -10,7 +10,7 @@ public record ProductResult(Long id,
                             Long price,
                             String mainImageUrl,
                             String description,
-                            Integer stockQuantity,
+                            Long stockQuantity,
                             Integer likeCount) implements Serializable {
     public static ProductResult from(Product product) {
         return new ProductResult(

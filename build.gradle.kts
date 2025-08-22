@@ -69,6 +69,8 @@ subprojects {
         testImplementation("org.testcontainers:junit-jupiter")
         // fixture-monkey
         testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.14")
+        // spring cloud openfeign.
+        implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     }
 
     tasks.withType(Jar::class) { enabled = true }

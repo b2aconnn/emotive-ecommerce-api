@@ -12,8 +12,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.loopers.domain.order.OrderStatus.COMPLETED;
-import static com.loopers.domain.order.OrderStatus.CREATED;
+import static com.loopers.domain.order.OrderStatus.*;
 import static com.loopers.support.validation.TextValidator.requireText;
 import static jakarta.persistence.EnumType.STRING;
 import static java.util.Objects.requireNonNull;
@@ -24,7 +23,10 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "orders")
 @Entity
 public class Order extends BaseEntity {
+
     private Long userId;
+
+    private Long paymentId;
 
     private String orderer;
 
@@ -75,18 +77,33 @@ public class Order extends BaseEntity {
         }
     }
 
+    public void pending() {
+        if (!checkCreateStatus()) {
+            throw new IllegalStateException("주문이 생성되지 않았습니다. 먼저 주문을 생성해주세요.");
+        }
+        this.status = PENDING;
+    }
+
     public void complete() {
-        validateCreateStatus();
+        if (!checkCreateStatus() && !checkPendingStatus()) {
+            return;
+        }
         this.status = COMPLETED;
     }
 
-    private void validateCreateStatus() {
-        if (this.status != CREATED) {
-            throw new IllegalStateException("주문이 생성되지 않았습니다.");
-        }
+    private boolean checkCreateStatus() {
+        return this.status == CREATED;
     }
 
-    public void setTotalAmount(Long totalAmount) {
+    private boolean checkPendingStatus() {
+        return this.status == PENDING;
+    }
+
+    public void updateTotalAmount(Long totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public void updateOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 }

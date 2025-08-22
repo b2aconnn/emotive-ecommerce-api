@@ -26,14 +26,14 @@ public class ProductStockRepositoryImpl implements ProductStockRepository {
     public ProductStock save(ProductStock productStock) {
         return stockJpaRepository.save(productStock);
     }
+
     @Override
     public Optional<ProductStock> findById(Long id) {
         return stockJpaRepository.findById(id);
     }
 
     @Override
-    public List<ProductStock> findStocks(List<Long> ids) {
-        return stockJpaRepository.findByIdIn(ids)
-                .orElse(List.of());
+    public Optional<List<ProductStock>> findByProductIdsWithLock(List<Long> ids) {
+        return stockJpaRepository.findByProductIdsWithLock(ids);
     }
 }

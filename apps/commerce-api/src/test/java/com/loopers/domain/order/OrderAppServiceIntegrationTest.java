@@ -3,6 +3,7 @@ package com.loopers.domain.order;
 import com.loopers.application.order.OrderAppService;
 import com.loopers.application.order.dto.OrderCreateCommand;
 import com.loopers.application.order.dto.OrderLineItem;
+import com.loopers.domain.payment.PaymentMethod;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.Product;
@@ -78,7 +79,11 @@ public class OrderAppServiceIntegrationTest {
                     "seoul gangnam",
                     "010-0000-0000",
                     List.of(new OrderLineItem(saveProduct.getId(), 1L)),
-                    100L));
+                    100L,
+
+                    PaymentMethod.CARD,
+                    null,
+                    null));
 
             // then
             assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);

@@ -22,8 +22,12 @@ public class UserAuthenticationInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
         String userIdHeader = request.getHeader("X-USER-ID");
 
-        if (validateUserIdHeader(response, userIdHeader)) return false;
-        if (rejectIfUserNotFound(response, userIdHeader)) return false;
+        if (validateUserIdHeader(response, userIdHeader)) {
+            return false;
+        }
+        if (rejectIfUserNotFound(response, userIdHeader)) {
+            return false;
+        }
 
         return true;
     }

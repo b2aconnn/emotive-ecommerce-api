@@ -5,6 +5,7 @@ import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.dto.command.ProductCreateCommand;
 import com.loopers.domain.productlike.ProductLikeCount;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Getter
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor(access = PROTECTED)
 @Table(name = "product")
 @Entity

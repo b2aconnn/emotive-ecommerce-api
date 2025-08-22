@@ -7,6 +7,5 @@ import java.util.Optional;
 public interface ProductStockRepository {
     ProductStock save(ProductStock brand);
     Optional<ProductStock> findById(Long id);
-
-    List<ProductStock> findStocks(List<Long> ids);
+    Optional<List<ProductStock>> findByProductIdsWithLock(List<Long> ids);
 }

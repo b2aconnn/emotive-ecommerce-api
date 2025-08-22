@@ -1,7 +1,6 @@
 package com.loopers.domain.product;
 
-import com.loopers.domain.product.dto.command.ProductStocksDeductCommand;
-import jakarta.persistence.EntityNotFoundException;
+import com.loopers.domain.order.OrderItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,26 +14,34 @@ import java.util.stream.Collectors;
 public class ProductStockService {
     private final ProductStockRepository productStockRepository;
 
-    public void deductStocks(List<ProductStocksDeductCommand> stocksDeductCommand) {
-        List<Long> productIds = stocksDeductCommand.stream()
-                .map(e -> e.product().getId()).toList();
+    public Map<Product, ProductStock> reserveProducts(List<OrderItem> orderItems) {
+        List<Long> productIds = orderItems.stream().map(e -> e.getProduct().getId()).toList();
 
-        Map<Long, ProductStock> productStockMap = productStockRepository.findStocks(productIds)
+        Map<Product, ProductStock> productStocksMap = productStockRepository.findByProductIdsWithLock(productIds)
+                .orElseThrow(() -> new IllegalStateException("상품이 존재하지 않거나 재고가 없습니다."))
                 .stream()
-                .collect(Collectors.toMap(e -> e.getProduct().getId(), Function.identity()));
+                .collect(Collectors.toMap(ProductStock::getProduct, Function.identity()));
 
-
-        stocksDeductCommand.forEach(command -> {
-            deductStock(command, productStockMap);
-        });
-    }
-
-    private void deductStock(ProductStocksDeductCommand command, Map<Long, ProductStock> productStockMap) {
-        ProductStock productStock = productStockMap.get(command.product().getId());
-        if (productStock == null) {
-            throw new EntityNotFoundException("상품 재고가 없습니다.");
+        for (OrderItem orderItem : orderItems) {
+            validateStockEnough(productStocksMap, orderItem);
         }
 
-        productStock.deduct(command.quantity());
+        return productStocksMap;
+    }
+
+    private void validateStockEnough(Map<Product, ProductStock> productStocksMap, OrderItem orderItem) {
+        ProductStock productStock = productStocksMap.get(orderItem.getProduct());
+        if (productStock == null) {
+            throw new IllegalArgumentException("상품 재고가 없습니다.");
+        }
+
+        productStock.validateStockEnough(orderItem.getQuantity());
+    }
+
+    public void deductStocks(List<OrderItem> orderItems, Map<Product, ProductStock> productStocksMap) {
+        for (OrderItem orderItem : orderItems) {
+            ProductStock productStock = productStocksMap.get(orderItem.getProduct());
+            productStock.deduct(orderItem.getQuantity());
+        }
     }
 }

@@ -1,6 +1,8 @@
 package com.loopers.domain.order;
 
 public enum PaymentStatus {
-    COMPLETE,
-    FAILED
+    REQUESTED,
+    SUCCESS,
+    FAILED,
+    CANCELED
 }

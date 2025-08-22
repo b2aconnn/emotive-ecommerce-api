@@ -6,13 +6,15 @@ import java.util.List;
 
 @Component
 public class OrderCalculator {
-    public Long calculateTotalAmount(List<OrderItem> orderItems) {
+    public Long calculateTotalAmount(List<OrderItem> orderItems, Long usePoint) {
         if (orderItems == null || orderItems.isEmpty()) {
             return 0L;
         }
 
-        return orderItems.stream()
+        long oderItemsTotalPrice = orderItems.stream()
                 .mapToLong(OrderItem::getTotalPrice)
                 .sum();
+
+        return oderItemsTotalPrice - usePoint;
     }
 }

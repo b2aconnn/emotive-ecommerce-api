@@ -2,7 +2,10 @@ package com.loopers.application.order.dto;
 
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.dto.OrderCreateInfo;
-import com.loopers.domain.product.dto.command.ProductQuantityCommand;
+import com.loopers.domain.payment.PaymentMethod;
+import com.loopers.domain.payment.dto.CardType;
+import com.loopers.domain.payment.dto.PaymentRequest;
+import com.loopers.domain.payment.generator.PgIdGenerator;
 
 import java.util.List;
 
@@ -12,7 +15,11 @@ public record OrderCreateCommand(
     String deliveryAddress,
     String contactNumber,
     List<OrderLineItem> items,
-    Long availablePoints
+    Long availablePoints,
+
+    PaymentMethod paymentMethod,
+    CardType cardType,
+    String cardNo
 ) {
     public Order toEntity() {
         return Order.create(new OrderCreateInfo(
@@ -23,8 +30,14 @@ public record OrderCreateCommand(
         ));
     }
 
-    public List<ProductQuantityCommand> toProductQuantityCommands() {
-        return items.stream()
-                .map(item -> new ProductQuantityCommand(item.productId(), item.quantity())).toList();
+    public PaymentRequest toPaymentRequest(Long amount, String callbackUrl) {
+        return new PaymentRequest(
+            PgIdGenerator.generatePgOrderId(),
+            paymentMethod,
+            cardType,
+            cardNo,
+            amount,
+            callbackUrl
+        );
     }
 }

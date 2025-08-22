@@ -29,7 +29,7 @@ public class ProductV1Dto {
                                Long price,
                                String mainImageUrl,
                                String description,
-                               Integer stockQuantity,
+                               Long stockQuantity,
                                Integer likeCount) {
         public static InfoResponse from(ProductResult info) {
             if (info == null) {

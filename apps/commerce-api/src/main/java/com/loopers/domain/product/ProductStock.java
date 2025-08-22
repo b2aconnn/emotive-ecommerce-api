@@ -21,23 +21,38 @@ public class ProductStock {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private Integer quantity;
+    private Long quantity;
 
 //    @Version
 //    private Long version;
 
-    private ProductStock(Product product, Integer quantity) {
+    private ProductStock(Product product, Long quantity) {
         this.product = product;
         this.quantity = quantity;
     }
 
-    public static ProductStock create(Product product, Integer quantity) {
+    public static ProductStock create(Product product, Long quantity) {
         return new ProductStock(product, quantity);
     }
 
     public void deduct(Long quantity) {
+        validateStockNotEmpty();
+        validateStockEnough(quantity);
+
+        this.quantity -= quantity;
+    }
+
+    public void validateStockNotEmpty() {
+        if (this.quantity <= 0) {
+            throw new IllegalArgumentException("상품 재고가 부족합니다.");
+        }
+    }
+
+    public void validateStockEnough(Long quantity) {
         if (this.quantity < quantity) {
             throw new IllegalArgumentException("상품 재고가 부족합니다.");
         }
     }
+
+
 }

@@ -2,7 +2,7 @@ package com.loopers.domain.product.dto.result;
 
 import com.loopers.domain.order.dto.OrderItemCreateCommand;
 import com.loopers.domain.product.Product;
-import com.loopers.domain.product.dto.command.ProductStocksDeductCommand;
+import com.loopers.domain.product.dto.command.ProductStockAdjustmentCommand;
 
 public record ProductQuantityResult(
         Product product,
@@ -12,7 +12,7 @@ public record ProductQuantityResult(
         return new OrderItemCreateCommand(product, quantity);
     }
 
-    public ProductStocksDeductCommand toProductStocksDeductCommands() {
-        return new ProductStocksDeductCommand(product, quantity);
+    public ProductStockAdjustmentCommand toProductStocksDeductCommands() {
+        return new ProductStockAdjustmentCommand(product, quantity);
     }
 }
