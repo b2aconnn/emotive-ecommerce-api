@@ -15,7 +15,7 @@ public record OrderCreateCommand(
     String deliveryAddress,
     String contactNumber,
     List<OrderLineItem> items,
-    Long availablePoints,
+    Long usedPoints,
 
     PaymentMethod paymentMethod,
     CardType cardType,
@@ -26,7 +26,8 @@ public record OrderCreateCommand(
             userId,
             orderer,
             deliveryAddress,
-            contactNumber
+            contactNumber,
+            usedPoints
         ));
     }
 

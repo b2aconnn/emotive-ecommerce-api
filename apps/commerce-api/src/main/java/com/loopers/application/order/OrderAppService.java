@@ -1,6 +1,8 @@
 package com.loopers.application.order;
 
 import com.loopers.application.order.dto.OrderCreateCommand;
+import com.loopers.application.payment.PaymentAppService;
+import com.loopers.application.payment.dto.PaymentStatusResult;
 import com.loopers.domain.order.*;
 import com.loopers.domain.payment.PGService;
 import com.loopers.domain.point.Point;
@@ -20,6 +22,8 @@ import java.util.Map;
 @Service
 public class OrderAppService {
 
+    private final OrderRepository orderRepository;
+
     private final UserService userService;
 
     private final OrderService orderService;
@@ -32,7 +36,7 @@ public class OrderAppService {
 
     private final PGService PGService;
 
-    private final OrderRepository orderRepository;
+    private final PaymentAppService paymentAppService;
 
     /**
      * 주문 생성
@@ -54,12 +58,12 @@ public class OrderAppService {
 
         Point point = pointRepository.findByUserId(createCommand.userId())
                 .orElseThrow(() -> new IllegalStateException("포인트가 부족합니다."));
-        point.use(createCommand.availablePoints());
+        point.use(createCommand.usedPoints());
 
-        Long totalAmount = orderCalculator.calculateTotalAmount(orderItems, createCommand.availablePoints());
+        Long totalAmount = orderCalculator.calculateTotalAmount(orderItems, createCommand.usedPoints());
         saveOrder.updateTotalAmount(totalAmount);
 
-        String callbackUrl = "http://localhost:8080/api/v1/orders/callback";
+        String callbackUrl = "http://localhost:8080/api/v1/payments/callback";
         PGService.requestPayment(saveOrder.getId(), createCommand.toPaymentRequest(totalAmount, callbackUrl));
 
         productStockService.deductStocks(orderItems, productStocksMap);
@@ -69,12 +73,12 @@ public class OrderAppService {
         return saveOrder;
     }
 
-    public PaymentStatusResult getOrderPaymentStatus(Long orderId) {
+    public OrderStatusResult getOrderStatus(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
 
-        PaymentStatusResult paymentStatus = PGService.getPaymentStatus(order.getPaymentId());
+        PaymentStatusResult paymentStatusResult = paymentAppService.getPaymentStatus(order.getId());
 
-        return paymentStatus;
+        return new OrderStatusResult(order.getId(), paymentStatusResult.paymentStatus());
     }
 }

@@ -8,7 +8,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static com.loopers.domain.order.PaymentStatus.REQUESTED;
+import static com.loopers.domain.order.PaymentStatus.PENDING;
+import static com.loopers.support.validation.TextValidator.requireText;
 import static jakarta.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -20,33 +21,40 @@ public class Payment extends BaseEntity {
 
     private Long orderId;
 
-    private Long transactionKey;
+    private String pgOrderId;
+
+    private String transactionKey;
 
     @Enumerated(STRING)
     private PaymentStatus status;
 
+    @Enumerated(STRING)
     private PaymentMethod method;
 
     private Long amount;
 
     private String reason;
 
-    private Payment(Long orderId, PaymentMethod method, Long amount) {
+    private Payment(Long orderId, String pgOrderId, PaymentMethod method, Long amount) {
         this.orderId = orderId;
-        this.status = REQUESTED;
+        this.pgOrderId = pgOrderId;
+        this.status = PENDING;
         this.method = method;
         this.amount = amount;
     }
 
-    public static Payment create(Long orderId, PaymentMethod method, Long amount) {
-        validateRequiredPaymentInfo(orderId, method, amount);
-        return new Payment(orderId, method, amount);
+    public static Payment create(Long orderId, String pgOrderId, PaymentMethod method, Long amount) {
+        validateRequiredPaymentInfo(orderId, pgOrderId, method, amount);
+        return new Payment(orderId, pgOrderId, method, amount);
     }
 
-    private static void validateRequiredPaymentInfo(Long orderId, PaymentMethod method, Long amount) {
+    private static void validateRequiredPaymentInfo(Long orderId, String pgOrderId, PaymentMethod method, Long amount) {
         if (orderId == null || orderId <= 0) {
             throw new IllegalArgumentException("주문 ID는 필수입니다.");
         }
+
+        requireText(pgOrderId, "유효하지 않는 PG 주문 ID입니다.");
+
         if (method == null) {
             throw new IllegalArgumentException("결제 방법은 필수입니다.");
         }
@@ -55,10 +63,17 @@ public class Payment extends BaseEntity {
         }
     }
 
-    public void updateTransactionKey(Long transactionKey) {
-        if (transactionKey == null || transactionKey <= 0) {
-            throw new IllegalArgumentException("유효하지 않은 거래 키입니다.");
-        }
+    public void updateResult(
+            String transactionKey,
+            PaymentStatus status,
+            String reason
+    ) {
+        updateTransactionKey(transactionKey);
+        updateStatus(status);
+        updateReason(reason);
+    }
+
+    public void updateTransactionKey(String transactionKey) {
         this.transactionKey = transactionKey;
     }
 

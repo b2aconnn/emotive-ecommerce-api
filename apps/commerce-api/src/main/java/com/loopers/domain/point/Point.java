@@ -52,4 +52,11 @@ public class Point extends BaseEntity {
             throw new IllegalArgumentException("포인트가 부족합니다.");
         }
     }
+
+    public void restorePoint(Long amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("복원할 포인트는 0 이상이어야 합니다.");
+        }
+        this.balance += amount;
+    }
 }

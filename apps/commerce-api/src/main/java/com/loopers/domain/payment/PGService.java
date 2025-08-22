@@ -1,6 +1,6 @@
 package com.loopers.domain.payment;
 
-import com.loopers.application.order.PaymentStatusResult;
+import com.loopers.domain.order.PaymentStatus;
 import com.loopers.domain.payment.dto.PaymentRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
@@ -18,16 +18,16 @@ public class PGService {
     @Async
     @Transactional
     public void requestPayment(Long orderId, PaymentRequest request) {
-        paymentRepository.save(Payment.create(
-                orderId, request.paymentMethod(), request.amount()));
+        Payment savePayment = paymentRepository.save(Payment.create(
+                orderId, request.orderId(), request.paymentMethod(), request.amount()));
 
-        pgClient.requestPayment(request);
-    }
-
-    public PaymentStatusResult getPaymentStatus(Long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new IllegalStateException("결제 정보가 존재하지 않습니다."));
-
-        return new PaymentStatusResult(payment.getStatus());
+        try {
+            pgClient.requestPayment(request);
+        } catch (Exception e) {
+            savePayment.updateResult(
+                    null,
+                    PaymentStatus.FAILED,
+                    "결제 요청 실패: " + e.getMessage());
+        }
     }
 }

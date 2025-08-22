@@ -1,7 +1,7 @@
 package com.loopers.interfaces.api.order;
 
 import com.loopers.application.order.OrderAppService;
-import com.loopers.application.order.PaymentStatusResult;
+import com.loopers.application.order.OrderStatusResult;
 import com.loopers.domain.order.Order;
 import com.loopers.interfaces.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,21 +24,13 @@ public class OrderV1Controller implements OrderV1ApiSpec {
         return ApiResponse.success(OrderV1Dto.CreateResponse.from(order));
     }
 
-    @PostMapping("/callback")
+    @GetMapping("/{orderId}/status")
     @Override
-    public ApiResponse<String> callback(
-            @RequestBody String payload
-    ) {
-        return ApiResponse.success("success");
-    }
-
-    @GetMapping("/{orderId}/payment-status")
-    @Override
-    public ApiResponse<OrderV1Dto.PaymentStatusResponse> getPaymentStatus(
+    public ApiResponse<OrderV1Dto.StatusResponse> getStatus(
             @PathVariable(value = "orderId") Long orderId) {
 
-        PaymentStatusResult orderPaymentStatus = orderAppService.getOrderPaymentStatus(orderId);
+        OrderStatusResult orderPaymentStatus = orderAppService.getOrderStatus(orderId);
 
-        return ApiResponse.success(OrderV1Dto.PaymentStatusResponse.from(orderPaymentStatus));
+        return ApiResponse.success(OrderV1Dto.StatusResponse.from(orderPaymentStatus));
     }
 }

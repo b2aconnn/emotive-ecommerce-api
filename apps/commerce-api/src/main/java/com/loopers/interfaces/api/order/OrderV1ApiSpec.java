@@ -17,18 +17,9 @@ public interface OrderV1ApiSpec {
     );
 
     @Operation(
-            summary = "주문 결제 요청 콜백",
-            description = "주문 결제 요청에 대한 콜백을 받습니다."
-    )
-    ApiResponse<String> callback(
-            @RequestBody String payload
-    );
-
-    @Operation(
             summary = "주문 결제 상태 조회",
             description = "주문 결제 상태를 조회합니다."
     )
-    ApiResponse<OrderV1Dto.PaymentStatusResponse> getPaymentStatus(
-            @PathVariable(value = "orderId") Long orderId
-    );
+    ApiResponse<OrderV1Dto.StatusResponse> getStatus(
+            @PathVariable(value = "orderId") Long orderId);
 }

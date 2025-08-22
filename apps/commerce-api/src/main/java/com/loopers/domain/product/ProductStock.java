@@ -54,5 +54,10 @@ public class ProductStock {
         }
     }
 
-
+    public void restoreStock(Long quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("복원할 재고 수량은 0 이상이어야 합니다.");
+        }
+        this.quantity += quantity;
+    }
 }

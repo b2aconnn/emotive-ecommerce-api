@@ -26,8 +26,6 @@ public class Order extends BaseEntity {
 
     private Long userId;
 
-    private Long paymentId;
-
     private String orderer;
 
     private String deliveryAddress;
@@ -36,6 +34,8 @@ public class Order extends BaseEntity {
 
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    private Long usedPoints;
 
     private Long totalAmount;
 
@@ -47,7 +47,8 @@ public class Order extends BaseEntity {
         this.orderer = createInfo.orderer();
         this.deliveryAddress = createInfo.deliveryAddress();
         this.contactNumber = createInfo.contactNumber();
-
+        this.usedPoints = createInfo.usedPoints();
+        this.totalAmount = 0L;
         this.status = CREATED;
     }
 
@@ -105,5 +106,12 @@ public class Order extends BaseEntity {
 
     public void updateOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public void cancel() {
+        if (!checkCreateStatus() && !checkPendingStatus()) {
+            return;
+        }
+        this.status = CANCELED;
     }
 }

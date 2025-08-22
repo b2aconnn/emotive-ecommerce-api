@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.order;
 
-import com.loopers.application.order.PaymentStatusResult;
+import com.loopers.application.order.OrderStatusResult;
 import com.loopers.application.order.dto.OrderCreateCommand;
 import com.loopers.application.order.dto.OrderLineItem;
 import com.loopers.domain.order.Order;
@@ -43,9 +43,10 @@ public class OrderV1Dto {
         }
     }
 
-    public record PaymentStatusResponse(PaymentStatus paymentStatus) {
-        public static PaymentStatusResponse from(PaymentStatusResult result) {
-            return new PaymentStatusResponse(result.paymentStatus());
+    public record StatusResponse(Long orderId,
+                                 PaymentStatus paymentStatus) {
+        public static StatusResponse from(OrderStatusResult result) {
+            return new StatusResponse(result.orderId(), result.paymentStatus());
         }
     }
 }
