@@ -23,6 +23,8 @@ public class PgSimulatorClient implements PgClient {
         return pgPaymentRequestResponse;
     }
 
+    @CircuitBreaker(name = "pg-request-payment", fallbackMethod = "requestPaymentFallback")
+    @Retry(name = "pg-request-payment-retry", fallbackMethod = "requestPaymentFallback")
     @Override
     public PGTransactionInfoResponse getTransaction(String transactionKey) {
         return pgSimulatorFeignClient.getTransaction(transactionKey);
