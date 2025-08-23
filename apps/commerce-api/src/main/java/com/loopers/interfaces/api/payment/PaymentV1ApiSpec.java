@@ -13,6 +13,14 @@ public interface PaymentV1ApiSpec {
             description = "주문 결제 요청에 대한 콜백을 받습니다."
     )
     ApiResponse<String> callback(
-            @RequestBody PaymentV1Dto.PgPaymentResultRequest pgResultRequest
+            @RequestBody PaymentV1Dto.PgResultRequest pgResultRequest
+    );
+
+    @Operation(
+            summary = "주문 결제 요청",
+            description = "주문 결제를 요청합니다."
+    )
+    ApiResponse<String> orderPayment(
+            @RequestBody PaymentV1Dto.OrderPaymentRequest orderPaymentRequest
     );
 }

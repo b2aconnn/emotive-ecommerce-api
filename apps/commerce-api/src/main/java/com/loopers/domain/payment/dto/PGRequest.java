@@ -2,7 +2,7 @@ package com.loopers.domain.payment.dto;
 
 import com.loopers.domain.payment.PaymentMethod;
 
-public record PaymentRequest(
+public record PGRequest(
     String orderId,
     PaymentMethod paymentMethod,
     CardType cardType,

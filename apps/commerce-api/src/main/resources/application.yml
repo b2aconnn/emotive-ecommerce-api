@@ -29,6 +29,41 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+pg:
+  callback-url: http://localhost:8080/api/v1/payments/callback
+
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 1
+      waitDuration: 1000
+      retryExceptions:
+        - java.lang.Throwable
+    pg-request-payment-retry:
+        maxAttempts: 1
+        waitDuration: 500
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slow-call-rate-threshold: 50
+        failure-rate-threshold: 50
+        slow-call-duration-threshold: 300
+        permitted-number-of-calls-in-half-open-state: 1
+        max-wait-duration-in-half-open-state: 500
+        sliding-window-type: time_based
+        sliding-window-size: 10
+        minimum-number-of-calls: 2
+        wait-duration-in-open-state: 1000
+        event-consumer-buffer-size: 1
+        register-health-indicator: true
+        record-exceptions:
+          - java.lang.Throwable
+      pg-request-payment:
+        slow-call-duration-threshold: 1000
+
 ---
 spring:
   config:

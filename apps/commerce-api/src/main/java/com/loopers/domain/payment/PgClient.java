@@ -1,8 +1,10 @@
 package com.loopers.domain.payment;
 
-import com.loopers.domain.payment.dto.PaymentRequest;
-import com.loopers.domain.payment.dto.PaymentResponse;
+import com.loopers.domain.payment.dto.PGPaymentRequestResponse;
+import com.loopers.domain.payment.dto.PGRequest;
+import com.loopers.domain.payment.dto.PGTransactionInfoResponse;
 
 public interface PgClient {
-    PaymentResponse requestPayment(PaymentRequest request);
+    PGPaymentRequestResponse requestPayment(PGRequest request);
+    PGTransactionInfoResponse getTransaction(String transactionKey);
 }

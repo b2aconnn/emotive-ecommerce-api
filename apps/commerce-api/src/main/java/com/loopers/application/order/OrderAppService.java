@@ -4,7 +4,7 @@ import com.loopers.application.order.dto.OrderCreateCommand;
 import com.loopers.application.payment.PaymentAppService;
 import com.loopers.application.payment.dto.PaymentStatusResult;
 import com.loopers.domain.order.*;
-import com.loopers.domain.payment.PGService;
+import com.loopers.domain.payment.generator.PgIdGenerator;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.Product;
@@ -34,8 +34,6 @@ public class OrderAppService {
 
     private final PointRepository pointRepository;
 
-    private final PGService PGService;
-
     private final PaymentAppService paymentAppService;
 
     /**
@@ -63,8 +61,10 @@ public class OrderAppService {
         Long totalAmount = orderCalculator.calculateTotalAmount(orderItems, createCommand.usedPoints());
         saveOrder.updateTotalAmount(totalAmount);
 
-        String callbackUrl = "http://localhost:8080/api/v1/payments/callback";
-        PGService.requestPayment(saveOrder.getId(), createCommand.toPaymentRequest(totalAmount, callbackUrl));
+        paymentAppService.createPayment(createCommand.toPaymentCreateCommand(
+                saveOrder.getId(),
+                PgIdGenerator.generatePgOrderId(),
+                totalAmount));
 
         productStockService.deductStocks(orderItems, productStocksMap);
 

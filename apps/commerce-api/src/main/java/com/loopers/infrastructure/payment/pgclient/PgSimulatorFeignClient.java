@@ -1,9 +1,12 @@
 package com.loopers.infrastructure.payment.pgclient;
 
-import com.loopers.domain.payment.dto.PaymentRequest;
-import com.loopers.domain.payment.dto.PaymentResponse;
+import com.loopers.domain.payment.dto.PGPaymentRequestResponse;
+import com.loopers.domain.payment.dto.PGRequest;
+import com.loopers.domain.payment.dto.PGTransactionInfoResponse;
 import com.loopers.infrastructure.payment.pgclient.config.FeignClientTimeoutConfig;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -14,5 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 )
 public interface PgSimulatorFeignClient {
     @PostMapping("/api/v1/payments")
-    PaymentResponse requestPayment(@RequestBody PaymentRequest request);
+    PGPaymentRequestResponse requestPayment(@RequestBody PGRequest request);
+
+    @GetMapping("/api/v1/payments/{transactionKey}")
+    PGTransactionInfoResponse getTransaction(@PathVariable String transactionKey);
 }

@@ -71,6 +71,9 @@ subprojects {
         testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.14")
         // spring cloud openfeign.
         implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+        // resilience4j
+        implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
+        implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
     }
 
     tasks.withType(Jar::class) { enabled = true }
