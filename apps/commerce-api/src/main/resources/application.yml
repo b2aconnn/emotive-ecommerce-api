@@ -40,9 +40,12 @@ resilience4j.retry:
       waitDuration: 1000
       retryExceptions:
         - java.lang.Throwable
-    pg-request-payment-retry:
-        maxAttempts: 1
-        waitDuration: 500
+  instances:
+    defaultConfig:
+      baseConfig: default
+    pgRequestPaymentRetryConfig:
+      baseConfig: default
+      waitDuration: 500
 
 resilience4j:
   circuitbreaker:
@@ -61,8 +64,12 @@ resilience4j:
         register-health-indicator: true
         record-exceptions:
           - java.lang.Throwable
-      pg-request-payment:
-        slow-call-duration-threshold: 1000
+    instances:
+      defaultConfig:
+        baseConfig: default
+      pgRequestPaymentConfig:
+        baseConfig: default
+        slow-call-duration-threshold: 200
 
 ---
 spring:
