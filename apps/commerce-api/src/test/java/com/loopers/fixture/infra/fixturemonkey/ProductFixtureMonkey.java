@@ -26,7 +26,7 @@ public class ProductFixtureMonkey implements ProductWithStockFixture {
                 .set("brand", brand)
                 .set("price", productPrice)
                 .set("id", 0L)
-                .set("productStock", ProductStock.create(null, 1))
+                .set("productStock", ProductStock.create(null, 1L))
                 .sampleList(count);
     }
 
@@ -36,7 +36,7 @@ public class ProductFixtureMonkey implements ProductWithStockFixture {
 
     @Transactional
     @Override
-    public Product save(Brand brand, Long productPrice, Integer stockQuantity) {
+    public Product save(Brand brand, Long productPrice, Long stockQuantity) {
         Product saveProduct = productRepository.save(createProduct(brand, productPrice));
         ProductStock saveProductStock = productStockRepository.save(ProductStock.create(saveProduct, stockQuantity));
         saveProduct.setProductStock(saveProductStock);

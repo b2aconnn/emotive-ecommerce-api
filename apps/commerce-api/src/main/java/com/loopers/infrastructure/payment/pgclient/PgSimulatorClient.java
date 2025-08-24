@@ -4,11 +4,17 @@ import com.loopers.domain.payment.PgClient;
 import com.loopers.domain.payment.dto.PGPaymentRequestResponse;
 import com.loopers.domain.payment.dto.PGRequest;
 import com.loopers.domain.payment.dto.PGTransactionInfoResponse;
+import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorRequestResponse;
+import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorTransactionInfoResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import static com.loopers.application.payment.dto.PaymentResultStatus.FAILED;
+
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class PgSimulatorClient implements PgClient {
@@ -19,14 +25,35 @@ public class PgSimulatorClient implements PgClient {
     @Retry(name = "pgRequestPaymentRetryConfig", fallbackMethod = "requestPaymentFallback")
     @Override
     public PGPaymentRequestResponse requestPayment(PGRequest request) {
-        PGPaymentRequestResponse pgPaymentRequestResponse = pgSimulatorFeignClient.requestPayment(request);
-        return pgPaymentRequestResponse;
+        PGSimulatorRequestResponse pgSimulatorRequestResponse =
+                pgSimulatorFeignClient.requestPayment(request.toSimulatorRequest());
+
+        return PGPaymentRequestResponse.from(pgSimulatorRequestResponse);
     }
 
-    @CircuitBreaker(name = "defaultConfig", fallbackMethod = "requestPaymentFallback")
-    @Retry(name = "defaultConfig", fallbackMethod = "requestPaymentFallback")
+    @CircuitBreaker(name = "defaultConfig", fallbackMethod = "getTransactionFallback")
+    @Retry(name = "defaultConfig", fallbackMethod = "getTransactionFallback")
     @Override
     public PGTransactionInfoResponse getTransaction(String transactionKey) {
-        return pgSimulatorFeignClient.getTransaction(transactionKey);
+        PGSimulatorTransactionInfoResponse transactionInfoResponse = pgSimulatorFeignClient.getTransaction(transactionKey);
+        return PGTransactionInfoResponse.from(transactionInfoResponse);
+    }
+
+    public PGPaymentRequestResponse requestPaymentFallback(PGRequest request, Throwable throwable) {
+        log.error("결제 요청 실패: {}", throwable.getMessage());
+        return new PGPaymentRequestResponse("", FAILED, "결제 요청 실패");
+    }
+
+    public PGTransactionInfoResponse getTransactionFallback(String transactionKey, Throwable throwable) {
+        log.error("거래 조회 실패: transactionKey : {}, error : {}", transactionKey, throwable.getMessage());
+        return new PGTransactionInfoResponse(
+                "",
+                null,
+                null,
+                null,
+                null,
+                FAILED,
+                "거래 조회 실패");
     }
 }
+

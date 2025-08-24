@@ -66,7 +66,7 @@ public class OrderAppServiceIntegrationTest {
             pointFixture.save(user.getId(), balance);
 
             Long productPrice = 100L;
-            Integer stockQuantity = 1;
+            Long stockQuantity = 1L;
             Product saveProduct = productWithStockFixture.save(
                     brandFixture.save(),
                     productPrice,

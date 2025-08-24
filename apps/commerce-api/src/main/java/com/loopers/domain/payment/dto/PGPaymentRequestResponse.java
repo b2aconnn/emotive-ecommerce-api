@@ -1,9 +1,18 @@
 package com.loopers.domain.payment.dto;
 
+import com.loopers.application.payment.dto.PaymentResultStatus;
+import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorRequestResponse;
+
 public record PGPaymentRequestResponse(
-    Meta meta,
-    Data data
+        String transactionKey,
+        PaymentResultStatus status,
+        String reason
 ) {
-    public record Meta(String result) {}
-    public record Data(String transactionKey, String status, String reason) {}
+    public static PGPaymentRequestResponse from(PGSimulatorRequestResponse pgSimulatorRequestResponse) {
+        return new PGPaymentRequestResponse(
+                pgSimulatorRequestResponse.data().transactionKey(),
+                pgSimulatorRequestResponse.data().status(),
+                pgSimulatorRequestResponse.data().reason()
+        );
+    }
 }

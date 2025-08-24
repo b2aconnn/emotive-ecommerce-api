@@ -48,11 +48,11 @@ public class PaymentAppService {
                 payment.getAmount(),
                 callbackUrl));
 
-        payment.updateTransactionKey(pgPaymentRequestResponse.data().transactionKey());
-    }
+        if (pgPaymentRequestResponse.status() == FAILED) {
+            throw new IllegalStateException("결제 요청에 실패했습니다: " + pgPaymentRequestResponse.reason());
+        }
 
-    public void requestPaymentFallback(PaymentOrderCommand paymentCommand, Throwable throwable) {
-        log.error("결제 요청 실패: {}", throwable.getMessage());
+        payment.updateTransactionKey(pgPaymentRequestResponse.transactionKey());
     }
 
     public void createPayment(PaymentCreateCommand createCommand) {
@@ -73,6 +73,10 @@ public class PaymentAppService {
 
     private void handlePaymentResult(Payment payment) {
         PGTransactionInfoResponse transactionInfoResponse = pgClient.getTransaction(payment.getTransactionKey());
+
+        if (payment.getTransactionKey() == null || payment.getTransactionKey().isEmpty()) {
+            throw new IllegalStateException("결제 요청이 존재하지 않습니다.");
+        }
 
         String transactionKey = transactionInfoResponse.transactionKey();
         PaymentResultStatus status = transactionInfoResponse.status();
