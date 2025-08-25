@@ -47,8 +47,6 @@ public class PaymentAppService {
                 payment.getAmount(),
                 callbackUrl));
 
-        pgRequestResult.checkFailed();
-
         payment.updateTransactionKey(pgRequestResult.transactionKey());
     }
 
