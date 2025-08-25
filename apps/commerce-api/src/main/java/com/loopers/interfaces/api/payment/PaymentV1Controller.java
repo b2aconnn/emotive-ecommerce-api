@@ -2,7 +2,6 @@ package com.loopers.interfaces.api.payment;
 
 import com.loopers.application.payment.PaymentAppService;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.support.resolver.UserContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,10 +20,7 @@ public class PaymentV1Controller implements PaymentV1ApiSpec {
     public ApiResponse<String> callback(
             @RequestBody PaymentV1Dto.PgResultRequest pgResultRequest
     ) {
-        // 현재 PG Simulator 에서 사용자 인증을 요구하고 있는데 callback이라 사용자 인증이 불가능함.
-        UserContextHolder.setUserId("abcd");
         paymentAppService.processPayment(pgResultRequest.toCommand());
-
         return ApiResponse.success("success");
     }
 

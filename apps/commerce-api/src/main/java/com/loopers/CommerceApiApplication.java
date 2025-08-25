@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import java.util.TimeZone;
 
+// @EnableScheduling
 @EnableFeignClients
 @ConfigurationPropertiesScan
 @SpringBootApplication
