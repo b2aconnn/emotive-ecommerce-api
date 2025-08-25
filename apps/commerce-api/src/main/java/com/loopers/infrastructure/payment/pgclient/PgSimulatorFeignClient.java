@@ -1,6 +1,6 @@
 package com.loopers.infrastructure.payment.pgclient;
 
-import com.loopers.infrastructure.payment.pgclient.config.FeignClientTimeoutConfig;
+import com.loopers.infrastructure.payment.pgclient.config.FeignClientConfig;
 import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorRequest;
 import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorRequestResponse;
 import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorTransactionInfoResponse;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(
         name = "pgSimulatorClient",
         url = "http://localhost:8082",
-        configuration = FeignClientTimeoutConfig.class
+        configuration = FeignClientConfig.class
 )
 public interface PgSimulatorFeignClient {
     @PostMapping("/api/v1/payments")
