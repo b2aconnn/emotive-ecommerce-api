@@ -63,4 +63,12 @@ public class Product extends BaseEntity {
     public boolean isStockEnough(Long quantity) {
         return productStock.isStockEnough(quantity);
     }
+
+    public void likeCountUp() {
+        this.productLikeCount.increase();
+    }
+
+    public void unlikeCountDown() {
+        this.productLikeCount.decrease();
+    }
 }

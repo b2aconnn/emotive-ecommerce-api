@@ -24,6 +24,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> findById(Long userId) {
+        return userJpaRepository.findById(userId);
+    }
+
+    @Override
     public Optional<User> findByUserId(String userId) {
         return userJpaRepository.findByUserId(userId);
     }
@@ -31,10 +36,5 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean existsByUserId(String userId) {
         return userJpaRepository.existsByUserId(userId);
-    }
-
-    @Override
-    public boolean existsById(Long id) {
-        return userJpaRepository.existsById(id);
     }
 }
