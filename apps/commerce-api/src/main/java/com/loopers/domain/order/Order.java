@@ -64,18 +64,16 @@ public class Order extends BaseEntity {
         requireText(createInfo.contactNumber(), "주문자 연락처를 입력해주세요.");
     }
 
-    public void addOrderItems(List<OrderItem> orderItems) {
-        validateProductExistence(orderItems);
-        for (OrderItem item : orderItems) {
-            item.setOrder(this);
-        }
-        this.orderItems.addAll(orderItems);
-    }
-
-    private static void validateProductExistence(List<OrderItem> orderItems) {
+    public void calculateTotalAmount(Long usePoint) {
         if (orderItems == null || orderItems.isEmpty()) {
-            throw new IllegalArgumentException("주문 항목이 비어있습니다.");
+            throw new IllegalStateException("주문 상품이 없습니다.");
         }
+
+        long oderItemsTotalPrice = orderItems.stream()
+                .mapToLong(OrderItem::getTotalPrice)
+                .sum();
+
+        this.totalAmount = oderItemsTotalPrice - usePoint;
     }
 
     public void pending() {
@@ -113,5 +111,19 @@ public class Order extends BaseEntity {
             return;
         }
         this.status = CANCELED;
+    }
+
+    public Long getItemTotalAmount() {
+        return orderItems.stream()
+                .mapToLong(OrderItem::getTotalPrice)
+                .sum();
+    }
+
+    public void applyDiscount(List<Discount> discounts) {
+        Long discountAmount = discounts.stream()
+                .mapToLong(Discount::amount)
+                .sum();
+
+        this.totalAmount = Math.max(0L, getItemTotalAmount() - discountAmount);
     }
 }

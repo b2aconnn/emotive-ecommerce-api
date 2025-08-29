@@ -1,7 +1,7 @@
 package com.loopers.interfaces.api.order;
 
 import com.loopers.application.order.OrderAppService;
-import com.loopers.application.order.OrderStatusResult;
+import com.loopers.application.order.dto.OrderStatusResult;
 import com.loopers.domain.order.Order;
 import com.loopers.interfaces.api.ApiResponse;
 import lombok.RequiredArgsConstructor;

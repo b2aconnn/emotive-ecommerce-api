@@ -2,38 +2,17 @@ package com.loopers.infrastructure.product.jpa;
 
 import com.loopers.domain.product.ProductStock;
 import com.loopers.domain.product.ProductStockRepository;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
-
+@RequiredArgsConstructor
 @Component
 public class ProductStockRepositoryImpl implements ProductStockRepository {
 
     private final StockJpaRepository stockJpaRepository;
 
-    private JPAQueryFactory queryFactory;
-
-    public ProductStockRepositoryImpl(StockJpaRepository stockJpaRepository,
-                                      EntityManager em) {
-        this.stockJpaRepository = stockJpaRepository;
-        this.queryFactory = new JPAQueryFactory(em);
-    }
-
     @Override
     public ProductStock save(ProductStock productStock) {
         return stockJpaRepository.save(productStock);
-    }
-
-    @Override
-    public Optional<ProductStock> findById(Long id) {
-        return stockJpaRepository.findById(id);
-    }
-
-    @Override
-    public Optional<List<ProductStock>> findByProductIdsWithLock(List<Long> ids) {
-        return stockJpaRepository.findByProductIdsWithLock(ids);
     }
 }

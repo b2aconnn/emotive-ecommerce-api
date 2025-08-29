@@ -49,7 +49,7 @@ public class ProductStock {
     }
 
     public void validateStockEnough(Long quantity) {
-        if (this.quantity < quantity) {
+        if (!isStockEnough(quantity)) {
             throw new IllegalArgumentException("상품 재고가 부족합니다.");
         }
     }
@@ -59,5 +59,9 @@ public class ProductStock {
             throw new IllegalArgumentException("복원할 재고 수량은 0 이상이어야 합니다.");
         }
         this.quantity += quantity;
+    }
+
+    public boolean isStockEnough(Long quantity) {
+        return this.quantity >= quantity;
     }
 }

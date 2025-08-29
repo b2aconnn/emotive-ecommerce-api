@@ -22,11 +22,4 @@ public class UserService {
         return userRepository.findByUserId(userId)
             .orElseThrow(() -> new EntityNotFoundException("[userId = " + userId + "] 를 찾을 수 없습니다."));
     }
-
-    public void existsById(Long userId) {
-        boolean isExistsUser = userRepository.existsById(userId);
-        if (isExistsUser == false) {
-            throw new IllegalStateException("사용자가 존재하지 않습니다.");
-        }
-    }
 }

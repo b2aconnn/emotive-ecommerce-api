@@ -1,9 +1,7 @@
 package com.loopers.application.payment;
 
-import com.loopers.application.payment.dto.PaymentCreateCommand;
 import com.loopers.application.payment.dto.PaymentOrderCommand;
 import com.loopers.application.payment.dto.PaymentResultCommand;
-import com.loopers.application.payment.dto.PaymentStatusResult;
 import com.loopers.domain.payment.Payment;
 import com.loopers.domain.payment.PaymentRepository;
 import com.loopers.domain.payment.PaymentService;
@@ -29,13 +27,6 @@ public class PaymentAppService {
     @Value("${pg.callback-url}")
     private String callbackUrl;
 
-    public PaymentStatusResult getPaymentStatus(Long orderId) {
-        Payment payment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new IllegalStateException("결제 정보가 없습니다."));
-
-        return new PaymentStatusResult(orderId, payment.getStatus());
-    }
-
     @Transactional
     public void requestPayment(PaymentOrderCommand paymentCommand) {
         Payment payment = paymentRepository.findByOrderId(paymentCommand.orderId())
@@ -48,14 +39,6 @@ public class PaymentAppService {
                 callbackUrl));
 
         payment.updateTransactionKey(pgRequestResult.transactionKey());
-    }
-
-    public void createPayment(PaymentCreateCommand createCommand) {
-        paymentRepository.save(Payment.create(
-                createCommand.orderId(),
-                createCommand.pgOrderId(),
-                createCommand.paymentMethod(),
-                createCommand.amount()));
     }
 
     @Transactional
