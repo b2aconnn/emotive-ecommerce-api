@@ -1,7 +1,7 @@
 package com.loopers.domain.point;
 
-import com.loopers.application.point.PointFacade;
-import com.loopers.application.point.PointInfo;
+import com.loopers.application.point.PointAppService;
+import com.loopers.application.point.dto.PointInfo;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.domain.user.dto.command.UserCreateInfo;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest
 class PointServiceIntegrationTest {
     @Autowired
-    private PointFacade pointFacade;
+    private PointAppService pointAppService;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -51,7 +51,7 @@ class PointServiceIntegrationTest {
 
             // act
             // assert
-            assertThatThrownBy(() -> pointFacade.charge(userId, point))
+            assertThatThrownBy(() -> pointAppService.charge(userId, point))
                     .isInstanceOf(EntityNotFoundException.class);
         }
     }
@@ -77,7 +77,7 @@ class PointServiceIntegrationTest {
             pointRepository.save(point);
 
             // act
-            PointInfo pointInfo = pointFacade.get(userId);
+            PointInfo pointInfo = pointAppService.get(userId);
 
             // assert
             assertAll(
@@ -95,7 +95,7 @@ class PointServiceIntegrationTest {
             String userId = "invalidUserId";
 
             // act
-            PointInfo pointInfo = pointFacade.get(userId);
+            PointInfo pointInfo = pointAppService.get(userId);
 
             // assert
             assertThat(pointInfo).isNull();

@@ -27,7 +27,8 @@ public record OrderCreateCommand(
             orderer,
             deliveryAddress,
             contactNumber,
-            usedPoints
+            usedPoints,
+            couponId
         ));
     }
 }

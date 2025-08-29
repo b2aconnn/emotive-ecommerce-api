@@ -1,8 +1,6 @@
 package com.loopers.domain.payment;
 
-import com.loopers.application.payment.dto.PaymentCreateCommand;
 import com.loopers.application.payment.dto.PaymentResultStatus;
-import com.loopers.domain.order.OrderService;
 import com.loopers.domain.order.PaymentStatus;
 import com.loopers.domain.payment.vo.PGTransactionInfoResult;
 import lombok.RequiredArgsConstructor;
@@ -22,21 +20,9 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
 
-    private final OrderService orderService;
-
     private final PgClient pgClient;
 
-    public void saveOrderPaymentRequest(PaymentCreateCommand createCommand) {
-        paymentRepository.save(Payment.create(
-                createCommand.orderId(),
-                createCommand.pgOrderId(),
-                createCommand.paymentMethod(),
-                createCommand.amount()));
-    }
-
-    public void handlePaymentResult(Payment payment) {
-        PGTransactionInfoResult transactionInfoResult = pgClient.getTransaction(payment.getTransactionKey());
-
+    public void handlePaymentResult(Payment payment, PGTransactionInfoResult transactionInfoResult) {
         PaymentResultStatus status = transactionInfoResult.status();
         String transactionKey = transactionInfoResult.transactionKey();
         String reason = transactionInfoResult.reason();
@@ -47,9 +33,9 @@ public class PaymentService {
             payment.updateResult(transactionKey, PaymentStatus.SUCCESS, reason);
         } else if (FAILED.equals(status)) {
             payment.updateResult(transactionKey, PaymentStatus.FAILED, reason);
-            orderService.cancelOrderWithRestoration(payment.getOrderId());
         } else {
             log.error("알 수 없는 결제 상태: {}", status);
+
             throw new IllegalArgumentException("알 수 없는 결제 상태입니다: " + status);
         }
     }
@@ -71,7 +57,8 @@ public class PaymentService {
 
         for (Payment payment : pendingPayments) {
             try {
-                handlePaymentResult(payment);
+                PGTransactionInfoResult transactionInfoResult = pgClient.getTransaction(payment.getTransactionKey());
+                handlePaymentResult(payment, transactionInfoResult);
             } catch (Exception e) {
                 log.error("Error recovering payment for orderId: {}, pgOrderId: {}: {}", payment.getOrderId(), payment.getPgOrderId(), e.getMessage(), e);
             }

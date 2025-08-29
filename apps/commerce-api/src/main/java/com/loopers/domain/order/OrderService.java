@@ -2,8 +2,6 @@ package com.loopers.domain.order;
 
 import com.loopers.application.order.dto.OrderCreateCommand;
 import com.loopers.application.order.dto.OrderLineItem;
-import com.loopers.domain.point.Point;
-import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.product.vo.Products;
@@ -17,8 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 public class OrderService {
-
-    private final PointRepository pointRepository;
 
     private final OrderRepository orderRepository;
 
@@ -67,23 +63,7 @@ public class OrderService {
         return productPrice * quantity;
     }
 
-    @Transactional
-    public void cancelOrderWithRestoration(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
-
-        restoreProductStocks(order.getOrderItems());
-
-        Point point = pointRepository.findByUserId(order.getUserId())
-                .orElseThrow(() -> new IllegalStateException("포인트가 존재하지 않습니다."));
-        point.restorePoint(order.getUsedPoints());
-
-        // 쿠폰 복원
-
-        order.cancel();
-    }
-
-    private void restoreProductStocks(List<OrderItem> orderItems) {
+    public void restoreProductStocks(List<OrderItem> orderItems) {
         List<Long> productIds = orderItems.stream().map(e -> e.getProduct().getId()).toList();
         Products products = productService.reserveProducts(productIds);
         for (OrderItem orderItem : orderItems) {
