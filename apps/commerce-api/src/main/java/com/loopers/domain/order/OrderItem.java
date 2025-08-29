@@ -28,6 +28,7 @@ public class OrderItem extends BaseEntity {
     private Product product;
 
     private Long quantity;
+
     private Long totalPrice;
 
     private OrderItem(Order order, Product product, Long quantity, Long totalPrice) {

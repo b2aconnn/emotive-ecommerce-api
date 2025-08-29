@@ -59,4 +59,8 @@ public class Product extends BaseEntity {
     public static Product create(ProductCreateCommand createCommand) {
         return new Product(createCommand);
     }
+
+    public boolean isStockEnough(Long quantity) {
+        return productStock.isStockEnough(quantity);
+    }
 }

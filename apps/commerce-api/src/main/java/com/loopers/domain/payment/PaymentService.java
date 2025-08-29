@@ -1,5 +1,6 @@
 package com.loopers.domain.payment;
 
+import com.loopers.application.payment.dto.PaymentCreateCommand;
 import com.loopers.application.payment.dto.PaymentResultStatus;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.order.PaymentStatus;
@@ -24,6 +25,14 @@ public class PaymentService {
     private final OrderService orderService;
 
     private final PgClient pgClient;
+
+    public void saveOrderPaymentRequest(PaymentCreateCommand createCommand) {
+        paymentRepository.save(Payment.create(
+                createCommand.orderId(),
+                createCommand.pgOrderId(),
+                createCommand.paymentMethod(),
+                createCommand.amount()));
+    }
 
     public void handlePaymentResult(Payment payment) {
         PGTransactionInfoResult transactionInfoResult = pgClient.getTransaction(payment.getTransactionKey());

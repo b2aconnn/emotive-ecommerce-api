@@ -1,10 +1,10 @@
 package com.loopers.interfaces.api.order;
 
-import com.loopers.application.order.OrderStatusResult;
 import com.loopers.application.order.dto.OrderCreateCommand;
 import com.loopers.application.order.dto.OrderLineItem;
+import com.loopers.application.order.dto.OrderStatusResult;
 import com.loopers.domain.order.Order;
-import com.loopers.domain.order.PaymentStatus;
+import com.loopers.domain.order.OrderStatus;
 import com.loopers.domain.payment.PaymentMethod;
 import com.loopers.domain.payment.dto.CardType;
 
@@ -17,6 +17,7 @@ public class OrderV1Dto {
                                 String contactNumber,
                                 List<OrderLineItem> items,
                                 Long availablePoints,
+                                Long couponId,
 
                                 PaymentMethod paymentMethod,
                                 CardType cardType,
@@ -29,6 +30,7 @@ public class OrderV1Dto {
                 contactNumber,
                 items,
                 availablePoints,
+                couponId,
 
                 paymentMethod,
                 cardType,
@@ -44,9 +46,9 @@ public class OrderV1Dto {
     }
 
     public record StatusResponse(Long orderId,
-                                 PaymentStatus paymentStatus) {
+                                 OrderStatus status) {
         public static StatusResponse from(OrderStatusResult result) {
-            return new StatusResponse(result.orderId(), result.paymentStatus());
+            return new StatusResponse(result.orderId(), result.status());
         }
     }
 }
