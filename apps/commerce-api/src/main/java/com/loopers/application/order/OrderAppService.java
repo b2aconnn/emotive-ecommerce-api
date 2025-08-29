@@ -3,14 +3,18 @@ package com.loopers.application.order;
 import com.loopers.application.order.dto.OrderCreateCommand;
 import com.loopers.application.order.dto.OrderLineItem;
 import com.loopers.application.order.dto.OrderStatusResult;
+import com.loopers.application.order.event.model.CreateOrderEvent;
+import com.loopers.application.order.event.model.OrderCancelEvent;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.order.Discount;
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderRepository;
 import com.loopers.domain.order.OrderService;
-import com.loopers.domain.point.PointService;
+import com.loopers.domain.point.Point;
+import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.product.vo.Products;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -30,27 +34,22 @@ public class OrderAppService {
 
     private final ProductService productService;
 
-    private final PointService pointService;
+    private final PointRepository pointRepository;
 
     private final CouponService couponService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
+     * ### 주문 프로세스
      * 상품 재고 예약
      * 주문 생성
-     * 포인트 조회
      * 쿠폰 조회
+     * 포인트 조회 및 사용
      * 할인 적용
      * 결제 진행
      * 재고 차감
      * 주문 결제 대기
-     */
-    /**
-     * ### 주문 생성 후 처리해야 할 것 (이벤트 발행)
-     * 포인트 사용 처리
-     * 쿠폰 사용 처리
-     * 결제 요청 처리
      */
     @Transactional
     public Order order(OrderCreateCommand createCommand) {
@@ -65,15 +64,26 @@ public class OrderAppService {
                 createCommand.couponId(),
                 saveOrder.getItemTotalAmount());
 
-        Discount pointDiscount = pointService.createPointDiscount(
-                createCommand.userId(),
-                createCommand.usedPoints());
+        Point point = pointRepository.findByUserId(createCommand.userId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "포인트 정보가 없습니다. userId: " + createCommand.userId()));
+        point.use(createCommand.usedPoints());
 
-        saveOrder.applyDiscount(List.of(couponDiscount, pointDiscount));
+        saveOrder.applyDiscount(List.of(couponDiscount));
 
         productService.deductStocks(products, createCommand.items());
 
         saveOrder.pending();
+
+        applicationEventPublisher.publishEvent(new CreateOrderEvent(
+                saveOrder.getId(),
+                createCommand.userId(),
+                createCommand.couponId(),
+                saveOrder.getTotalAmount(),
+                createCommand.paymentMethod(),
+                createCommand.cardType(),
+                createCommand.cardNo()
+        ));
 
         return saveOrder;
     }
@@ -83,5 +93,32 @@ public class OrderAppService {
                 .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
 
         return new OrderStatusResult(order.getId(), order.getStatus());
+    }
+
+    @Transactional
+    public void cancelOrderWithRestoration(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
+
+        orderService.restoreProductStocks(order.getOrderItems());
+
+        Point point = pointRepository.findByUserId(order.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "포인트 정보가 없습니다. userId: " + order.getUserId()));
+        point.restorePoint(order.getUsedPoints());
+
+        order.cancel();
+
+        applicationEventPublisher.publishEvent(new OrderCancelEvent(
+                order.getCouponId(),
+                order.getUserId()));
+    }
+
+    @Transactional
+    public void completeOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
+
+        order.complete();
     }
 }

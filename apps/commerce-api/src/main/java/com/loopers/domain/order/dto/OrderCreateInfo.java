@@ -5,5 +5,6 @@ public record OrderCreateInfo(
         String orderer,
         String deliveryAddress,
         String contactNumber,
-        Long usedPoints
+        Long usedPoints,
+        Long couponId
 ) {}

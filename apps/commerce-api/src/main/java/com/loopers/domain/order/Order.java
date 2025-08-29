@@ -37,6 +37,8 @@ public class Order extends BaseEntity {
 
     private Long usedPoints;
 
+    private Long couponId;
+
     private Long totalAmount;
 
     @Enumerated(STRING)
@@ -47,6 +49,7 @@ public class Order extends BaseEntity {
         this.orderer = createInfo.orderer();
         this.deliveryAddress = createInfo.deliveryAddress();
         this.contactNumber = createInfo.contactNumber();
+        this.couponId = createInfo.couponId();
         this.usedPoints = createInfo.usedPoints();
         this.totalAmount = 0L;
         this.status = CREATED;
@@ -90,27 +93,19 @@ public class Order extends BaseEntity {
         this.status = COMPLETED;
     }
 
+    public void cancel() {
+        if (!checkCreateStatus() && !checkPendingStatus()) {
+            return;
+        }
+        this.status = CANCELED;
+    }
+
     private boolean checkCreateStatus() {
         return this.status == CREATED;
     }
 
     private boolean checkPendingStatus() {
         return this.status == PENDING;
-    }
-
-    public void updateTotalAmount(Long totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public void updateOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-    }
-
-    public void cancel() {
-        if (!checkCreateStatus() && !checkPendingStatus()) {
-            return;
-        }
-        this.status = CANCELED;
     }
 
     public Long getItemTotalAmount() {
@@ -124,6 +119,10 @@ public class Order extends BaseEntity {
                 .mapToLong(Discount::amount)
                 .sum();
 
-        this.totalAmount = Math.max(0L, getItemTotalAmount() - discountAmount);
+        this.totalAmount = Math.max(0L, getItemTotalAmount() - discountAmount - usedPoints);
+    }
+
+    public void updateOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 }

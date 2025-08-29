@@ -1,5 +1,6 @@
 package com.loopers.application.point;
 
+import com.loopers.application.point.dto.PointInfo;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.user.User;
@@ -13,9 +14,10 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
-public class PointFacade {
+public class PointAppService {
 
     private final UserRepository userRepository;
+
     private final PointRepository pointRepository;
 
     @Transactional(rollbackFor = Exception.class)
