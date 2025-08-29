@@ -27,7 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 class ProductLikeServiceIntegrationTest {
@@ -65,7 +66,7 @@ class ProductLikeServiceIntegrationTest {
         void userNotFound() {
             // act
             // assert
-            assertThatThrownBy(() -> productLikeAppService.likeProduct("nonexistent-user", 1L))
+            assertThatThrownBy(() -> productLikeAppService.likeProduct(1L, 1L))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("유저가 존재하지 않습니다. userId: nonexistent-user");
         }
@@ -83,7 +84,7 @@ class ProductLikeServiceIntegrationTest {
             userRepository.save(User.create(userCreateInfo));
 
             // act
-            assertThatThrownBy(() -> productLikeAppService.likeProduct("user1234", 1L))
+            assertThatThrownBy(() -> productLikeAppService.likeProduct(1L, 1L))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("상품이 존재하지 않습니다. productId: 1");
         }
@@ -112,13 +113,13 @@ class ProductLikeServiceIntegrationTest {
                     saveBrand)));
 
             // act
-            productLikeAppService.likeProduct("user1234", saveProduct.getId());
+            productLikeAppService.likeProduct(1L, saveProduct.getId());
 
             // assert
             Optional<ProductLikeCount> productLikeCountOptional = productLikeCountRepository.findByProductId(saveProduct.getId());
 
             assertAll(
-                () -> assertThat(productLikeRepository.hasUserLikedProduct(saveUser.getId(), saveProduct.getId())).isTrue(),
+                () -> assertThat(productLikeRepository.existsUserLikedProduct(saveUser.getId(), saveProduct.getId())).isTrue(),
                 () -> assertThat(productLikeCountOptional.isPresent()).isTrue(),
                 () -> assertThat(productLikeCountOptional.get().getLikeCount()).isEqualTo(1),
                 () -> verify(productLikeRepository, times(1))
@@ -156,17 +157,17 @@ class ProductLikeServiceIntegrationTest {
             productLikeCount.increase();
             productLikeCountRepository.save(productLikeCount);
 
-            assertThat(productLikeRepository.hasUserLikedProduct(saveUser.getId(), saveProduct.getId())).isTrue();
+            assertThat(productLikeRepository.existsUserLikedProduct(saveUser.getId(), saveProduct.getId())).isTrue();
 
             Optional<ProductLikeCount> productLikeCountOptional = productLikeCountRepository.findByProductId(saveProduct.getId());
             assertThat(productLikeCountOptional.isPresent()).isTrue();
             assertThat(productLikeCountOptional.get().getLikeCount()).isEqualTo(1);
 
             // act
-            productLikeAppService.likeProduct("user1234", saveProduct.getId());
+            productLikeAppService.likeProduct(1L, saveProduct.getId());
 
             // assert
-            assertThat(productLikeRepository.hasUserLikedProduct(saveUser.getId(), saveProduct.getId())).isTrue();
+            assertThat(productLikeRepository.existsUserLikedProduct(saveUser.getId(), saveProduct.getId())).isTrue();
 
             productLikeCountOptional = productLikeCountRepository.findByProductId(saveProduct.getId());
             assertThat(productLikeCountOptional.isPresent()).isTrue();
@@ -202,17 +203,17 @@ class ProductLikeServiceIntegrationTest {
             productLikeCount.increase();
             productLikeCountRepository.save(productLikeCount);
 
-            assertThat(productLikeRepository.hasUserLikedProduct(saveUser.getId(), saveProduct.getId())).isTrue();
+            assertThat(productLikeRepository.existsUserLikedProduct(saveUser.getId(), saveProduct.getId())).isTrue();
 
             Optional<ProductLikeCount> productLikeCountOptional = productLikeCountRepository.findByProductId(saveProduct.getId());
             assertThat(productLikeCountOptional.isPresent()).isTrue();
             assertThat(productLikeCountOptional.get().getLikeCount()).isEqualTo(1);
 
             // act
-            productLikeAppService.unlikeProduct("user1234", saveProduct.getId());
+            productLikeAppService.unlikeProduct(1L, saveProduct.getId());
 
             // assert
-            assertThat(productLikeRepository.hasUserLikedProduct(saveUser.getId(), saveProduct.getId())).isFalse();
+            assertThat(productLikeRepository.existsUserLikedProduct(saveUser.getId(), saveProduct.getId())).isFalse();
 
             productLikeCountOptional = productLikeCountRepository.findByProductId(saveProduct.getId());
             assertThat(productLikeCountOptional.isPresent()).isTrue();
@@ -242,16 +243,16 @@ class ProductLikeServiceIntegrationTest {
                     10_000L,
                     saveBrand)));
 
-            assertThat(productLikeRepository.hasUserLikedProduct(saveUser.getId(), saveProduct.getId())).isFalse();
+            assertThat(productLikeRepository.existsUserLikedProduct(saveUser.getId(), saveProduct.getId())).isFalse();
 
             Optional<ProductLikeCount> productLikeCountOptional = productLikeCountRepository.findByProductId(saveProduct.getId());
             assertThat(productLikeCountOptional.isPresent()).isFalse();
 
             // act
-            productLikeAppService.unlikeProduct("user1234", saveProduct.getId());
+            productLikeAppService.unlikeProduct(1L, saveProduct.getId());
 
             // assert
-            assertThat(productLikeRepository.hasUserLikedProduct(saveUser.getId(), saveProduct.getId())).isFalse();
+            assertThat(productLikeRepository.existsUserLikedProduct(saveUser.getId(), saveProduct.getId())).isFalse();
 
             productLikeCountOptional = productLikeCountRepository.findByProductId(saveProduct.getId());
             assertThat(productLikeCountOptional.isPresent()).isFalse();

@@ -1,11 +1,7 @@
 package com.loopers.infrastructure.productlike.jpa;
 
-import com.loopers.domain.product.Product;
 import com.loopers.domain.productlike.ProductLike;
-import com.loopers.domain.productlike.ProductLikeCount;
-import com.loopers.domain.productlike.ProductLikeCountRepository;
 import com.loopers.domain.productlike.ProductLikeRepository;
-import com.loopers.domain.user.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -30,12 +26,12 @@ public class ProductLikeRepositoryImpl implements ProductLikeRepository {
     }
 
     @Override
-    public boolean hasUserLikedProduct(Long userId, Long productId) {
+    public boolean existsUserLikedProduct(Long userId, Long productId) {
         return productLikeJpaRepository.existsByUserIdAndProductId(userId, productId);
     }
 
     @Override
-    public Optional<ProductLike> findByUserAndProduct(Long userId, Long productId) {
+    public Optional<ProductLike> findByUserIdAndProductId(Long userId, Long productId) {
         return productLikeJpaRepository.findByUserIdAndProductId(userId, productId);
     }
 }

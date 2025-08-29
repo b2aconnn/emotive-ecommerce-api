@@ -13,13 +13,13 @@ public class DataPlatformEventPublisher {
 
     private final DataPlatformClient dataPlatformClient;
 
-    @Async("dataPlatformExecutor")
+    @Async
     @TransactionalEventListener
     public void publishOrderData(CreateOrderEvent event) {
         dataPlatformClient.sendOrderData(event);
     }
 
-    @Async("dataPlatformExecutor")
+    @Async
     @TransactionalEventListener
     public void publishPaymentData(PaymentResultEvent payment) {
         dataPlatformClient.sendPaymentData(payment);
