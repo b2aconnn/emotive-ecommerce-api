@@ -8,6 +8,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,13 +26,15 @@ import static org.springframework.util.StringUtils.hasText;
 public class ProductRepositoryImpl implements ProductRepository {
 
     private final ProductJpaRepository productJpaRepository;
+    private final JpaContext jpaContext;
 
     private JPAQueryFactory queryFactory;
 
     public ProductRepositoryImpl(ProductJpaRepository productJpaRepository,
-                                EntityManager em) {
+                                 EntityManager em, JpaContext jpaContext) {
         this.productJpaRepository = productJpaRepository;
         this.queryFactory = new JPAQueryFactory(em);
+        this.jpaContext = jpaContext;
     }
 
     @Override
@@ -83,8 +86,11 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .fetchOne());
     }
 
-    @Override
-    public Optional<List<Product>> findByIdsWithStockLock(List<Long> ids) {
-        return Optional.empty();
+    public Optional<List<Product>> findByIdInWithStock(List<Long> ids) {
+        return Optional.ofNullable(queryFactory.select(product)
+                .from(product)
+                .leftJoin(product.productStock, productStock).fetchJoin()
+                .where(product.id.in(ids))
+                .fetch());
     }
 }
