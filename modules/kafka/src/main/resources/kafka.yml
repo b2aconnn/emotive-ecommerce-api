@@ -15,6 +15,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       retries: 3
+      acks: all # ISR 까지 메세지 저장 및 응답 받기 설정
+      properties:
+        enable.idempotence: true # 멱등성 활성화
     consumer:
       group-id: loopers-default-consumer
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
