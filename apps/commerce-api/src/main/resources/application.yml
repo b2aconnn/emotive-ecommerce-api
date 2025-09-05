@@ -25,6 +25,12 @@ spring:
       - logging.yml
       - monitoring.yml
 
+kafka:
+  topics:
+    order: order.v1
+    audit: audit.v1
+    product: product.v1
+
 springdoc:
   use-fqn: true
   swagger-ui:

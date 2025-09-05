@@ -1,9 +1,11 @@
 package com.loopers.application.product;
 
+import com.loopers.application.product.event.model.ProductViewedEvent;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,12 +14,21 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Service
 public class ProductAppService {
+
     private final ProductRepository productRepository;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Cacheable(value = "products", key = "#id", unless = "#result == null")
     public ProductResult getProduct(Long id) {
         Optional<Product> productOptional = productRepository.findById(id);
-        return productOptional.map(ProductResult::from).orElse(null);
+        ProductResult productResult = productOptional.map(ProductResult::from).orElse(null);
+
+        if (productResult != null) {
+            applicationEventPublisher.publishEvent(new ProductViewedEvent(productResult.id()));
+        }
+
+        return productResult;
     }
 
     @Cacheable(

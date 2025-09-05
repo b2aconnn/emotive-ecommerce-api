@@ -1,5 +1,7 @@
 package com.loopers.application.productlike;
 
+import com.loopers.application.productlike.event.model.ProductLikeCountAddedEvent;
+import com.loopers.application.productlike.event.model.ProductLikeCountRemovedEvent;
 import com.loopers.application.productlike.event.model.ProductLikedEvent;
 import com.loopers.application.productlike.event.model.ProductUnlikedEvent;
 import com.loopers.domain.product.Product;
@@ -55,6 +57,11 @@ public class ProductLikeAppService {
                         "상품이 존재하지 않습니다. productId: " + productId));
 
         product.likeCountUp();
+
+        applicationEventPublisher.publishEvent(new ProductLikeCountAddedEvent(
+                productId,
+                product.getProductStock().getQuantity()
+        ));
     }
 
     @Transactional
@@ -83,5 +90,10 @@ public class ProductLikeAppService {
                         "상품이 존재하지 않습니다. productId: " + productId));
 
         product.unlikeCountDown();
+
+        applicationEventPublisher.publishEvent(new ProductLikeCountRemovedEvent(
+                productId,
+                product.getProductStock().getQuantity()
+        ));
     }
 }
