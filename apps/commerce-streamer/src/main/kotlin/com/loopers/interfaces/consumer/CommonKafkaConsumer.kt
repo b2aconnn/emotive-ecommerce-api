@@ -5,6 +5,8 @@ import com.loopers.config.kafka.KafkaConfig
 import com.loopers.domain.auditlog.EventLog
 import com.loopers.domain.auditlog.EventLogRepository
 import com.loopers.domain.auditlog.AuditMessageEnvelope
+import com.loopers.domain.event.EventHandled
+import com.loopers.domain.event.EventHandledRepository
 import com.loopers.domain.order.OrderCompletedMessage
 import com.loopers.domain.order.OrderMessageEnvelope
 import com.loopers.domain.product.ProductLikeAddedMessage
@@ -13,18 +15,16 @@ import com.loopers.domain.product.ProductMessageEnvelope
 import com.loopers.domain.product.ProductMetrics
 import com.loopers.domain.product.ProductMetricsRepository
 import com.loopers.domain.product.ProductViewedMessage
-import com.sun.org.apache.xml.internal.serializer.utils.Utils.messages
-import jdk.internal.platform.Container.metrics
-import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
 import kotlin.jvm.java
 
 @Component
-class DemoKafkaConsumer(
+class CommonKafkaConsumer(
     private val eventLogRepository: EventLogRepository,
     private val productMetricsRepository: ProductMetricsRepository,
+    private val eventHandledRepository: EventHandledRepository,
     private val jacksonObjectMapper: ObjectMapper
 ) {
     @KafkaListener(
@@ -36,6 +36,11 @@ class DemoKafkaConsumer(
         acknowledgment: Acknowledgment,
     ) {
         val envelope = jacksonObjectMapper.readValue(message, OrderMessageEnvelope::class.java)
+
+        if (eventHandledRepository.existsByEventIdAndEventType(
+                envelope.eventId, envelope.eventType)) {
+            return
+        }
 
         var metrics: ProductMetrics? = null
         when (envelope.aggregateType) {
@@ -55,6 +60,8 @@ class DemoKafkaConsumer(
             }
         }
 
+        eventHandledRepository.save(EventHandled(envelope.eventId, envelope.eventType))
+
         acknowledgment.acknowledge() // manual ack
     }
 
@@ -67,6 +74,11 @@ class DemoKafkaConsumer(
         acknowledgment: Acknowledgment,
     ) {
         val envelope = jacksonObjectMapper.readValue(message, ProductMessageEnvelope::class.java)
+
+        if (eventHandledRepository.existsByEventIdAndEventType(
+                envelope.eventId, envelope.eventType)) {
+            return
+        }
 
         when (envelope.aggregateType) {
             "LIKE_ADDED" -> {
@@ -101,6 +113,8 @@ class DemoKafkaConsumer(
             }
         }
 
+        eventHandledRepository.save(EventHandled(envelope.eventId, envelope.eventType))
+
         acknowledgment.acknowledge() // manual ack
     }
 
@@ -112,6 +126,11 @@ class DemoKafkaConsumer(
         message: AuditMessageEnvelope,
         acknowledgment: Acknowledgment,
     ) {
+        if (eventHandledRepository.existsByEventIdAndEventType(
+                message.eventId, message.eventType)) {
+            return
+        }
+
         val eventLog = EventLog(
             eventId = message.eventId,
             eventType = message.eventType,
@@ -120,6 +139,8 @@ class DemoKafkaConsumer(
             payload = message.payload
         )
         eventLogRepository.save(eventLog)
+
+        eventHandledRepository.save(EventHandled(message.eventId, message.eventType))
 
         acknowledgment.acknowledge() // manual ack
     }
