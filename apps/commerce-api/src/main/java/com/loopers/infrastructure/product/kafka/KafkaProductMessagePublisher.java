@@ -16,7 +16,7 @@ public class KafkaProductMessagePublisher implements ProductMessagePublisher {
 
     private final KafkaTemplate kafkaTemplate;
 
-    @Value( "${kafka.product.order}")
+    @Value( "${kafka.topics.product}")
     private String productTopic;
 
     @Value( "${kafka.topics.audit}")
@@ -27,6 +27,8 @@ public class KafkaProductMessagePublisher implements ProductMessagePublisher {
         ProductMessageEnvelope<ProductLikeAddedMessage> messageEnvelope = new ProductMessageEnvelope<>(
                 ProductMessageType.LIKE_ADDED,
                 UUID.randomUUID().toString(),
+                Long.toString(message.productId()),
+                "PRODUCT",
                 ZonedDateTime.now(),
                 message
         );
@@ -38,8 +40,10 @@ public class KafkaProductMessagePublisher implements ProductMessagePublisher {
     @Override
     public void publishLikeRemoved(ProductLikeRemovedMessage message) {
         ProductMessageEnvelope<ProductLikeRemovedMessage> messageEnvelope = new ProductMessageEnvelope<>(
-                ProductMessageType.LIKE_ADDED,
+                ProductMessageType.LIKE_REMOVED,
                 UUID.randomUUID().toString(),
+                Long.toString(message.productId()),
+                "PRODUCT",
                 ZonedDateTime.now(),
                 message
         );
@@ -51,8 +55,10 @@ public class KafkaProductMessagePublisher implements ProductMessagePublisher {
     @Override
     public void publishViewed(ProductViewedMessage message) {
         ProductMessageEnvelope<ProductViewedMessage> messageEnvelope = new ProductMessageEnvelope<>(
-                ProductMessageType.LIKE_ADDED,
+                ProductMessageType.LIKE_VIEWED,
                 UUID.randomUUID().toString(),
+                Long.toString(message.productId()),
+                "PRODUCT",
                 ZonedDateTime.now(),
                 message
         );
