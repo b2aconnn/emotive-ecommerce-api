@@ -6,7 +6,6 @@ import com.loopers.domain.order.message.model.OrderMessageEnvelope;
 import com.loopers.domain.order.message.model.OrderMessageType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +29,8 @@ public class KafkaOrderMessagePublisher implements OrderMessagePublisher {
         OrderMessageEnvelope<OrderCompletedMessage> messageEnvelope = new OrderMessageEnvelope<>(
                 OrderMessageType.ORDER_COMPLETED,
                 UUID.randomUUID().toString(),
+                Long.toString(message.orderId()),
+                "ORDER",
                 ZonedDateTime.now(),
                 message
         );
