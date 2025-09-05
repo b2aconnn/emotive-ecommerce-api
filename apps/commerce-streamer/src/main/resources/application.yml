@@ -24,11 +24,13 @@ spring:
       - redis.yml
       - kafka.yml
       - logging.yml
-      - monitoring.yml
+#      - monitoring.yml
 
-demo-kafka:
-  test:
-    topic-name: demo.internal.topic-v1
+kafka:
+  topics:
+    order: order.v1
+    audit: audit.v1
+    product: product.v1
 
 ---
 spring:
