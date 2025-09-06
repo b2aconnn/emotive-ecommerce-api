@@ -16,8 +16,12 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    private final ProductStockRepository productStockRepository;
+
     public Products reserveProducts(List<Long> productIds) {
-        Map<Long, Product> productsMap = productRepository.findByIdsWithStockLock(productIds)
+        productStockRepository.findByProductIdsWithStockLock(productIds);
+
+        Map<Long, Product> productsMap = productRepository.findByIdInWithStock(productIds)
                 .orElseThrow(() -> new IllegalStateException("상품이 존재하지 않거나 재고가 없습니다."))
                 .stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));

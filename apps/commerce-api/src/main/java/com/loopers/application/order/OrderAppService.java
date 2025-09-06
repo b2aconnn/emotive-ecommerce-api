@@ -3,8 +3,9 @@ package com.loopers.application.order;
 import com.loopers.application.order.dto.OrderCreateCommand;
 import com.loopers.application.order.dto.OrderLineItem;
 import com.loopers.application.order.dto.OrderStatusResult;
-import com.loopers.application.order.event.model.CreateOrderEvent;
-import com.loopers.application.order.event.model.OrderCancelEvent;
+import com.loopers.application.order.event.model.OrderCompletedEvent;
+import com.loopers.application.order.event.model.OrderCreatedEvent;
+import com.loopers.application.order.event.model.OrderCanceledEvent;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.order.Discount;
 import com.loopers.domain.order.Order;
@@ -75,7 +76,7 @@ public class OrderAppService {
 
         saveOrder.pending();
 
-        applicationEventPublisher.publishEvent(new CreateOrderEvent(
+        applicationEventPublisher.publishEvent(new OrderCreatedEvent(
                 saveOrder.getId(),
                 createCommand.userId(),
                 createCommand.couponId(),
@@ -109,7 +110,7 @@ public class OrderAppService {
 
         order.cancel();
 
-        applicationEventPublisher.publishEvent(new OrderCancelEvent(
+        applicationEventPublisher.publishEvent(new OrderCanceledEvent(
                 order.getCouponId(),
                 order.getUserId()));
     }
@@ -120,5 +121,10 @@ public class OrderAppService {
                 .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
 
         order.complete();
+
+        applicationEventPublisher.publishEvent(new OrderCompletedEvent(
+                orderId,
+                order.getOrderItems()
+        ));
     }
 }

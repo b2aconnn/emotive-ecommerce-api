@@ -1,6 +1,6 @@
 package com.loopers.infrastructure.external.dataplatform;
 
-import com.loopers.application.order.event.model.CreateOrderEvent;
+import com.loopers.application.order.event.model.OrderCreatedEvent;
 import com.loopers.application.payment.event.model.PaymentResultEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
@@ -15,7 +15,7 @@ public class DataPlatformEventPublisher {
 
     @Async
     @TransactionalEventListener
-    public void publishOrderData(CreateOrderEvent event) {
+    public void publishOrderData(OrderCreatedEvent event) {
         dataPlatformClient.sendOrderData(event);
     }
 
