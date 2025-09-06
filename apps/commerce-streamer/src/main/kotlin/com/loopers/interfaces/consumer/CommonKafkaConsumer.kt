@@ -2,23 +2,17 @@ package com.loopers.interfaces.consumer
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.loopers.config.kafka.KafkaConfig
+import com.loopers.domain.auditlog.AuditMessageEnvelope
 import com.loopers.domain.auditlog.EventLog
 import com.loopers.domain.auditlog.EventLogRepository
-import com.loopers.domain.auditlog.AuditMessageEnvelope
 import com.loopers.domain.event.EventHandled
 import com.loopers.domain.event.EventHandledRepository
 import com.loopers.domain.order.OrderCompletedMessage
 import com.loopers.domain.order.OrderMessageEnvelope
-import com.loopers.domain.product.ProductLikeAddedMessage
-import com.loopers.domain.product.ProductLikeRemovedMessage
-import com.loopers.domain.product.ProductMessageEnvelope
-import com.loopers.domain.product.ProductMetrics
-import com.loopers.domain.product.ProductMetricsRepository
-import com.loopers.domain.product.ProductViewedMessage
+import com.loopers.domain.product.*
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
-import kotlin.jvm.java
 
 @Component
 class CommonKafkaConsumer(
@@ -28,7 +22,7 @@ class CommonKafkaConsumer(
     private val jacksonObjectMapper: ObjectMapper
 ) {
     @KafkaListener(
-        topics = ["\${kafka.topics.product}"],
+        topics = ["\${kafka.topics.order}"],
         containerFactory = KafkaConfig.BATCH_LISTENER,
     )
     fun orderListener(
