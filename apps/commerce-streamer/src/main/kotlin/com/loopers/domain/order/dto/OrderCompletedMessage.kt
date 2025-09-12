@@ -1,4 +1,4 @@
-package com.loopers.domain.order
+package com.loopers.domain.order.dto
 
 data class OrderCompletedMessage(
     val orderId: Long,

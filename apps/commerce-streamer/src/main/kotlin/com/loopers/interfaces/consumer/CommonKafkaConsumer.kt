@@ -7,8 +7,8 @@ import com.loopers.domain.auditlog.EventLog
 import com.loopers.domain.auditlog.EventLogRepository
 import com.loopers.domain.event.EventHandled
 import com.loopers.domain.event.EventHandledRepository
-import com.loopers.domain.order.OrderCompletedMessage
-import com.loopers.domain.order.OrderMessageEnvelope
+import com.loopers.domain.order.application.OrderService
+import com.loopers.domain.order.dto.OrderMessageEnvelope
 import com.loopers.domain.product.*
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -19,7 +19,8 @@ class CommonKafkaConsumer(
     private val eventLogRepository: EventLogRepository,
     private val productMetricsRepository: ProductMetricsRepository,
     private val eventHandledRepository: EventHandledRepository,
-    private val jacksonObjectMapper: ObjectMapper
+    private val jacksonObjectMapper: ObjectMapper,
+    private val orderService: OrderService
 ) {
     @KafkaListener(
         topics = ["\${kafka.topics.order}"],
@@ -36,18 +37,9 @@ class CommonKafkaConsumer(
             return
         }
 
-        var metrics: ProductMetrics? = null
         when (envelope.eventType) {
             "ORDER_COMPLETED" -> {
-                val payload = jacksonObjectMapper.treeToValue(envelope.payload, OrderCompletedMessage::class.java)
-
-                for (item in payload.orderItems) {
-                    metrics = productMetricsRepository.findByProductId(item.productId)
-                        ?: ProductMetrics(productId = item.productId)
-                    metrics.soldCount(item.quantity)
-                }
-
-                metrics?.let { productMetricsRepository.save(it) }
+                orderService.processOrderEvent(envelope)
             }
             else -> {
                 println("Unknown event type: ${envelope.eventType}")

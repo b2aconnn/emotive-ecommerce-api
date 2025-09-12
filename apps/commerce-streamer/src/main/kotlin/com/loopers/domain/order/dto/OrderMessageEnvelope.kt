@@ -1,4 +1,4 @@
-package com.loopers.domain.order
+package com.loopers.domain.order.dto
 
 import com.fasterxml.jackson.databind.JsonNode
 
