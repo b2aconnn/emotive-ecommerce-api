@@ -37,9 +37,9 @@ class CommonKafkaConsumer(
         }
 
         var metrics: ProductMetrics? = null
-        when (envelope.aggregateType) {
+        when (envelope.eventType) {
             "ORDER_COMPLETED" -> {
-                val payload = jacksonObjectMapper.readValue(envelope.payload, OrderCompletedMessage::class.java)
+                val payload = jacksonObjectMapper.treeToValue(envelope.payload, OrderCompletedMessage::class.java)
 
                 for (item in payload.orderItems) {
                     metrics = productMetricsRepository.findByProductId(item.productId)
