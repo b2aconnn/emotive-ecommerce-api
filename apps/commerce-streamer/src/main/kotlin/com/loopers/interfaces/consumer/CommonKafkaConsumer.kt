@@ -7,8 +7,8 @@ import com.loopers.domain.auditlog.EventLog
 import com.loopers.domain.auditlog.EventLogRepository
 import com.loopers.domain.event.EventHandled
 import com.loopers.domain.event.EventHandledRepository
-import com.loopers.domain.order.dto.OrderMessageEnvelope
 import com.loopers.domain.order.application.OrderService
+import com.loopers.domain.order.dto.OrderMessageEnvelope
 import com.loopers.domain.product.*
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -47,7 +47,6 @@ class CommonKafkaConsumer(
         }
 
         eventHandledRepository.save(EventHandled(envelope.eventId, envelope.eventType))
-
         acknowledgment.acknowledge() // manual ack
     }
 
