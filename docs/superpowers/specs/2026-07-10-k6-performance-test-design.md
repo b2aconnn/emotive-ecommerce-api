@@ -18,7 +18,7 @@ k6에서 VU별로 서로 다른 유저의 포인트 흐름을 검증하려면 �
 
 **수정 범위** (`commerce-api-conventions`의 interfaces 계층 컨벤션을 따름):
 - `PointV1Controller`: `charge`, `get` 메서드에 `@CurrentUser User currentUser` 파라미터를 추가하고, `pointAppService.charge(currentUser.getUserId(), ...)` / `pointAppService.get(currentUser.getUserId())`로 교체. 하드코딩된 `String userId = "user1234"` 제거.
-- `PointV1ApiSpec`: 인터페이스 메서드 시그니처를 Controller와 동일하게 맞춘다(`@Override` 매칭을 위해 파라미터 개수가 일치해야 함).
+- `PointV1ApiSpec`: 인터페이스 메서드 시그니처를 Controller와 동일하게 맞춘다(`@Override` 매칭을 위해 파라미터 개수가 일치해야 함). `currentUser` 파라미터는 요청 바디/쿼리가 아니라 헤더에서 오므로 `@Parameter(hidden = true)`로 Swagger 문서에서 숨긴다.
 - `application/point/PointAppService`, `PointV1Dto`는 변경 없음(이미 `String userId`를 받는 시그니처).
 
 **영향받는 기존 테스트**: `PointV1ApiE2ETest`는 이미 모든 케이스에서 `X-USER-ID: user1234`를 보내고 있어(우연히 하드코딩 값과 일치) 이 수정으로 깨지지 않는다. 유저 존재 검증(404/400)은 이미 `UserAuthenticationInterceptor`가 컨트롤러 진입 전에 처리하고 있으므로 그 부분도 영향 없음.
@@ -67,9 +67,11 @@ load-test/
 3. 방문자 유형 분기(누적 확률):
    - **70% 이탈**: 세션 종료
    - **20% 관심**: 포인트 잔액 조회만 하고 이탈
-   - **10% 구매 완주**: 포인트 잔액 조회 → 필요 시(잔액 < 주문 총액)에만 충전 → 상품 풀에서 고른 상품으로 주문 생성(보유 포인트 일부 사용) → 결제 요청 → 주문 상태 확인
+   - **10% 구매 완주**: 포인트 잔액 조회 → 1단계에서 조회했던 상품 중 마지막으로 본 상품을 구매 대상으로 정하고 그 상세 응답의 `price`로 주문 총액을 계산 → 잔액이 부족할 때만 충전 → 해당 상품으로 주문 생성(보유 포인트 일부 사용) → 결제 요청 → 주문 상태 확인
 
 각 VU는 `pool.js`의 `pickUser(__VU)`로 유저 풀에서 결정론적으로 배정된 계정을 사용한다(같은 VU는 항상 같은 계정 → 세션 내 일관성 보장).
+
+`smoke.js`에서 세 분기를 모두 강제로 실행해야 하므로, `user-journey.js`는 분기 로직을 별도 함수(예: `runBrowseOnly`, `runCheckPoint`, `runFullPurchase`)로 분리하고 기본 export는 확률에 따라 이 중 하나를 호출하는 얇은 래퍼로 둔다. `smoke.js`는 세 함수를 직접 import해서 순서대로 호출한다.
 
 ### `hotitem-flow.js` (spike 전용)
 
@@ -86,7 +88,7 @@ load-test/
 | `smoke.js` | `user-journey`의 3개 분기(이탈/관심/구매완주)를 각 1회씩 강제 실행 + `hotitem-flow` 1회 + `point-charge-event` 1회 | VU 1, iteration 고정(랜덤 분기에 의존하지 않음) | 하드 threshold: p95<500ms, p99<1000ms, 실패율<1% |
 | `load.js` | `user-journey`만(내부 70/20/10 랜덤 분기) | ramping-vus: 0→100(1m) → 100 유지(5m) → 0(1m) | p95<500ms, p99<1000ms, 실패율<1% |
 | `stress.js` | `user-journey`만 | 계단식 ramping-vus: 0→50→100→150→200, 구간별 1~2분 유지 후 다음 단계, 마지막 램프다운 | 하드 threshold로 강제 실패시키지 않음(관찰용). 구간별 p95/실패율을 리포트에 기록해 어느 지점에서 SLA가 무너지는지 확인 |
-| `spike.js` | `hotitem-flow` + `point-charge-event` | ramping-arrival-rate: 0→300 req/s를 10~15초 내 급증 → 30초 유지 → 급감 | 하드 threshold 없음. 커스텀 `Counter`로 "재고부족" 응답 비율 집계. 테스트 종료 후 `README.md`에 첨부된 검증 SQL(`SELECT quantity FROM product_stock WHERE product_id = <핫아이템ID>`와 실제 생성된 주문 수 비교)로 오버셀 여부를 수동 확인 |
+| `spike.js` | `hotitem-flow` + `point-charge-event` | 각각 독립된 `ramping-arrival-rate` executor 2개(시나리오 키 분리, VU 풀 겹치지 않음): 0→300 req/s를 10~15초 내 급증 → 30초 유지 → 급감. `preAllocatedVUs`/`maxVUs`를 요청 레이트를 감당할 만큼 넉넉히(예: 300/500) 설정 | 하드 threshold 없음. 커스텀 `Counter`로 "재고부족" 응답 비율 집계. 테스트 종료 후 `README.md`에 첨부된 검증 SQL(`SELECT quantity FROM product_stock WHERE product_id = <핫아이템ID>`와 실제 생성된 주문 수 비교)로 오버셀 여부를 수동 확인 |
 
 ## Out of scope
 
