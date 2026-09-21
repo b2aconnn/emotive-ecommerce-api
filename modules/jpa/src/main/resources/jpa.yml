@@ -44,8 +44,8 @@ spring.config.activate.on-profile: local
 spring:
   jpa:
     show-sql: true
-#    hibernate:
-#      ddl-auto: update
+    hibernate:
+      ddl-auto: update
 
 datasource:
   mysql-jpa:
@@ -60,8 +60,8 @@ spring.config.activate.on-profile: test
 spring:
   jpa:
     show-sql: true
-#    hibernate:
-#      ddl-auto: create
+    hibernate:
+      ddl-auto: create
 
 datasource:
   mysql-jpa:
