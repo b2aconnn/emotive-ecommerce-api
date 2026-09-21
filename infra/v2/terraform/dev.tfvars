@@ -1,0 +1,9 @@
+aws_region           = "ap-northeast-2"
+project              = "loopers-dev-v2"
+compute_enabled      = true
+asg_min_size         = 1
+asg_max_size         = 3
+asg_desired_capacity = 1
+app_instance_type    = "m7i-flex.large"
+db_instance_class    = "db.t4g.micro"
+redis_node_type      = "cache.t3.medium"
