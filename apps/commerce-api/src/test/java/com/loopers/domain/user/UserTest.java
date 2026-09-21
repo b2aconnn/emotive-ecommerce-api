@@ -18,27 +18,6 @@ class UserTest {
         @ValueSource(strings = {
                 "",
                 " ",
-                "failedId123",
-                "id_123",
-        })
-        @ParameterizedTest
-        @DisplayName("ID 가 영문 및 숫자 10자 이내 형식에 맞지 않으면, User 객체 생성에 실패한다.")
-        void failsWhenUserIdFormatIsInvalid(String userId) {
-            // act
-            String name = "park";
-            String email = "abc@abc.com";
-            String birthDateString = "2000-01-01";
-            GenderType gender = MALE;
-            UserCreateInfo userCreateInfo = new UserCreateInfo(userId, name, email, birthDateString, gender);
-
-            // assert
-            assertThatThrownBy(() -> User.create(userCreateInfo))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @ValueSource(strings = {
-                "",
-                " ",
                 "usermail.com",
                 "user@domain",
                 "user@domain.c",
@@ -50,10 +29,9 @@ class UserTest {
         void failsWhenEmailFormatIsInvalid(String email) {
             // act
             String name = "park";
-            String userId = "user1234";
             String birthDateString = "2000-01-01";
             GenderType gender = MALE;
-            UserCreateInfo userCreateInfo = new UserCreateInfo(userId, name, email, birthDateString, gender);
+            UserCreateInfo userCreateInfo = new UserCreateInfo(name, email, birthDateString, gender);
 
             // assert
             assertThatThrownBy(() -> User.create(userCreateInfo))
@@ -77,9 +55,8 @@ class UserTest {
             // act
             String name = "park";
             String email = "user@abc.com";
-            String userId = "user1234";
             GenderType gender = MALE;
-            UserCreateInfo userCreateInfo = new UserCreateInfo(userId, name, email, birthDateString, gender);
+            UserCreateInfo userCreateInfo = new UserCreateInfo(name, email, birthDateString, gender);
 
             // assert
             assertThatThrownBy(() -> User.create(userCreateInfo))

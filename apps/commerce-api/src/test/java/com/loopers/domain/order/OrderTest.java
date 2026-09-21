@@ -28,7 +28,8 @@ public class OrderTest {
                     "홍길동",
                     "서울시 강남구",
                     "010-1234-5678",
-                    5000L)))
+                    5000L,
+                    null)))
                     .isInstanceOf(NullPointerException.class);
         }
 
@@ -54,7 +55,8 @@ public class OrderTest {
                     userName,
                     deliveryAddress,
                     contactNumber,
-                    5000L
+                    5000L,
+                    null
             ))).isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -75,7 +77,8 @@ public class OrderTest {
                     userName,
                     deliveryAddress,
                     contactNumber,
-                    5000L
+                    5000L,
+                    null
             ));
 
             // assert

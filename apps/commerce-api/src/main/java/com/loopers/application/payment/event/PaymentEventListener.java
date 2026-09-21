@@ -1,7 +1,7 @@
 package com.loopers.application.payment.event;
 
 import com.loopers.application.order.event.model.OrderCreatedEvent;
-import com.loopers.application.payment.PaymentAppService;
+import com.loopers.application.payment.PaymentService;
 import com.loopers.application.payment.dto.PaymentCreateCommand;
 import com.loopers.domain.payment.generator.PgIdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +17,14 @@ import static org.springframework.transaction.annotation.Propagation.REQUIRES_NE
 @Component
 public class PaymentEventListener {
 
-    private final PaymentAppService paymentAppService;
+    private final PaymentService paymentService;
 
     @Transactional(propagation = REQUIRES_NEW)
     @TransactionalEventListener
     public void handleCreatePayment(OrderCreatedEvent event) {
         log.info("Payment requested for orderId: {}", event.orderId());
 
-        paymentAppService.create(new PaymentCreateCommand(
+        paymentService.create(new PaymentCreateCommand(
                 event.orderId(),
                 PgIdGenerator.generatePgOrderId(),
                 event.paymentMethod(),

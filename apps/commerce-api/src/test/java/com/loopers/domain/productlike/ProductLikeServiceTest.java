@@ -32,7 +32,6 @@ public class ProductLikeServiceTest {
     void userCanLikeProductOnce() {
         // arrange
         UserCreateInfo userCreateInfo = new UserCreateInfo(
-                "user1234",
                 "park",
                 "user@domain.com",
                 "2000-01-01",
@@ -75,7 +74,6 @@ public class ProductLikeServiceTest {
     void userCannotLikeProductTwice() {
         // arrange
         UserCreateInfo userCreateInfo = new UserCreateInfo(
-                "user1234",
                 "park",
                 "user@domain.com",
                 "2000-01-01",
@@ -110,7 +108,6 @@ public class ProductLikeServiceTest {
     void userCanUnlikeProduct() {
         // arrange
         UserCreateInfo userCreateInfo = new UserCreateInfo(
-                "user1234",
                 "park",
                 "user@domain.com",
                 "2000-01-01",
@@ -152,7 +149,6 @@ public class ProductLikeServiceTest {
     void userCannotUnlikeProductIfNotLiked() {
         // arrange
         UserCreateInfo userCreateInfo = new UserCreateInfo(
-                "user1234",
                 "park",
                 "user@domain.com",
                 "2000-01-01",

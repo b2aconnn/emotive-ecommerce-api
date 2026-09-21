@@ -1,6 +1,6 @@
 package com.loopers.application.order.event;
 
-import com.loopers.application.order.OrderAppService;
+import com.loopers.application.order.OrderService;
 import com.loopers.application.order.event.model.OrderCompletedEvent;
 import com.loopers.application.payment.event.model.PaymentResultEvent;
 import com.loopers.domain.order.message.OrderMessagePublisher;
@@ -20,7 +20,7 @@ import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMI
 @Component
 public class OrderEventListener {
 
-    private final OrderAppService orderAppService;
+    private final OrderService orderService;
 
     private final OrderMessagePublisher orderMessagePublisher;
 
@@ -31,10 +31,10 @@ public class OrderEventListener {
 
         if (SUCCESS.equals(event.status())) {
             log.info("Payment successful for orderId: {}, no action needed.", event.orderId());
-            orderAppService.completeOrder(event.orderId());
+            orderService.completeOrder(event.orderId());
         } else if (FAILED.equals(event.status())) {
             log.info("Payment failed for orderId: {}, cancelling order.", event.orderId());
-            orderAppService.cancelOrderWithRestoration(event.orderId());
+            orderService.cancelOrderWithRestoration(event.orderId());
         } else {
             log.info("Payment status is pending for orderId: {}, no action taken.", event.orderId());
         }

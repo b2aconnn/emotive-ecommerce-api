@@ -1,10 +1,11 @@
 package com.loopers.domain.user;
 
-import com.loopers.application.user.UserFacade;
-import com.loopers.application.user.UserInfo;
+import com.loopers.application.user.UserService;
+import com.loopers.application.user.dto.UserResult;
 import com.loopers.domain.user.dto.command.UserCreateInfo;
 import com.loopers.domain.user.type.GenderType;
 import com.loopers.utils.DatabaseCleanUp;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest
 class UserServiceIntegrationTest {
     @Autowired
-    private UserFacade userFacade;
+    private UserService userService;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -47,45 +48,25 @@ class UserServiceIntegrationTest {
         @Test
         void successfullySavesUserOnRegistration() {
             // arrange
-            String userId = "user1234";
             String name = "park";
             String email = "user@domain.com";
             String birthDateString = "2000-01-01";
             GenderType gender = MALE;
-            UserCreateInfo userCreateInfo = new UserCreateInfo(userId, name, email, birthDateString, gender);
+            UserCreateInfo userCreateInfo = new UserCreateInfo(name, email, birthDateString, gender);
 
             // act
-            UserInfo userInfo = userFacade.create(userCreateInfo);
+            UserResult userInfo = userService.create(userCreateInfo);
 
             // assert
             assertAll(
                 () -> assertThat(userInfo).isNotNull(),
                 () -> assertThat(userInfo.id()).isNotNull(),
-                () -> assertThat(userInfo.userId()).isEqualTo(userCreateInfo.userId()),
                 () -> assertThat(userInfo.name()).isEqualTo(userCreateInfo.name()),
                 () -> assertThat(userInfo.email()).isEqualTo(userCreateInfo.email()),
                 () -> assertThat(userInfo.birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
             );
 
             verify(userRepository, times(1)).save(any(User.class));
-        }
-
-        @DisplayName("이미 가입된 ID 로 회원가입 시도 시, 실패한다.")
-        @Test
-        void failsWhenRegisteringWithExistingUserId() {
-            // arrange
-            String userId = "user1234";
-            String name = "park";
-            String email = "user@domain.com";
-            String birthDateString = "2000-01-01";
-            GenderType gender = MALE;
-            UserCreateInfo userCreateInfo = new UserCreateInfo(userId, name, email, birthDateString, gender);
-            userFacade.create(userCreateInfo);
-
-            // act
-            // assert
-            assertThatThrownBy(() -> userFacade.create(userCreateInfo))
-                    .isInstanceOf(Exception.class); // exception 뭘로 만들 지 고민해보기
         }
     }
 
@@ -96,40 +77,33 @@ class UserServiceIntegrationTest {
         @Test
         void returnsUserInfoWhenUserExists() {
             // arrange
-            String userId = "user1234";
             UserCreateInfo userCreateInfo = new UserCreateInfo(
-                    userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateInfo));
+            User saveUser = userRepository.save(User.create(userCreateInfo));
 
             // act
-            UserInfo userInfo = userFacade.get(userId);
+            UserResult userInfo = userService.get(saveUser.getId());
 
             // assert
             assertAll(
                     () -> assertThat(userInfo).isNotNull(),
-                    () -> assertThat(userInfo.id()).isNotNull(),
-                    () -> assertThat(userInfo.userId()).isEqualTo(userCreateInfo.userId()),
+                    () -> assertThat(userInfo.id()).isEqualTo(saveUser.getId()),
                     () -> assertThat(userInfo.name()).isEqualTo(userCreateInfo.name()),
                     () -> assertThat(userInfo.email()).isEqualTo(userCreateInfo.email()),
                     () -> assertThat(userInfo.birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
             );
         }
 
-        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, 예외가 발생한다.")
         @Test
-        void returnsNullWhenUserDoesNotExist() {
-            // arrange
-            String userId = "invalidUserId";
-
+        void throwsExceptionWhenUserDoesNotExist() {
             // act
-            UserInfo userInfo = userFacade.get(userId);
-
             // assert
-            assertThat(userInfo).isNull();
+            assertThatThrownBy(() -> userService.get(999L))
+                    .isInstanceOf(EntityNotFoundException.class);
         }
     }
 }

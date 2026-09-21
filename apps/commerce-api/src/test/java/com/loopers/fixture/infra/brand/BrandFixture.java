@@ -4,4 +4,6 @@ import com.loopers.domain.brand.Brand;
 
 public interface BrandFixture {
     Brand save();
+
+    Brand save(String name);
 }

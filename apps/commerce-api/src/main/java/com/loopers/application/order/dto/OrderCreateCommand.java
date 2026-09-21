@@ -8,7 +8,6 @@ import com.loopers.domain.payment.dto.CardType;
 import java.util.List;
 
 public record OrderCreateCommand(
-    Long userId,
     String orderer,
     String deliveryAddress,
     String contactNumber,
@@ -21,7 +20,7 @@ public record OrderCreateCommand(
     CardType cardType,
     String cardNo
 ) {
-    public Order toEntity() {
+    public Order toEntity(Long userId) {
         return Order.create(new OrderCreateInfo(
             userId,
             orderer,

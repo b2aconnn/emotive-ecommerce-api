@@ -1,7 +1,7 @@
 package com.loopers.infrastructure.product.jpa;
 
-import com.loopers.application.product.ProductsCondition;
-import com.loopers.application.product.ProductsSortType;
+import com.loopers.application.product.dto.ProductsCondition;
+import com.loopers.application.product.dto.ProductsSortType;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.querydsl.core.types.OrderSpecifier;
@@ -17,6 +17,7 @@ import java.util.Optional;
 import static com.loopers.domain.brand.QBrand.brand;
 import static com.loopers.domain.product.QProduct.product;
 import static com.loopers.domain.product.QProductStock.productStock;
+import static com.loopers.domain.productlike.QProductLike.productLike;
 import static com.loopers.domain.productlike.QProductLikeCount.productLikeCount;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNullElse;
@@ -92,5 +93,16 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .leftJoin(product.productStock, productStock).fetchJoin()
                 .where(product.id.in(ids))
                 .fetch());
+    }
+
+    @Override
+    public List<Product> findLikedByUserId(Long userId) {
+        return queryFactory.select(product)
+                .from(productLike)
+                .join(productLike.product, product)
+                .leftJoin(product.brand, brand).fetchJoin()
+                .where(productLike.user.id.eq(userId))
+                .orderBy(productLike.createdAt.desc())
+                .fetch();
     }
 }

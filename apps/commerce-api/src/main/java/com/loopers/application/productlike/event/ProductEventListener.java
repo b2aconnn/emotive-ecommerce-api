@@ -1,7 +1,7 @@
 package com.loopers.application.productlike.event;
 
 import com.loopers.application.product.event.model.ProductViewedEvent;
-import com.loopers.application.productlike.ProductLikeAppService;
+import com.loopers.application.productlike.ProductLikeService;
 import com.loopers.application.productlike.event.model.ProductLikeCountAddedEvent;
 import com.loopers.application.productlike.event.model.ProductLikeCountRemovedEvent;
 import com.loopers.application.productlike.event.model.ProductLikedEvent;
@@ -21,7 +21,7 @@ import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMI
 @Component
 public class ProductEventListener {
 
-    private final ProductLikeAppService productLikeAppService;
+    private final ProductLikeService productLikeService;
 
     private final ProductMessagePublisher productMessagePublisher;
 
@@ -30,7 +30,7 @@ public class ProductEventListener {
     @TransactionalEventListener(phase = AFTER_COMMIT)
     public void handleProductLike(ProductLikedEvent event) {
         log.info("Product Like. productId: {}", event.productId());
-        productLikeAppService.likeCountUp(event.productId());
+        productLikeService.likeCountUp(event.productId());
     }
 
     @Async
@@ -46,7 +46,7 @@ public class ProductEventListener {
     @TransactionalEventListener(phase = AFTER_COMMIT)
     public void handleProductUnlike(ProductLikedEvent event) {
         log.info("Product Unlike. productId: {}", event.productId());
-        productLikeAppService.unlikeCountDown(event.productId());
+        productLikeService.unlikeCountDown(event.productId());
     }
 
     @Async

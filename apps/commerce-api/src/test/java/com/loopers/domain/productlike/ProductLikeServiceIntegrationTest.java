@@ -1,6 +1,6 @@
 package com.loopers.domain.productlike;
 
-import com.loopers.application.productlike.ProductLikeAppService;
+import com.loopers.application.productlike.ProductLikeService;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.brand.dto.command.BrandCreateCommand;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest
 class ProductLikeServiceIntegrationTest {
     @Autowired
-    private ProductLikeAppService productLikeAppService;
+    private ProductLikeService productLikeService;
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
@@ -66,9 +66,9 @@ class ProductLikeServiceIntegrationTest {
         void userNotFound() {
             // act
             // assert
-            assertThatThrownBy(() -> productLikeAppService.likeProduct(1L, 1L))
+            assertThatThrownBy(() -> productLikeService.likeProduct(999L, 1L))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("유저가 존재하지 않습니다. userId: nonexistent-user");
+                    .hasMessage("유저가 존재하지 않습니다. userId: 999");
         }
 
         @DisplayName("상품이 존재하지 않으면, 좋아요를 할 수 없다.")
@@ -76,15 +76,14 @@ class ProductLikeServiceIntegrationTest {
         void productNotFound() {
             // arrange
             UserCreateInfo userCreateInfo = new UserCreateInfo(
-                    "user1234",
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateInfo));
+            User saveUser = userRepository.save(User.create(userCreateInfo));
 
             // act
-            assertThatThrownBy(() -> productLikeAppService.likeProduct(1L, 1L))
+            assertThatThrownBy(() -> productLikeService.likeProduct(saveUser.getId(), 1L))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("상품이 존재하지 않습니다. productId: 1");
         }
@@ -94,7 +93,6 @@ class ProductLikeServiceIntegrationTest {
         void createProductLike() {
             // arrange
             User saveUser = userRepository.save(User.create(new UserCreateInfo(
-                    "user1234",
                     "park",
                     "user@domain.com",
                     "2000-01-01",
@@ -113,7 +111,7 @@ class ProductLikeServiceIntegrationTest {
                     saveBrand)));
 
             // act
-            productLikeAppService.likeProduct(1L, saveProduct.getId());
+            productLikeService.likeProduct(saveUser.getId(), saveProduct.getId());
 
             // assert
             Optional<ProductLikeCount> productLikeCountOptional = productLikeCountRepository.findByProductId(saveProduct.getId());
@@ -134,7 +132,6 @@ class ProductLikeServiceIntegrationTest {
         void userCannotLikeProductTwice() {
             // arrange
             User saveUser = userRepository.save(User.create(new UserCreateInfo(
-                    "user1234",
                     "park",
                     "user@domain.com",
                     "2000-01-01",
@@ -164,7 +161,7 @@ class ProductLikeServiceIntegrationTest {
             assertThat(productLikeCountOptional.get().getLikeCount()).isEqualTo(1);
 
             // act
-            productLikeAppService.likeProduct(1L, saveProduct.getId());
+            productLikeService.likeProduct(saveUser.getId(), saveProduct.getId());
 
             // assert
             assertThat(productLikeRepository.existsUserLikedProduct(saveUser.getId(), saveProduct.getId())).isTrue();
@@ -180,7 +177,6 @@ class ProductLikeServiceIntegrationTest {
         void deleteProductLike() {
             // arrange
             User saveUser = userRepository.save(User.create(new UserCreateInfo(
-                    "user1234",
                     "park",
                     "user@domain.com",
                     "2000-01-01",
@@ -210,7 +206,7 @@ class ProductLikeServiceIntegrationTest {
             assertThat(productLikeCountOptional.get().getLikeCount()).isEqualTo(1);
 
             // act
-            productLikeAppService.unlikeProduct(1L, saveProduct.getId());
+            productLikeService.unlikeProduct(saveUser.getId(), saveProduct.getId());
 
             // assert
             assertThat(productLikeRepository.existsUserLikedProduct(saveUser.getId(), saveProduct.getId())).isFalse();
@@ -225,7 +221,6 @@ class ProductLikeServiceIntegrationTest {
         void deleteProductLikeWhenNotLiked() {
             // arrange
             User saveUser = userRepository.save(User.create(new UserCreateInfo(
-                    "user1234",
                     "park",
                     "user@domain.com",
                     "2000-01-01",
@@ -249,7 +244,7 @@ class ProductLikeServiceIntegrationTest {
             assertThat(productLikeCountOptional.isPresent()).isFalse();
 
             // act
-            productLikeAppService.unlikeProduct(1L, saveProduct.getId());
+            productLikeService.unlikeProduct(saveUser.getId(), saveProduct.getId());
 
             // assert
             assertThat(productLikeRepository.existsUserLikedProduct(saveUser.getId(), saveProduct.getId())).isFalse();

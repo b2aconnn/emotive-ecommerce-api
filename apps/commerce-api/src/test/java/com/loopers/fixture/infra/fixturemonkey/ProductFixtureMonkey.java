@@ -27,6 +27,9 @@ public class ProductFixtureMonkey implements ProductWithStockFixture {
                 .set("price", productPrice)
                 .set("id", 0L)
                 .set("productStock", ProductStock.create(null, 1L))
+                // defaultNotNull 이라 비워두면 transient ProductLikeCount(내부에 transient Product)가 채워져
+                // Product 저장 시점에 TransientObjectException 이 난다. 좋아요 수 행은 필요한 테스트가 직접 만든다.
+                .setNull("productLikeCount")
                 .sampleList(count);
     }
 

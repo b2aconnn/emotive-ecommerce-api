@@ -2,6 +2,7 @@ package com.loopers.fixture.infra.fixturemonkey;
 
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
+import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 import com.loopers.fixture.infra.brand.BrandFixture;
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,12 @@ public class BrandFixtureMonkey implements BrandFixture {
     @Override
     public Brand save() {
         Brand brand = create();
+        return brandRepository.save(brand);
+    }
+
+    @Override
+    public Brand save(String name) {
+        Brand brand = Brand.create(new BrandCreateCommand(name, "http://example.com/" + name + ".png", name + " description"));
         return brandRepository.save(brand);
     }
 }

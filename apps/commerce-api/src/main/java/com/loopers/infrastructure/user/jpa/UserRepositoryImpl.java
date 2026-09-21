@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 @RequiredArgsConstructor
 @Component
 public class UserRepositoryImpl implements UserRepository {
@@ -29,12 +32,17 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByUserId(String userId) {
-        return userJpaRepository.findByUserId(userId);
+    public boolean existsById(Long userId) {
+        return userJpaRepository.existsById(userId);
     }
 
     @Override
-    public boolean existsByUserId(String userId) {
-        return userJpaRepository.existsByUserId(userId);
+    public List<User> findAllByIdIn(List<Long> ids) {
+        // 빈 목록으로 IN () 쿼리를 만들지 않는다.
+        if (isEmpty(ids)) {
+            return emptyList();
+        }
+
+        return userJpaRepository.findAllByIdIn(ids);
     }
 }

@@ -2,14 +2,15 @@ package com.loopers.fixture.infra.fixturemonkey;
 
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
 import com.loopers.fixture.user.UserFixture;
-import com.navercorp.fixturemonkey.FixtureMonkey;
-import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+
+import static com.loopers.domain.user.type.GenderType.MALE;
 
 @Component
 public class UserFixtureMonkey implements UserFixture {
@@ -37,5 +38,11 @@ public class UserFixtureMonkey implements UserFixture {
     public List<User> save(int count) {
         List<User> users = create(count);
         return userRepository.saveAll(users);
+    }
+
+    @Override
+    public User save(String name) {
+        UserCreateInfo userCreateInfo = new UserCreateInfo(name, "user@domain.com", "2000-01-01", MALE);
+        return userRepository.save(User.create(userCreateInfo));
     }
 }

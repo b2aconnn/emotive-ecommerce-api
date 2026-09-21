@@ -12,6 +12,8 @@ import java.io.IOException;
 @Component
 public class UserAuthenticationInterceptor implements HandlerInterceptor {
 
+    private static final String SIGNUP_PATH = "/api/users";
+
     private final UserRepository userRepository;
 
     public UserAuthenticationInterceptor(UserRepository userRepository) {
@@ -20,32 +22,40 @@ public class UserAuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
+        if (isSignupRequest(request)) {
+            return true;
+        }
+
         String userIdHeader = request.getHeader("X-USER-ID");
 
-        if (validateUserIdHeader(response, userIdHeader)) {
+        if (userIdHeader == null || userIdHeader.isBlank()) {
+            response.sendError(HttpStatus.BAD_REQUEST.value(), "Missing X-USER-ID header");
             return false;
         }
-        if (rejectIfUserNotFound(response, userIdHeader)) {
+
+        Long userId = parseUserId(userIdHeader);
+        if (userId == null) {
+            response.sendError(HttpStatus.BAD_REQUEST.value(), "Invalid X-USER-ID");
+            return false;
+        }
+
+        if (!userRepository.existsById(userId)) {
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid X-USER-ID");
             return false;
         }
 
         return true;
     }
 
-    private boolean rejectIfUserNotFound(HttpServletResponse response, String userIdHeader) throws IOException {
-        boolean userExists = userRepository.existsByUserId(userIdHeader);
-        if (!userExists) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid X-USER-ID");
-            return true;
+    private Long parseUserId(String userIdHeader) {
+        try {
+            return Long.valueOf(userIdHeader);
+        } catch (NumberFormatException e) {
+            return null;
         }
-        return false;
     }
 
-    private static boolean validateUserIdHeader(HttpServletResponse response, String userIdHeader) throws IOException {
-        if (userIdHeader == null || userIdHeader.isBlank()) {
-            response.sendError(HttpStatus.BAD_REQUEST.value(), "Missing X-USER-ID header");
-            return true;
-        }
-        return false;
+    private boolean isSignupRequest(HttpServletRequest request) {
+        return "POST".equalsIgnoreCase(request.getMethod()) && SIGNUP_PATH.equals(request.getRequestURI());
     }
 }

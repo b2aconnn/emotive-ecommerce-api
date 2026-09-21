@@ -43,12 +43,12 @@ public class Point extends BaseEntity {
         this.balance -= amount;
     }
 
-    private void validateUseAmount(Long amount) {
-        if (amount < 100) {
+    private void validateUseAmount(Long useAmount) {
+        if (useAmount < 100) {
             throw new IllegalArgumentException("포인트는 100원 이상 사용할 수 있습니다.");
         }
 
-        if (this.balance < amount) {
+        if (this.balance < useAmount) {
             throw new IllegalArgumentException("포인트가 부족합니다.");
         }
     }
