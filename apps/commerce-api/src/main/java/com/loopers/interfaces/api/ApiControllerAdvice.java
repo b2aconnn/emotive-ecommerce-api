@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -37,6 +38,22 @@ public class ApiControllerAdvice {
         String value = e.getValue() != null ? e.getValue().toString() : "null";
         String message = String.format("요청 파라미터 '%s' (타입: %s)의 값 '%s'이(가) 잘못되었습니다.", name, type, value);
         return failureResponse(ErrorType.BAD_REQUEST, message);
+    }
+
+    /**
+     * {@code @ModelAttribute} 로 바인딩되는 요청 객체(record 포함)의 값 변환이 실패하면
+     * {@link org.springframework.web.bind.MethodArgumentNotValidException}(= {@link BindException})이 발생한다.
+     * 이를 처리하지 않으면 잘못된 쿼리 파라미터(정의되지 않은 enum 값, 날짜 형식 오류 등)가 500 으로 나간다.
+     */
+    @ExceptionHandler
+    public ResponseEntity<ApiResponse<?>> handleBadRequest(BindException e) {
+        String message = e.getBindingResult().getFieldErrors().stream()
+            .map(fieldError -> String.format("요청 파라미터 '%s'의 값 '%s'이(가) 잘못되었습니다.",
+                fieldError.getField(), fieldError.getRejectedValue()))
+            .collect(Collectors.joining(" "));
+
+        log.warn("BindException : {}", message, e);
+        return failureResponse(ErrorType.BAD_REQUEST, message.isEmpty() ? null : message);
     }
 
     @ExceptionHandler

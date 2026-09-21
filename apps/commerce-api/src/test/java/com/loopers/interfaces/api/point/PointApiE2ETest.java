@@ -6,7 +6,10 @@ import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.domain.user.dto.command.UserCreateInfo;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.user.UserV1Dto;
+import com.loopers.interfaces.api.point.dto.PointChargeRequest;
+import com.loopers.interfaces.api.point.dto.PointChargeResponse;
+import com.loopers.interfaces.api.point.dto.PointInfoResponse;
+import com.loopers.interfaces.api.user.dto.UserMyInfoResponse;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,17 +21,15 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
-import java.util.function.Function;
-
 import static com.loopers.domain.user.type.GenderType.MALE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class PointV1ApiE2ETest {
-    private static final String ENDPOINT_CREATE = "/api/v1/points/charge";
-    private static final Function<String, String> ENDPOINT_GET = id -> "/api/v1/points";
+class PointApiE2ETest {
+    private static final String ENDPOINT_CREATE = "/api/points/charge";
+    private static final String ENDPOINT_GET = "/api/points";
 
     private final TestRestTemplate testRestTemplate;
     private final UserRepository userRepository;
@@ -36,7 +37,7 @@ class PointV1ApiE2ETest {
     private final DatabaseCleanUp databaseCleanUp;
 
     @Autowired
-    public PointV1ApiE2ETest(
+    public PointApiE2ETest(
         TestRestTemplate testRestTemplate,
         UserRepository userRepository,
         PointRepository pointRepository,
@@ -53,35 +54,33 @@ class PointV1ApiE2ETest {
         databaseCleanUp.truncateAllTables();
     }
 
-    @DisplayName("POST /api/v1/points/chage")
+    @DisplayName("POST /api/points/chage")
     @Nested
     class POST {
         @DisplayName("존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.")
         @Test
         void returnsTotalPointsAfterSuccessfulCharge() {
             // arrange
-            String userId = "user1234";
             UserCreateInfo userCreateInfo = new UserCreateInfo(
-                    userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
                     MALE);
-            userRepository.save(User.create(userCreateInfo));
+            User saveUser = userRepository.save(User.create(userCreateInfo));
 
             Long amount = 10_000L;
-            PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(amount);
+            PointChargeRequest chargeRequest = new PointChargeRequest(amount);
 
             String requestUrl = ENDPOINT_CREATE;
 
             // act
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("X-USER-ID", userId);
-            HttpEntity<PointV1Dto.ChargeRequest> requestEntity = new HttpEntity<>(chargeRequest, headers);
+            headers.set("X-USER-ID", String.valueOf(saveUser.getId()));
+            HttpEntity<PointChargeRequest> requestEntity = new HttpEntity<>(chargeRequest, headers);
 
-            ParameterizedTypeReference<ApiResponse<PointV1Dto.ChargeResponse>> responseType = new ParameterizedTypeReference<>() {};
-            ResponseEntity<ApiResponse<PointV1Dto.ChargeResponse>> response =
+            ParameterizedTypeReference<ApiResponse<PointChargeResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<PointChargeResponse>> response =
                     testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, responseType);
 
             // assert
@@ -95,21 +94,19 @@ class PointV1ApiE2ETest {
         @Test
         void returnsNotFoundResponseWhenUserDoesNotExist() {
             // arrange
-            String userId = "invalidUserId";
-
             Long amount = 10_000L;
-            PointV1Dto.ChargeRequest chargeRequest = new PointV1Dto.ChargeRequest(amount);
+            PointChargeRequest chargeRequest = new PointChargeRequest(amount);
 
             String requestUrl = ENDPOINT_CREATE;
 
             // act
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("X-USER-ID", userId);
-            HttpEntity<PointV1Dto.ChargeRequest> requestEntity = new HttpEntity<>(chargeRequest, headers);
+            headers.set("X-USER-ID", "999999");
+            HttpEntity<PointChargeRequest> requestEntity = new HttpEntity<>(chargeRequest, headers);
 
-            ParameterizedTypeReference<ApiResponse<PointV1Dto.ChargeResponse>> responseType = new ParameterizedTypeReference<>() {};
-            ResponseEntity<ApiResponse<PointV1Dto.ChargeResponse>> response =
+            ParameterizedTypeReference<ApiResponse<PointChargeResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<PointChargeResponse>> response =
                     testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, responseType);
 
             // assert
@@ -117,16 +114,14 @@ class PointV1ApiE2ETest {
         }
     }
 
-    @DisplayName("GET /api/v1/points")
+    @DisplayName("GET /api/points")
     @Nested
     class GET {
         @DisplayName("포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다.")
         @Test
         void returnsUserPointsOnSuccessfulRetrieval() {
             // arrange
-            String userId = "user1234";
             UserCreateInfo userCreateInfo = new UserCreateInfo(
-                    userId,
                     "park",
                     "user@domain.com",
                     "2000-01-01",
@@ -137,21 +132,21 @@ class PointV1ApiE2ETest {
             point.charge(10_000L);
             pointRepository.save(point);
 
-            String requestUrl = ENDPOINT_GET.apply(userId);
+            String requestUrl = ENDPOINT_GET;
 
             // act
             HttpHeaders headers = new HttpHeaders();
-            headers.set("X-USER-ID", userId);
+            headers.set("X-USER-ID", String.valueOf(saveUser.getId()));
             HttpEntity requestEntity = new HttpEntity<>(headers);
 
-            ParameterizedTypeReference<ApiResponse<PointV1Dto.InfoResponse>> responseType = new ParameterizedTypeReference<>() {};
-            ResponseEntity<ApiResponse<PointV1Dto.InfoResponse>> response =
+            ParameterizedTypeReference<ApiResponse<PointInfoResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<PointInfoResponse>> response =
                     testRestTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, responseType);
 
             // assert
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data().userId()).isEqualTo(userCreateInfo.userId()),
+                    () -> assertThat(response.getBody().data().userId()).isEqualTo(saveUser.getId()),
                     () -> assertThat(response.getBody().data().amount()).isEqualTo(point.getBalance())
             );
         }
@@ -160,13 +155,12 @@ class PointV1ApiE2ETest {
         @Test
         void returnsBadRequestWhenUserIdHeaderIsMissing() {
             // arrange
-            String userId = "user1234";
-            String requestUrl = ENDPOINT_GET.apply(userId);
+            String requestUrl = ENDPOINT_GET;
 
             // act
-            ParameterizedTypeReference<ApiResponse<UserV1Dto.MyInfoResponse>> responseType =
+            ParameterizedTypeReference<ApiResponse<UserMyInfoResponse>> responseType =
                     new ParameterizedTypeReference<>() {};
-            ResponseEntity<ApiResponse<UserV1Dto.MyInfoResponse>> response =
+            ResponseEntity<ApiResponse<UserMyInfoResponse>> response =
                     testRestTemplate.exchange(requestUrl, HttpMethod.GET, new HttpEntity<>(null), responseType);
 
             // assert
