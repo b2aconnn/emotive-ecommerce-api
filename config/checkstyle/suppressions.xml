@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- main 코드: 테스트 전용 규칙 제외 -->
+    <suppress files="[\\/]src[\\/]main[\\/]" id="testMethodName"/>
+
+    <!-- test / testFixtures 코드 -->
+    <suppress files="[\\/]src[\\/](test|testFixtures)[\\/]" id="mainMethodName"/>
+    <!-- static import 허용 (4.2) -->
+    <suppress files="[\\/]src[\\/](test|testFixtures)[\\/]" checks="AvoidStaticImport"/>
+    <!-- 테스트 데이터의 숫자 리터럴 허용 -->
+    <suppress files="[\\/]src[\\/](test|testFixtures)[\\/]" checks="MagicNumber"/>
+    <!-- 테스트 클래스의 @Autowired 필드 주입 허용 -->
+    <suppress files="[\\/]src[\\/](test|testFixtures)[\\/]" id="fieldInjection"/>
+</suppressions>

@@ -16,6 +16,7 @@ include(
 pluginManagement {
     val springBootVersion: String by settings
     val springDependencyManagementVersion: String by settings
+    val spotlessPluginVersion: String by settings
 
     repositories {
         maven { url = uri("https://repo.spring.io/milestone") }
@@ -28,6 +29,7 @@ pluginManagement {
             when (requested.id.id) {
                 "org.springframework.boot" -> useVersion(springBootVersion)
                 "io.spring.dependency-management" -> useVersion(springDependencyManagementVersion)
+                "com.diffplug.spotless" -> useVersion(spotlessPluginVersion)
             }
         }
     }
