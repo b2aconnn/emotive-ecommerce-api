@@ -1,13 +1,15 @@
 package com.loopers.domain.productlike;
 
-import com.loopers.domain.product.Product;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+
+import jakarta.persistence.*;
+
+import com.loopers.domain.product.Product;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)

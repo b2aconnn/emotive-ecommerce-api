@@ -15,4 +15,3 @@ public class UserContextHolder {
         userId.remove();
     }
 }
-

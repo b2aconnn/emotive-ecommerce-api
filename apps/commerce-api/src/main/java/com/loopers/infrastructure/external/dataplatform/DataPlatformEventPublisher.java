@@ -1,11 +1,13 @@
 package com.loopers.infrastructure.external.dataplatform;
 
-import com.loopers.application.order.event.model.OrderCreatedEvent;
-import com.loopers.application.payment.event.model.PaymentResultEvent;
-import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import com.loopers.application.order.event.model.OrderCreatedEvent;
+import com.loopers.application.payment.event.model.PaymentResultEvent;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component

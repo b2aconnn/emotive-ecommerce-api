@@ -10,17 +10,8 @@ public record PaymentPgResultRequest(
         String cardNo,
         Long amount,
         PaymentResultStatus status,
-        String reason
-) {
+        String reason) {
     public PaymentResultCommand toCommand() {
-        return new PaymentResultCommand(
-                transactionKey,
-                orderId,
-                cardType,
-                cardNo,
-                amount,
-                status,
-                reason
-        );
+        return new PaymentResultCommand(transactionKey, orderId, cardType, cardNo, amount, status, reason);
     }
 }

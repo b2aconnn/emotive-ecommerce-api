@@ -1,17 +1,19 @@
 package com.loopers.domain.user;
 
-import com.loopers.domain.BaseEntity;
-import com.loopers.domain.user.dto.command.UserCreateInfo;
-import com.loopers.domain.user.type.GenderType;
-import com.loopers.support.converter.DateConverter;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import static lombok.AccessLevel.PROTECTED;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import static lombok.AccessLevel.PROTECTED;
+import jakarta.persistence.*;
+
+import com.loopers.domain.BaseEntity;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
+import com.loopers.domain.user.type.GenderType;
+import com.loopers.support.converter.DateConverter;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = PROTECTED)
 @Getter

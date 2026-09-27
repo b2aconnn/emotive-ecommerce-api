@@ -1,9 +1,9 @@
 package com.loopers.domain.order;
 
-import com.loopers.domain.order.dto.result.UserOrderedProductResult;
-
 import java.time.ZonedDateTime;
 import java.util.List;
+
+import com.loopers.domain.order.dto.result.UserOrderedProductResult;
 
 public interface OrderItemRepository {
     List<OrderItem> saveAll(List<OrderItem> orderItems);

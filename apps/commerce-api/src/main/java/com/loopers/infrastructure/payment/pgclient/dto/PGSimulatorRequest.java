@@ -4,10 +4,9 @@ import com.loopers.domain.payment.PaymentMethod;
 import com.loopers.domain.payment.dto.CardType;
 
 public record PGSimulatorRequest(
-    String orderId,
-    PaymentMethod paymentMethod,
-    CardType cardType,
-    String cardNo,
-    Long amount,
-    String callbackUrl
-) {}
+        String orderId,
+        PaymentMethod paymentMethod,
+        CardType cardType,
+        String cardNo,
+        Long amount,
+        String callbackUrl) {}

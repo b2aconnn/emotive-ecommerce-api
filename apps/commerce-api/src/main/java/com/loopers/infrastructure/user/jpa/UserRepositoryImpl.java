@@ -1,15 +1,17 @@
 package com.loopers.infrastructure.user.jpa;
 
-import com.loopers.domain.user.User;
-import com.loopers.domain.user.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import static java.util.Collections.emptyList;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Collections.emptyList;
-import static org.springframework.util.CollectionUtils.isEmpty;
+import org.springframework.stereotype.Component;
+
+import com.loopers.domain.user.User;
+import com.loopers.domain.user.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component

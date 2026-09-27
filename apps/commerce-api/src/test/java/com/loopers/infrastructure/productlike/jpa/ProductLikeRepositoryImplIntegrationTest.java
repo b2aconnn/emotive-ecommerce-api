@@ -1,5 +1,21 @@
 package com.loopers.infrastructure.productlike.jpa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.productlike.ProductLike;
@@ -11,28 +27,14 @@ import com.loopers.fixture.product.ProductWithStockFixture;
 import com.loopers.fixture.productlike.ProductLikeFixture;
 import com.loopers.fixture.user.UserFixture;
 import com.loopers.utils.DatabaseCleanUp;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 @SpringBootTest
 class ProductLikeRepositoryImplIntegrationTest {
 
     private static final ZoneId ZONE = ZoneId.systemDefault();
     private static final ZonedDateTime PERIOD_START = LocalDate.of(2026, 7, 6).atStartOfDay(ZONE);
-    private static final ZonedDateTime PERIOD_END_EXCLUSIVE = LocalDate.of(2026, 7, 7).atStartOfDay(ZONE);
+    private static final ZonedDateTime PERIOD_END_EXCLUSIVE =
+            LocalDate.of(2026, 7, 7).atStartOfDay(ZONE);
 
     @Autowired
     private ProductLikeRepository productLikeRepository;
@@ -90,8 +92,7 @@ class ProductLikeRepositoryImplIntegrationTest {
                     .containsExactlyInAnyOrder(
                             tuple(user.getId(), product.getId()),
                             tuple(user.getId(), anotherProduct.getId()),
-                            tuple(anotherUser.getId(), product.getId())
-                    );
+                            tuple(anotherUser.getId(), product.getId()));
         }
 
         @DisplayName("기간 중에 눌렀다가 취소(하드 삭제)한 좋아요는, 집계 시점에 행이 없으므로 조회되지 않는다.")

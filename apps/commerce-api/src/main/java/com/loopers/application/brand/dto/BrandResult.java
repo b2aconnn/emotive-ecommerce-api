@@ -2,16 +2,8 @@ package com.loopers.application.brand.dto;
 
 import com.loopers.domain.brand.Brand;
 
-public record BrandResult(Long id,
-                          String brandName,
-                          String logoUrl,
-                          String description) {
+public record BrandResult(Long id, String brandName, String logoUrl, String description) {
     public static BrandResult from(Brand brand) {
-        return new BrandResult(
-                brand.getId(),
-                brand.getName(),
-                brand.getLogoUrl(),
-                brand.getDescription()
-        );
+        return new BrandResult(brand.getId(), brand.getName(), brand.getLogoUrl(), brand.getDescription());
     }
 }

@@ -1,9 +1,6 @@
 package com.loopers.application.brand.dto;
 
-public record BrandsCondition(
-        String searchKeyword,
-        Integer offset,
-        Integer size) {
+public record BrandsCondition(String searchKeyword, Integer offset, Integer size) {
     private static final Integer DEFAULT_OFFSET = 0;
     private static final Integer DEFAULT_SIZE = 20;
 

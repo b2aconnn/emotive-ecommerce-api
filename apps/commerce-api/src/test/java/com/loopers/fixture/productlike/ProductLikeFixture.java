@@ -1,14 +1,15 @@
 package com.loopers.fixture.productlike;
 
+import java.time.ZonedDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.loopers.domain.product.Product;
 import com.loopers.domain.productlike.ProductLike;
 import com.loopers.domain.productlike.ProductLikeRepository;
 import com.loopers.domain.user.User;
 import com.loopers.fixture.support.CreatedAtBackdater;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.time.ZonedDateTime;
 
 /** 원하는 생성 시각의 좋아요를 저장한다. 취소는 하드 삭제이므로 {@link ProductLikeRepository#delete}를 그대로 쓴다. */
 @Component

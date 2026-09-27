@@ -11,8 +11,7 @@ public record PGTransactionInfoResult(
         String cardNo,
         Long amount,
         PaymentResultStatus status,
-        String reason
-) {
+        String reason) {
     public static PGTransactionInfoResult from(PGSimulatorTransactionInfoResponse transactionInfoResponse) {
         return new PGTransactionInfoResult(
                 transactionInfoResponse.data().transactionKey(),
@@ -21,7 +20,6 @@ public record PGTransactionInfoResult(
                 transactionInfoResponse.data().cardNo(),
                 transactionInfoResponse.data().amount(),
                 transactionInfoResponse.data().status(),
-                transactionInfoResponse.data().reason()
-        );
+                transactionInfoResponse.data().reason());
     }
 }

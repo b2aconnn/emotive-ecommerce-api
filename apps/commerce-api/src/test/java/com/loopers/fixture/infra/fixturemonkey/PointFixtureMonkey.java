@@ -1,13 +1,14 @@
 package com.loopers.fixture.infra.fixturemonkey;
 
-import com.loopers.domain.point.Point;
-import com.loopers.domain.point.PointRepository;
-import com.loopers.fixture.point.PointFixture;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Objects;
+import com.loopers.domain.point.Point;
+import com.loopers.domain.point.PointRepository;
+import com.loopers.fixture.point.PointFixture;
 
 @Component
 public class PointFixtureMonkey implements PointFixture {
@@ -15,7 +16,8 @@ public class PointFixtureMonkey implements PointFixture {
     private PointRepository pointRepository;
 
     private List<Point> create(Long userId, Long balance, int count) {
-        return FixtureMonkeyFactory.create().giveMeBuilder(Point.class)
+        return FixtureMonkeyFactory.create()
+                .giveMeBuilder(Point.class)
                 .set("id", 0L)
                 .set("userId", userId)
                 .set("balance", balance)

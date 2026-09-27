@@ -1,5 +1,24 @@
 package com.loopers.infrastructure.order.jpa;
 
+import static com.loopers.domain.order.OrderStatus.CANCELED;
+import static com.loopers.domain.order.OrderStatus.CREATED;
+import static com.loopers.domain.order.OrderStatus.PENDING;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.loopers.domain.order.OrderRepository;
 import com.loopers.domain.order.dto.result.UserOrderCountResult;
 import com.loopers.domain.product.Product;
@@ -9,31 +28,14 @@ import com.loopers.fixture.order.CompletedOrderFixture;
 import com.loopers.fixture.product.ProductWithStockFixture;
 import com.loopers.fixture.user.UserFixture;
 import com.loopers.utils.DatabaseCleanUp;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import static com.loopers.domain.order.OrderStatus.CANCELED;
-import static com.loopers.domain.order.OrderStatus.CREATED;
-import static com.loopers.domain.order.OrderStatus.PENDING;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 @SpringBootTest
 class OrderRepositoryImplIntegrationTest {
 
     private static final ZoneId ZONE = ZoneId.systemDefault();
     private static final ZonedDateTime PERIOD_START = LocalDate.of(2026, 7, 6).atStartOfDay(ZONE);
-    private static final ZonedDateTime PERIOD_END_EXCLUSIVE = LocalDate.of(2026, 7, 7).atStartOfDay(ZONE);
+    private static final ZonedDateTime PERIOD_END_EXCLUSIVE =
+            LocalDate.of(2026, 7, 7).atStartOfDay(ZONE);
 
     @Autowired
     private OrderRepository orderRepository;
@@ -85,10 +87,7 @@ class OrderRepositoryImplIntegrationTest {
             // then
             assertThat(results)
                     .extracting(UserOrderCountResult::userId, UserOrderCountResult::orderCount)
-                    .containsExactlyInAnyOrder(
-                            tuple(buyer.getId(), 2L),
-                            tuple(anotherBuyer.getId(), 1L)
-                    );
+                    .containsExactlyInAnyOrder(tuple(buyer.getId(), 2L), tuple(anotherBuyer.getId(), 1L));
         }
 
         @DisplayName("기간 시작 시각에 정확히 생성된 주문은 포함하고, 기간 종료 시각에 생성된 주문은 제외한다. ([start, end) 반개구간)")
@@ -110,7 +109,8 @@ class OrderRepositoryImplIntegrationTest {
                     orderRepository.countCompletedOrdersGroupByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
 
             // then
-            assertThat(results).extracting(UserOrderCountResult::userId)
+            assertThat(results)
+                    .extracting(UserOrderCountResult::userId)
                     .containsExactlyInAnyOrder(onStart.getId(), justBeforeEnd.getId());
         }
 
@@ -129,7 +129,8 @@ class OrderRepositoryImplIntegrationTest {
                     orderRepository.countCompletedOrdersGroupByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
 
             // then
-            assertThat(results).singleElement()
+            assertThat(results)
+                    .singleElement()
                     .satisfies(result -> assertThat(result.orderCount()).isEqualTo(1L));
         }
 

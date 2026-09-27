@@ -1,5 +1,14 @@
 package com.loopers.fixture.order;
 
+import static com.loopers.domain.order.OrderStatus.COMPLETED;
+
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.loopers.domain.order.Order;
 import com.loopers.domain.order.OrderItem;
 import com.loopers.domain.order.OrderItemRepository;
@@ -8,14 +17,6 @@ import com.loopers.domain.order.OrderStatus;
 import com.loopers.domain.order.dto.OrderCreateInfo;
 import com.loopers.domain.product.Product;
 import com.loopers.fixture.support.CreatedAtBackdater;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.loopers.domain.order.OrderStatus.COMPLETED;
 
 /**
  * 집계 대상이 되는 주문(기본 {@link OrderStatus#COMPLETED})을 원하는 생성 시각으로 저장한다.
@@ -55,7 +56,9 @@ public class CompletedOrderFixture {
 
     private void applyStatus(Order order, OrderStatus status) {
         switch (status) {
-            case CREATED -> { /* Order.create 직후 상태가 CREATED다. */ }
+            case CREATED -> {
+                /* Order.create 직후 상태가 CREATED다. */
+            }
             case PENDING -> order.pending();
             case COMPLETED -> order.complete();
             case CANCELED -> order.cancel();

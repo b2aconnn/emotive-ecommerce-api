@@ -1,11 +1,13 @@
 package com.loopers.infrastructure.point.jpa;
 
-import com.loopers.domain.point.Point;
-import com.loopers.domain.point.PointRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import com.loopers.domain.point.Point;
+import com.loopers.domain.point.PointRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component

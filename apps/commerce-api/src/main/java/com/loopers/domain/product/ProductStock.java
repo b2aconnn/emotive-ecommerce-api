@@ -1,12 +1,13 @@
 package com.loopers.domain.product;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+
+import jakarta.persistence.*;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)
@@ -23,8 +24,8 @@ public class ProductStock {
 
     private Long quantity;
 
-//    @Version
-//    private Long version;
+    //    @Version
+    //    private Long version;
 
     private ProductStock(Product product, Long quantity) {
         this.product = product;

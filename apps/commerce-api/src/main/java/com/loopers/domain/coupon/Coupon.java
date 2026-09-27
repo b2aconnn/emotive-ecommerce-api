@@ -1,18 +1,20 @@
 package com.loopers.domain.coupon;
 
-import com.loopers.domain.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import static jakarta.persistence.EnumType.STRING;
+import static java.util.Objects.requireNonNull;
+import static lombok.AccessLevel.PROTECTED;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
-import static jakarta.persistence.EnumType.STRING;
-import static java.util.Objects.requireNonNull;
-import static lombok.AccessLevel.PROTECTED;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+
+import com.loopers.domain.BaseEntity;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)

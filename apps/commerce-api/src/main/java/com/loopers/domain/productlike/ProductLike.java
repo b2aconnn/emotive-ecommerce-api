@@ -1,18 +1,20 @@
 package com.loopers.domain.productlike;
 
-import com.loopers.domain.BaseEntity;
-import com.loopers.domain.product.Product;
-import com.loopers.domain.user.User;
+import static jakarta.persistence.FetchType.LAZY;
+import static lombok.AccessLevel.PROTECTED;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+
+import com.loopers.domain.BaseEntity;
+import com.loopers.domain.product.Product;
+import com.loopers.domain.user.User;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import static jakarta.persistence.FetchType.LAZY;
-import static lombok.AccessLevel.PROTECTED;
 
 /**
  * 사용자가 상품에 누른 좋아요 한 건.
@@ -29,11 +31,10 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @Table(
         name = "product_like",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_product_like_user_product",
-                columnNames = {"user_id", "product_id"}
-        )
-)
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uk_product_like_user_product",
+                        columnNames = {"user_id", "product_id"}))
 @Entity
 public class ProductLike extends BaseEntity {
 

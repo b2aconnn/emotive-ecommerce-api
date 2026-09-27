@@ -12,5 +12,4 @@ public record OrderCreatedEvent(
 
         PaymentMethod paymentMethod,
         CardType cardType,
-        String cardNo
-) {}
+        String cardNo) {}

@@ -1,7 +1,7 @@
 package com.loopers.infrastructure.order.jpa;
 
-import com.loopers.domain.order.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
-}
+import com.loopers.domain.order.OrderItem;
+
+public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {}

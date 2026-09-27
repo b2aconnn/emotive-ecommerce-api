@@ -1,13 +1,15 @@
 package com.loopers.domain.brand;
 
-import com.loopers.domain.BaseEntity;
-import com.loopers.domain.brand.dto.command.BrandCreateCommand;
+import static lombok.AccessLevel.PROTECTED;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+
+import com.loopers.domain.BaseEntity;
+import com.loopers.domain.brand.dto.command.BrandCreateCommand;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import static lombok.AccessLevel.PROTECTED;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)
@@ -28,9 +30,6 @@ public class Brand extends BaseEntity {
     }
 
     public static Brand create(BrandCreateCommand createCommand) {
-        return new Brand(
-                createCommand.name(),
-                createCommand.logoUrl(),
-                createCommand.description());
+        return new Brand(createCommand.name(), createCommand.logoUrl(), createCommand.description());
     }
 }

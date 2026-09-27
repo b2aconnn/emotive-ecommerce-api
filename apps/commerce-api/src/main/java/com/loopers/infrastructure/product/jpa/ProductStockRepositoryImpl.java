@@ -1,12 +1,14 @@
 package com.loopers.infrastructure.product.jpa;
 
-import com.loopers.domain.product.ProductStock;
-import com.loopers.domain.product.ProductStockRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Component;
+
+import com.loopers.domain.product.ProductStock;
+import com.loopers.domain.product.ProductStockRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component

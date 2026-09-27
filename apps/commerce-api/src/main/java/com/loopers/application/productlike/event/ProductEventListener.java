@@ -1,20 +1,22 @@
 package com.loopers.application.productlike.event;
 
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
+import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
+
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
+
 import com.loopers.application.product.event.model.ProductViewedEvent;
 import com.loopers.application.productlike.ProductLikeService;
 import com.loopers.application.productlike.event.model.ProductLikeCountAddedEvent;
 import com.loopers.application.productlike.event.model.ProductLikeCountRemovedEvent;
 import com.loopers.application.productlike.event.model.ProductLikedEvent;
 import com.loopers.domain.product.message.ProductMessagePublisher;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
-
-import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
-import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
 
 @Slf4j
 @RequiredArgsConstructor

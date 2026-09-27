@@ -1,5 +1,12 @@
 package com.loopers.application.productlike;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.loopers.application.product.dto.ProductsResult;
 import com.loopers.application.productlike.event.model.ProductLikeCountAddedEvent;
 import com.loopers.application.productlike.event.model.ProductLikeCountRemovedEvent;
@@ -11,13 +18,8 @@ import com.loopers.domain.productlike.ProductLike;
 import com.loopers.domain.productlike.ProductLikeRepository;
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -34,13 +36,13 @@ public class ProductLikeService {
 
     @Transactional
     public void likeProduct(Long userId, Long productId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "유저가 존재하지 않습니다. userId: " + userId));
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다. userId: " + userId));
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "상품이 존재하지 않습니다. productId: " + productId));
+        Product product = productRepository
+                .findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다. productId: " + productId));
 
         Optional<ProductLike> productLikeOptional =
                 productLikeRepository.findByUserIdAndProductId(user.getId(), product.getId());
@@ -55,24 +57,24 @@ public class ProductLikeService {
 
     @Transactional
     public void likeCountUp(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "상품이 존재하지 않습니다. productId: " + productId));
+        Product product = productRepository
+                .findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다. productId: " + productId));
 
         product.likeCountUp();
 
         applicationEventPublisher.publishEvent(new ProductLikeCountAddedEvent(
-                productId,
-                product.getProductStock().getQuantity()
-        ));
+                productId, product.getProductStock().getQuantity()));
     }
 
     @Transactional
     public void unlikeProduct(Long userId, Long productId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository
+                .findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다. userId: " + userId));
 
-        Product product = productRepository.findById(productId)
+        Product product = productRepository
+                .findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다. productId: " + productId));
 
         Optional<ProductLike> byUserAndProductOptional =
@@ -94,15 +96,13 @@ public class ProductLikeService {
 
     @Transactional
     public void unlikeCountDown(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "상품이 존재하지 않습니다. productId: " + productId));
+        Product product = productRepository
+                .findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다. productId: " + productId));
 
         product.unlikeCountDown();
 
         applicationEventPublisher.publishEvent(new ProductLikeCountRemovedEvent(
-                productId,
-                product.getProductStock().getQuantity()
-        ));
+                productId, product.getProductStock().getQuantity()));
     }
 }

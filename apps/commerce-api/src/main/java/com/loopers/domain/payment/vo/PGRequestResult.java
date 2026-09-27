@@ -1,21 +1,16 @@
 package com.loopers.domain.payment.vo;
 
+import static com.loopers.application.payment.dto.PaymentResultStatus.FAILED;
+
 import com.loopers.application.payment.dto.PaymentResultStatus;
 import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorRequestResponse;
 
-import static com.loopers.application.payment.dto.PaymentResultStatus.FAILED;
-
-public record PGRequestResult(
-        String transactionKey,
-        PaymentResultStatus status,
-        String reason
-) {
+public record PGRequestResult(String transactionKey, PaymentResultStatus status, String reason) {
     public static PGRequestResult from(PGSimulatorRequestResponse pgSimulatorRequestResponse) {
         return new PGRequestResult(
                 pgSimulatorRequestResponse.data().transactionKey(),
                 pgSimulatorRequestResponse.data().status(),
-                pgSimulatorRequestResponse.data().reason()
-        );
+                pgSimulatorRequestResponse.data().reason());
     }
 
     public void checkFailed() {

@@ -1,10 +1,11 @@
 package com.loopers.domain;
 
+import java.time.ZonedDateTime;
+
 import jakarta.persistence.*;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import java.time.ZonedDateTime;
 
 /**
  * 생성/수정/삭제 정보를 자동으로 관리해준다.

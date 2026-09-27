@@ -1,16 +1,17 @@
 package com.loopers.fixture.infra.fixturemonkey;
 
-import com.loopers.domain.user.User;
-import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.command.UserCreateInfo;
-import com.loopers.fixture.user.UserFixture;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import static com.loopers.domain.user.type.GenderType.MALE;
 
 import java.util.List;
 import java.util.Objects;
 
-import static com.loopers.domain.user.type.GenderType.MALE;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.loopers.domain.user.User;
+import com.loopers.domain.user.UserRepository;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
+import com.loopers.fixture.user.UserFixture;
 
 @Component
 public class UserFixtureMonkey implements UserFixture {
@@ -19,7 +20,8 @@ public class UserFixtureMonkey implements UserFixture {
 
     @Override
     public List<User> create(int count) {
-        return FixtureMonkeyFactory.create().giveMeBuilder(User.class)
+        return FixtureMonkeyFactory.create()
+                .giveMeBuilder(User.class)
                 .set("id", 0L)
                 .sampleList(count);
     }

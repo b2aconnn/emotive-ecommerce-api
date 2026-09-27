@@ -6,7 +6,4 @@ package com.loopers.domain.productlike.dto.result;
  * @param userId    사용자 내부 PK
  * @param productId 좋아요 대상 상품 PK
  */
-public record UserLikedProductResult(
-        Long userId,
-        Long productId
-) {}
+public record UserLikedProductResult(Long userId, Long productId) {}

@@ -7,5 +7,4 @@ public record PaymentResultCommand(
         String cardNo,
         Long amount,
         PaymentResultStatus status,
-        String reason
-) {}
+        String reason) {}

@@ -1,13 +1,15 @@
 package com.loopers.support.interceptor;
 
-import com.loopers.domain.user.UserRepository;
+import java.io.IOException;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.io.IOException;
+import com.loopers.domain.user.UserRepository;
 
 @Component
 public class UserAuthenticationInterceptor implements HandlerInterceptor {
@@ -21,7 +23,8 @@ public class UserAuthenticationInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws IOException {
         if (isSignupRequest(request)) {
             return true;
         }

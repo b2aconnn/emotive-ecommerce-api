@@ -1,12 +1,12 @@
 package com.loopers.domain.point;
 
-import com.loopers.application.point.PointService;
-import com.loopers.application.point.dto.PointResult;
-import com.loopers.domain.user.User;
-import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.command.UserCreateInfo;
-import com.loopers.utils.DatabaseCleanUp;
+import static com.loopers.domain.user.type.GenderType.MALE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,10 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import static com.loopers.domain.user.type.GenderType.MALE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import com.loopers.application.point.PointService;
+import com.loopers.application.point.dto.PointResult;
+import com.loopers.domain.user.User;
+import com.loopers.domain.user.UserRepository;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
+import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest
 class PointServiceIntegrationTest {
@@ -46,8 +48,8 @@ class PointServiceIntegrationTest {
         @Test
         void createsNewPointWhenChargingForTheFirstTime() {
             // arrange
-            User saveUser = userRepository.save(User.create(new UserCreateInfo(
-                    "park", "user@domain.com", "2000-01-01", MALE)));
+            User saveUser =
+                    userRepository.save(User.create(new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE)));
             Long amount = 10_000L;
 
             // act
@@ -55,9 +57,8 @@ class PointServiceIntegrationTest {
 
             // assert
             assertAll(
-                () -> assertThat(result.userId()).isEqualTo(saveUser.getId()),
-                () -> assertThat(result.amount()).isEqualTo(amount)
-            );
+                    () -> assertThat(result.userId()).isEqualTo(saveUser.getId()),
+                    () -> assertThat(result.amount()).isEqualTo(amount));
         }
     }
 
@@ -68,8 +69,8 @@ class PointServiceIntegrationTest {
         @Test
         void returnsUserPointsWhenUserExists() {
             // arrange
-            User saveUser = userRepository.save(User.create(new UserCreateInfo(
-                    "park", "user@domain.com", "2000-01-01", MALE)));
+            User saveUser =
+                    userRepository.save(User.create(new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE)));
 
             Point point = Point.create(saveUser.getId());
             point.charge(10_000L);
@@ -80,11 +81,10 @@ class PointServiceIntegrationTest {
 
             // assert
             assertAll(
-                () -> assertThat(pointInfo).isNotNull(),
-                () -> assertThat(pointInfo.id()).isNotNull(),
-                () -> assertThat(pointInfo.userId()).isEqualTo(saveUser.getId()),
-                () -> assertThat(pointInfo.amount()).isEqualTo(10_000)
-            );
+                    () -> assertThat(pointInfo).isNotNull(),
+                    () -> assertThat(pointInfo.id()).isNotNull(),
+                    () -> assertThat(pointInfo.userId()).isEqualTo(saveUser.getId()),
+                    () -> assertThat(pointInfo.amount()).isEqualTo(10_000));
         }
 
         @DisplayName("해당 ID 의 포인트 정보가 없을 경우, 예외가 발생한다.")
@@ -92,8 +92,7 @@ class PointServiceIntegrationTest {
         void throwsWhenPointDoesNotExist() {
             // act
             // assert
-            assertThatThrownBy(() -> pointService.get(999L))
-                    .isInstanceOf(EntityNotFoundException.class);
+            assertThatThrownBy(() -> pointService.get(999L)).isInstanceOf(EntityNotFoundException.class);
         }
     }
 }

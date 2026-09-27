@@ -6,7 +6,4 @@ package com.loopers.domain.order.dto.result;
  * @param userId    사용자 내부 PK
  * @param productId 주문에 포함된 상품 PK
  */
-public record UserOrderedProductResult(
-        Long userId,
-        Long productId
-) {}
+public record UserOrderedProductResult(Long userId, Long productId) {}

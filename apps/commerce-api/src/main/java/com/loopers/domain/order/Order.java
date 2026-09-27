@@ -1,22 +1,24 @@
 package com.loopers.domain.order;
 
-import com.loopers.domain.BaseEntity;
-import com.loopers.domain.order.dto.OrderCreateInfo;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.loopers.domain.order.OrderStatus.*;
 import static com.loopers.support.validation.TextValidator.requireText;
 import static jakarta.persistence.EnumType.STRING;
 import static java.util.Objects.requireNonNull;
 import static lombok.AccessLevel.PROTECTED;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+import com.loopers.domain.BaseEntity;
+import com.loopers.domain.order.dto.OrderCreateInfo;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PROTECTED)
@@ -72,9 +74,8 @@ public class Order extends BaseEntity {
             throw new IllegalStateException("주문 상품이 없습니다.");
         }
 
-        long oderItemsTotalPrice = orderItems.stream()
-                .mapToLong(OrderItem::getTotalPrice)
-                .sum();
+        long oderItemsTotalPrice =
+                orderItems.stream().mapToLong(OrderItem::getTotalPrice).sum();
 
         this.totalAmount = oderItemsTotalPrice - usePoint;
     }
@@ -109,15 +110,11 @@ public class Order extends BaseEntity {
     }
 
     public Long getItemTotalAmount() {
-        return orderItems.stream()
-                .mapToLong(OrderItem::getTotalPrice)
-                .sum();
+        return orderItems.stream().mapToLong(OrderItem::getTotalPrice).sum();
     }
 
     public void applyDiscount(List<Discount> discounts) {
-        Long discountAmount = discounts.stream()
-                .mapToLong(Discount::amount)
-                .sum();
+        Long discountAmount = discounts.stream().mapToLong(Discount::amount).sum();
 
         this.totalAmount = Math.max(0L, getItemTotalAmount() - discountAmount - usedPoints);
     }

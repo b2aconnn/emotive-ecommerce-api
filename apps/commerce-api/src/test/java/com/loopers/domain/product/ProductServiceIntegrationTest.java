@@ -1,5 +1,18 @@
 package com.loopers.domain.product;
 
+import static com.loopers.application.product.dto.ProductsSortType.LIKES_DESC;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.loopers.application.product.ProductService;
 import com.loopers.application.product.dto.ProductResult;
 import com.loopers.application.product.dto.ProductsCondition;
@@ -11,18 +24,6 @@ import com.loopers.domain.product.dto.command.ProductCreateCommand;
 import com.loopers.domain.productlike.ProductLikeCount;
 import com.loopers.domain.productlike.ProductLikeCountRepository;
 import com.loopers.utils.DatabaseCleanUp;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static com.loopers.application.product.dto.ProductsSortType.LIKES_DESC;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 @SpringBootTest
 public class ProductServiceIntegrationTest {
@@ -63,10 +64,8 @@ public class ProductServiceIntegrationTest {
         @Test
         void returnsAllProductsSortedByNewestWithoutKeyword() {
             // arrange
-            Brand saveBrand = brandRepository.save(Brand.create(new BrandCreateCommand(
-                    "Test Brand",
-                    "http://example.com/logo.png",
-                    "This is a test brand.")));
+            Brand saveBrand = brandRepository.save(Brand.create(
+                    new BrandCreateCommand("Test Brand", "http://example.com/logo.png", "This is a test brand.")));
 
             productRepository.save(Product.create(new ProductCreateCommand(
                     "Test Product 1",
@@ -86,22 +85,20 @@ public class ProductServiceIntegrationTest {
             List<ProductsResult> productsResult = productService.getAll(new ProductsCondition());
 
             // assert
-            assertThat(productsResult).hasSize(2)
+            assertThat(productsResult)
+                    .hasSize(2)
                     .extracting("productName", "brandName", "price", "mainImageUrl")
                     .containsExactlyInAnyOrder(
                             tuple("Test Product 1", "Test Brand", 10_000, "http://example.com/product1.png"),
-                            tuple("Test Product 2", "Test Brand", 20_000, "http://example.com/product2.png")
-                    );
+                            tuple("Test Product 2", "Test Brand", 20_000, "http://example.com/product2.png"));
         }
 
         @DisplayName("모든 상품 목록이 높은 좋아요 수 순으로 조회된다.")
         @Test
         void returnsAllProductsSortedByLikeCount() {
             // arrange
-            Brand saveBrand = brandRepository.save(Brand.create(new BrandCreateCommand(
-                    "Test Brand",
-                    "http://example.com/logo.png",
-                    "This is a test brand.")));
+            Brand saveBrand = brandRepository.save(Brand.create(
+                    new BrandCreateCommand("Test Brand", "http://example.com/logo.png", "This is a test brand.")));
 
             Product saveProduct1 = productRepository.save(Product.create(new ProductCreateCommand(
                     "Test Product 1",
@@ -132,22 +129,20 @@ public class ProductServiceIntegrationTest {
             List<ProductsResult> productsResult = productService.getAll(new ProductsCondition(LIKES_DESC));
 
             // assert
-            assertThat(productsResult).hasSize(2)
+            assertThat(productsResult)
+                    .hasSize(2)
                     .extracting("productName", "brandName", "price", "mainImageUrl")
                     .containsExactly(
                             tuple("Test Product 2", "Test Brand", 20_000, "http://example.com/product2.png"),
-                            tuple("Test Product 1", "Test Brand", 10_000, "http://example.com/product1.png")
-                    );
+                            tuple("Test Product 1", "Test Brand", 10_000, "http://example.com/product1.png"));
         }
 
         @DisplayName("존재하지 않는 브랜드명을 검색할 입력할 경우, 빈 값을 반환해야 한다.")
         @Test
         void returnsEmptyListWhenBrandNameNotFoundInSearch() {
             // arrange
-            Brand saveBrand = brandRepository.save(Brand.create(new BrandCreateCommand(
-                    "테스트 브랜드",
-                    "http://example.com/logo.png",
-                    "This is a test brand.")));
+            Brand saveBrand = brandRepository.save(Brand.create(
+                    new BrandCreateCommand("테스트 브랜드", "http://example.com/logo.png", "This is a test brand.")));
 
             productRepository.save(Product.create(new ProductCreateCommand(
                     "Test Product 1",
@@ -190,17 +185,11 @@ public class ProductServiceIntegrationTest {
         @Test
         void returnsProductInfoWhenProductExists() {
             // arrange
-            Brand saveBrand = brandRepository.save(Brand.create(new BrandCreateCommand(
-                    "Test Brand",
-                    "http://example.com/logo.png",
-                    "This is a test brand.")));
+            Brand saveBrand = brandRepository.save(Brand.create(
+                    new BrandCreateCommand("Test Brand", "http://example.com/logo.png", "This is a test brand.")));
 
             Product saveProduct = productRepository.save(Product.create(new ProductCreateCommand(
-                    "Test Product",
-                    "http://example.com/product.png",
-                    "This is a test product.",
-                    10_000L,
-                    saveBrand)));
+                    "Test Product", "http://example.com/product.png", "This is a test product.", 10_000L, saveBrand)));
 
             ProductLikeCount saveLikeCount = productLikeCountRepository.save(ProductLikeCount.create(saveProduct));
             saveProduct.setProductLikeCount(saveLikeCount);
@@ -210,13 +199,16 @@ public class ProductServiceIntegrationTest {
 
             // assert
             assertThat(productResult.id()).isNotNull();
-            assertThat(productResult.brandName()).isEqualTo(saveProduct.getBrand().getName());
+            assertThat(productResult.brandName())
+                    .isEqualTo(saveProduct.getBrand().getName());
             assertThat(productResult.productName()).isEqualTo(saveProduct.getName());
             assertThat(productResult.mainImageUrl()).isEqualTo(saveProduct.getMainImageUrl());
             assertThat(productResult.description()).isEqualTo(saveProduct.getDescription());
             assertThat(productResult.price()).isEqualTo(saveProduct.getPrice());
-            assertThat(productResult.stockQuantity()).isEqualTo(saveProduct.getProductStock().getQuantity());
-            assertThat(productResult.likeCount()).isEqualTo(saveProduct.getProductLikeCount().getLikeCount());
+            assertThat(productResult.stockQuantity())
+                    .isEqualTo(saveProduct.getProductStock().getQuantity());
+            assertThat(productResult.likeCount())
+                    .isEqualTo(saveProduct.getProductLikeCount().getLikeCount());
         }
     }
 }

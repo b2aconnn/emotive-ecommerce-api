@@ -1,19 +1,21 @@
 package com.loopers.application.order.event;
 
-import com.loopers.application.order.OrderService;
-import com.loopers.application.order.event.model.OrderCompletedEvent;
-import com.loopers.application.payment.event.model.PaymentResultEvent;
-import com.loopers.domain.order.message.OrderMessagePublisher;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionalEventListener;
-
 import static com.loopers.application.payment.dto.PaymentResultStatus.FAILED;
 import static com.loopers.application.payment.dto.PaymentResultStatus.SUCCESS;
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
+
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+import com.loopers.application.order.OrderService;
+import com.loopers.application.order.event.model.OrderCompletedEvent;
+import com.loopers.application.payment.event.model.PaymentResultEvent;
+import com.loopers.domain.order.message.OrderMessagePublisher;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor

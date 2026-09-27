@@ -1,17 +1,19 @@
 package com.loopers.domain.payment;
 
-import com.loopers.domain.BaseEntity;
-import com.loopers.domain.order.PaymentStatus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import static com.loopers.domain.order.PaymentStatus.PENDING;
 import static com.loopers.support.validation.TextValidator.requireText;
 import static jakarta.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+
+import com.loopers.domain.BaseEntity;
+import com.loopers.domain.order.PaymentStatus;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = PROTECTED)
 @Getter
@@ -63,11 +65,7 @@ public class Payment extends BaseEntity {
         }
     }
 
-    public void updateResult(
-            String transactionKey,
-            PaymentStatus status,
-            String reason
-    ) {
+    public void updateResult(String transactionKey, PaymentStatus status, String reason) {
         updateTransactionKey(transactionKey);
         updateStatus(status);
         updateReason(reason);
@@ -90,6 +88,4 @@ public class Payment extends BaseEntity {
         }
         this.reason = reason;
     }
-
-
 }

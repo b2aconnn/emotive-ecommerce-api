@@ -2,14 +2,15 @@ package com.loopers.interfaces.api.product.dto;
 
 import com.loopers.application.product.dto.ProductResult;
 
-public record ProductInfoResponse(Long id,
-                               String brandName,
-                               String productName,
-                               Long price,
-                               String mainImageUrl,
-                               String description,
-                               Long stockQuantity,
-                               Integer likeCount) {
+public record ProductInfoResponse(
+        Long id,
+        String brandName,
+        String productName,
+        Long price,
+        String mainImageUrl,
+        String description,
+        Long stockQuantity,
+        Integer likeCount) {
     public static ProductInfoResponse from(ProductResult info) {
         if (info == null) {
             return null;
@@ -22,7 +23,6 @@ public record ProductInfoResponse(Long id,
                 info.mainImageUrl(),
                 info.description(),
                 info.stockQuantity(),
-                info.likeCount()
-        );
+                info.likeCount());
     }
 }

@@ -1,10 +1,10 @@
 package com.loopers.application.order.dto;
 
-import com.loopers.domain.order.Order;
-import com.loopers.domain.order.OrderStatus;
-
 import java.time.ZonedDateTime;
 import java.util.List;
+
+import com.loopers.domain.order.Order;
+import com.loopers.domain.order.OrderStatus;
 
 public record OrderDetailResult(
         Long id,
@@ -15,16 +15,14 @@ public record OrderDetailResult(
         Long usedPoints,
         Long totalAmount,
         List<OrderItemResult> items,
-        ZonedDateTime orderedAt
-) {
+        ZonedDateTime orderedAt) {
     public static OrderDetailResult from(Order order) {
         List<OrderItemResult> items = order.getOrderItems().stream()
                 .map(item -> new OrderItemResult(
                         item.getProduct().getId(),
                         item.getProduct().getName(),
                         item.getQuantity(),
-                        item.getTotalPrice()
-                ))
+                        item.getTotalPrice()))
                 .toList();
 
         return new OrderDetailResult(
@@ -36,7 +34,6 @@ public record OrderDetailResult(
                 order.getUsedPoints(),
                 order.getTotalAmount(),
                 items,
-                order.getCreatedAt()
-        );
+                order.getCreatedAt());
     }
 }
