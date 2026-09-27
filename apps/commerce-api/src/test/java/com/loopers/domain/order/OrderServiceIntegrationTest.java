@@ -56,7 +56,7 @@ public class OrderServiceIntegrationTest {
 
     @DisplayName("주문을 완료할 때, ")
     @Nested
-    class POST {
+    class Post {
         @DisplayName("현재 보유 포인트가 100원이고 100원의 상품 1개를 구매할 때, 포인트 100원을 사용해 주문 완료된다.")
         @Test
         void completeOrderWithFullPoints() {

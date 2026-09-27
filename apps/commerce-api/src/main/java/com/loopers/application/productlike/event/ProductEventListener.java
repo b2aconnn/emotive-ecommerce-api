@@ -1,11 +1,10 @@
 package com.loopers.application.productlike.event;
 
-import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
-import static org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT;
-
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.loopers.application.product.event.model.ProductViewedEvent;
@@ -28,32 +27,32 @@ public class ProductEventListener {
     private final ProductMessagePublisher productMessagePublisher;
 
     @Async
-    @Transactional(propagation = REQUIRES_NEW)
-    @TransactionalEventListener(phase = AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleProductLike(ProductLikedEvent event) {
         log.info("Product Like. productId: {}", event.productId());
         productLikeService.likeCountUp(event.productId());
     }
 
     @Async
-    @Transactional(propagation = REQUIRES_NEW)
-    @TransactionalEventListener(phase = AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleProductLikeCountUp(ProductLikeCountAddedEvent event) {
         log.info("Product Like Count Up. productId: {}", event.productId());
         productMessagePublisher.publishLikeAdded(event.toLikeAddedMessage());
     }
 
     @Async
-    @Transactional(propagation = REQUIRES_NEW)
-    @TransactionalEventListener(phase = AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleProductUnlike(ProductLikedEvent event) {
         log.info("Product Unlike. productId: {}", event.productId());
         productLikeService.unlikeCountDown(event.productId());
     }
 
     @Async
-    @Transactional(propagation = REQUIRES_NEW)
-    @TransactionalEventListener(phase = AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleProductUnlikeCountDown(ProductLikeCountRemovedEvent event) {
         log.info("Product Unlike Count Down. productId: {}", event.productId());
         productMessagePublisher.publishLikeRemoved(event.toLikeRemovedMessage());

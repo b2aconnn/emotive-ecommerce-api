@@ -1,30 +1,30 @@
 package com.loopers.domain.product;
 
-import static jakarta.persistence.FetchType.LAZY;
-import static lombok.AccessLevel.PROTECTED;
-
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.dto.command.ProductCreateCommand;
 import com.loopers.domain.productlike.ProductLikeCount;
 
-import lombok.EqualsAndHashCode;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "product")
 @Entity
 public class Product extends BaseEntity {
 
     private String name;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
@@ -34,12 +34,10 @@ public class Product extends BaseEntity {
 
     private Long price;
 
-    @Setter
-    @OneToOne(fetch = LAZY, mappedBy = "product")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "product")
     private ProductStock productStock;
 
-    @Setter
-    @OneToOne(fetch = LAZY, mappedBy = "product")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "product")
     private ProductLikeCount productLikeCount;
 
     public Product(ProductCreateCommand createCommand) {
@@ -60,6 +58,14 @@ public class Product extends BaseEntity {
 
     public static Product create(ProductCreateCommand createCommand) {
         return new Product(createCommand);
+    }
+
+    public void assignStock(ProductStock productStock) {
+        this.productStock = productStock;
+    }
+
+    public void assignLikeCount(ProductLikeCount productLikeCount) {
+        this.productLikeCount = productLikeCount;
     }
 
     public boolean isStockEnough(Long quantity) {

@@ -18,7 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
@@ -34,7 +39,7 @@ import com.loopers.interfaces.api.point.dto.PointChargeRequest;
 import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class BrandApiE2ETest {
+class BrandApiE2eTest {
     private static final Function<Long, String> ENDPOINT_GET = id -> "/api/brands/" + id;
     private static final String ENDPOINT_GET_ALL = "/api/brands";
 
@@ -45,7 +50,7 @@ class BrandApiE2ETest {
     private final DatabaseCleanUp databaseCleanUp;
 
     @Autowired
-    public BrandApiE2ETest(
+    public BrandApiE2eTest(
             TestRestTemplate testRestTemplate,
             BrandRepository brandRepository,
             BrandFixture brandFixture,
@@ -65,7 +70,7 @@ class BrandApiE2ETest {
 
     @DisplayName("GET /api/brands/{brandId}")
     @Nested
-    class GET {
+    class Get {
         @DisplayName("브랜드 조회에 성공할 경우, 해당하는 브랜드 정보를 응답으로 반환한다.")
         @Test
         void returnsBrandInfoOnSuccessfulRetrievalOfBrandInfo() {
@@ -131,7 +136,7 @@ class BrandApiE2ETest {
 
     @DisplayName("GET /api/brands")
     @Nested
-    class GET_ALL {
+    class GetAll {
         private HttpEntity<Void> authorizedRequest() {
             User saveUser =
                     userRepository.save(User.create(new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE)));

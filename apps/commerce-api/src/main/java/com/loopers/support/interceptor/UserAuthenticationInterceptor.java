@@ -1,6 +1,7 @@
 package com.loopers.support.interceptor;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,13 +37,13 @@ public class UserAuthenticationInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        Long userId = parseUserId(userIdHeader);
-        if (userId == null) {
+        Optional<Long> userId = parseUserId(userIdHeader);
+        if (userId.isEmpty()) {
             response.sendError(HttpStatus.BAD_REQUEST.value(), "Invalid X-USER-ID");
             return false;
         }
 
-        if (!userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId.get())) {
             response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid X-USER-ID");
             return false;
         }
@@ -50,11 +51,11 @@ public class UserAuthenticationInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    private Long parseUserId(String userIdHeader) {
+    private Optional<Long> parseUserId(String userIdHeader) {
         try {
-            return Long.valueOf(userIdHeader);
+            return Optional.of(Long.valueOf(userIdHeader));
         } catch (NumberFormatException e) {
-            return null;
+            return Optional.empty();
         }
     }
 

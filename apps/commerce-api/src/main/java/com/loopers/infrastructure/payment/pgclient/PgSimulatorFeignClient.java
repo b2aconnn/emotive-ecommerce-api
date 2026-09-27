@@ -7,15 +7,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.loopers.infrastructure.payment.pgclient.config.FeignClientConfig;
-import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorRequest;
-import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorRequestResponse;
-import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorTransactionInfoResponse;
+import com.loopers.infrastructure.payment.pgclient.dto.PgSimulatorRequest;
+import com.loopers.infrastructure.payment.pgclient.dto.PgSimulatorRequestResponse;
+import com.loopers.infrastructure.payment.pgclient.dto.PgSimulatorTransactionInfoResponse;
 
 @FeignClient(name = "pgSimulatorClient", url = "http://localhost:8082", configuration = FeignClientConfig.class)
 public interface PgSimulatorFeignClient {
     @PostMapping("/api/v1/payments")
-    PGSimulatorRequestResponse requestPayment(@RequestBody PGSimulatorRequest request);
+    PgSimulatorRequestResponse requestPayment(@RequestBody PgSimulatorRequest request);
 
     @GetMapping("/api/v1/payments/{transactionKey}")
-    PGSimulatorTransactionInfoResponse getTransaction(@PathVariable String transactionKey);
+    PgSimulatorTransactionInfoResponse getTransaction(@PathVariable String transactionKey);
 }

@@ -1,18 +1,17 @@
 package com.loopers.domain.brand;
 
-import static lombok.AccessLevel.PROTECTED;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "brand")
 @Entity
 public class Brand extends BaseEntity {

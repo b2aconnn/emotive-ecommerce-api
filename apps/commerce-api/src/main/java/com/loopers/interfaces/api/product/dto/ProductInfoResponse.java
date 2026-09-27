@@ -12,9 +12,6 @@ public record ProductInfoResponse(
         Long stockQuantity,
         Integer likeCount) {
     public static ProductInfoResponse from(ProductResult info) {
-        if (info == null) {
-            return null;
-        }
         return new ProductInfoResponse(
                 info.id(),
                 info.brandName(),

@@ -1,30 +1,29 @@
 package com.loopers.domain.coupon;
 
-import static jakarta.persistence.EnumType.STRING;
-import static java.util.Objects.requireNonNull;
-import static lombok.AccessLevel.PROTECTED;
-
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 import com.loopers.domain.BaseEntity;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "coupon")
 @Entity
 public class Coupon extends BaseEntity {
 
     private Long userId;
 
-    @Enumerated(STRING)
+    @Enumerated(EnumType.STRING)
     private CouponType type;
 
     private BigDecimal discountValue;
@@ -46,10 +45,10 @@ public class Coupon extends BaseEntity {
     }
 
     private static void validateRequiredCouponInfo(CouponCreateInfo createInfo) {
-        requireNonNull(createInfo);
-        requireNonNull(createInfo.userId());
-        requireNonNull(createInfo.type());
-        requireNonNull(createInfo.expirationDate());
+        Objects.requireNonNull(createInfo);
+        Objects.requireNonNull(createInfo.userId());
+        Objects.requireNonNull(createInfo.type());
+        Objects.requireNonNull(createInfo.expirationDate());
     }
 
     public Long calculateDiscount(Long amount) {

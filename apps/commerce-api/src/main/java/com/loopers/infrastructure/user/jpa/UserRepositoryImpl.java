@@ -1,12 +1,11 @@
 package com.loopers.infrastructure.user.jpa;
 
-import static java.util.Collections.emptyList;
-import static org.springframework.util.CollectionUtils.isEmpty;
-
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
@@ -41,8 +40,8 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> findAllByIdIn(List<Long> ids) {
         // 빈 목록으로 IN () 쿼리를 만들지 않는다.
-        if (isEmpty(ids)) {
-            return emptyList();
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
         }
 
         return userJpaRepository.findAllByIdIn(ids);

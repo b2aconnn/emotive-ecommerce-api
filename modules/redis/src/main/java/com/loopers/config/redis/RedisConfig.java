@@ -21,8 +21,8 @@ import io.lettuce.core.ReadFrom;
 @Configuration
 @EnableConfigurationProperties(RedisProperties.class)
 public class RedisConfig {
-    private static final String CONNECTION_MASTER = "redisConnectionMaster";
     public static final String REDIS_TEMPLATE_MASTER = "redisTemplateMaster";
+    private static final String CONNECTION_MASTER = "redisConnectionMaster";
 
     private final RedisProperties redisProperties;
 
@@ -69,7 +69,9 @@ public class RedisConfig {
             List<RedisNodeInfo> replicas,
             Consumer<LettuceClientConfiguration.LettuceClientConfigurationBuilder> customizer) {
         LettuceClientConfiguration.LettuceClientConfigurationBuilder builder = LettuceClientConfiguration.builder();
-        if (customizer != null) customizer.accept(builder);
+        if (customizer != null) {
+            customizer.accept(builder);
+        }
         LettuceClientConfiguration clientConfig = builder.build();
         RedisStaticMasterReplicaConfiguration masterReplicaConfig =
                 new RedisStaticMasterReplicaConfiguration(master.host(), master.port());

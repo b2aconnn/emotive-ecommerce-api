@@ -49,7 +49,7 @@ public class ProductServiceIntegrationTest {
 
     @DisplayName("상품를 조회할 때, ")
     @Nested
-    class GET {
+    class Get {
         @DisplayName("상품 목록이 존재하지 않은 경우, 빈 값을 반환된다.")
         @Test
         void returnsEmptyListIfNoProductsFound() {
@@ -110,7 +110,7 @@ public class ProductServiceIntegrationTest {
             ProductLikeCount productLikeCount1 = ProductLikeCount.create(saveProduct1);
             productLikeCount1.increase();
             ProductLikeCount saveLikeCount1 = productLikeCountRepository.save(productLikeCount1);
-            saveProduct1.setProductLikeCount(saveLikeCount1);
+            saveProduct1.assignLikeCount(saveLikeCount1);
 
             Product saveProduct2 = productRepository.save(Product.create(new ProductCreateCommand(
                     "Test Product 2",
@@ -123,7 +123,7 @@ public class ProductServiceIntegrationTest {
             productLikeCount2.increase();
             productLikeCount2.increase();
             ProductLikeCount saveLikeCount2 = productLikeCountRepository.save(productLikeCount2);
-            saveProduct2.setProductLikeCount(saveLikeCount2);
+            saveProduct2.assignLikeCount(saveLikeCount2);
 
             // act
             List<ProductsResult> productsResult = productService.getAll(new ProductsCondition(LIKES_DESC));
@@ -192,7 +192,7 @@ public class ProductServiceIntegrationTest {
                     "Test Product", "http://example.com/product.png", "This is a test product.", 10_000L, saveBrand)));
 
             ProductLikeCount saveLikeCount = productLikeCountRepository.save(ProductLikeCount.create(saveProduct));
-            saveProduct.setProductLikeCount(saveLikeCount);
+            saveProduct.assignLikeCount(saveLikeCount);
 
             // act
             ProductResult productResult = productService.getProduct(saveProduct.getId());

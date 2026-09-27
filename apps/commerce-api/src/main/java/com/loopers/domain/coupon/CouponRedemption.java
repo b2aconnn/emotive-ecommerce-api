@@ -1,10 +1,9 @@
 package com.loopers.domain.coupon;
 
-import static com.loopers.domain.order.DiscountType.COUPON;
-
 import org.springframework.stereotype.Service;
 
 import com.loopers.domain.order.Discount;
+import com.loopers.domain.order.DiscountType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,7 +20,7 @@ public class CouponRedemption {
 
         Long discountAmount = coupon.calculateDiscount(orderAmount);
 
-        return new Discount(discountAmount, COUPON);
+        return new Discount(discountAmount, DiscountType.COUPON);
     }
 
     public void useCoupon(Long userId, Long couponId) {

@@ -1,17 +1,17 @@
 package com.loopers.support.resolver;
 
 public class UserContextHolder {
-    private static final ThreadLocal<String> userId = new ThreadLocal<>();
+    private static final ThreadLocal<String> USER_ID = new ThreadLocal<>();
 
     public static void setUserId(String id) {
-        userId.set(id);
+        USER_ID.set(id);
     }
 
     public static String getUserId() {
-        return userId.get();
+        return USER_ID.get();
     }
 
     public static void clear() {
-        userId.remove();
+        USER_ID.remove();
     }
 }

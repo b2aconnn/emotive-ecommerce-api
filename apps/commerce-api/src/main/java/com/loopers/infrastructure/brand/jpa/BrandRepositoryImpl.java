@@ -1,17 +1,16 @@
 package com.loopers.infrastructure.brand.jpa;
 
-import static com.loopers.domain.brand.QBrand.brand;
-import static org.springframework.util.StringUtils.hasText;
-
 import java.util.List;
 import java.util.Optional;
 
 import jakarta.persistence.EntityManager;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
+import com.loopers.domain.brand.QBrand;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -34,17 +33,17 @@ public class BrandRepositoryImpl implements BrandRepository {
     @Override
     public List<Brand> findAll(String searchKeyword, Integer offset, Integer size) {
         return queryFactory
-                .select(brand)
-                .from(brand)
+                .select(QBrand.brand)
+                .from(QBrand.brand)
                 .where(searchKeywordContains(searchKeyword))
-                .orderBy(brand.id.asc())
+                .orderBy(QBrand.brand.id.asc())
                 .offset(offset)
                 .limit(size)
                 .fetch();
     }
 
     private BooleanExpression searchKeywordContains(String searchKeyword) {
-        return hasText(searchKeyword) ? brand.name.containsIgnoreCase(searchKeyword) : null;
+        return StringUtils.hasText(searchKeyword) ? QBrand.brand.name.containsIgnoreCase(searchKeyword) : null;
     }
 
     @Override

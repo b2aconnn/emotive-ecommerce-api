@@ -42,8 +42,9 @@ public class ProductService {
     @Cacheable(
             value = "products",
             key = "'offset:' + #productsCondition.offset() + ':size:' + #productsCondition.size()",
-            condition =
-                    "#productsCondition.offset() == 0 || #productsCondition.offset() == 20 || #productsCondition.offset() == 40")
+            condition = "#productsCondition.offset() == 0"
+                    + " || #productsCondition.offset() == 20"
+                    + " || #productsCondition.offset() == 40")
     public List<ProductsResult> getAll(ProductsCondition productsCondition) {
         List<Product> products = productRepository.findAll(productsCondition);
         return products.stream().map(ProductsResult::from).toList();

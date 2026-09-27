@@ -1,20 +1,22 @@
 package com.loopers.domain.point;
 
-import static lombok.AccessLevel.PROTECTED;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 import com.loopers.domain.BaseEntity;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "point")
 @Entity
 public class Point extends BaseEntity {
+
+    private static final long MIN_CHARGE_AMOUNT = 100L;
+    private static final long MIN_USE_AMOUNT = 100L;
 
     private Long userId;
 
@@ -35,7 +37,7 @@ public class Point extends BaseEntity {
     }
 
     private void validateChargeAmount(Long amount) {
-        if (amount < 100) {
+        if (amount < MIN_CHARGE_AMOUNT) {
             throw new IllegalArgumentException("100 이상의 포인트를 충전할 수 있습니다.");
         }
     }
@@ -46,7 +48,7 @@ public class Point extends BaseEntity {
     }
 
     private void validateUseAmount(Long useAmount) {
-        if (useAmount < 100) {
+        if (useAmount < MIN_USE_AMOUNT) {
             throw new IllegalArgumentException("포인트는 100원 이상 사용할 수 있습니다.");
         }
 
