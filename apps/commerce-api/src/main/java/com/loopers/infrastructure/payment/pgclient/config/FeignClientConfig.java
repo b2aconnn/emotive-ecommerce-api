@@ -1,10 +1,11 @@
 package com.loopers.infrastructure.payment.pgclient.config;
 
-import feign.Request;
-import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import feign.Request;
+import feign.RequestInterceptor;
 
 @Configuration
 public class FeignClientConfig {

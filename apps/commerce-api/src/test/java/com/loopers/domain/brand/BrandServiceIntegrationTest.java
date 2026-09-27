@@ -1,12 +1,11 @@
 package com.loopers.domain.brand;
 
-import com.loopers.application.brand.BrandService;
-import com.loopers.application.brand.dto.BrandResult;
-import com.loopers.application.brand.dto.BrandsCondition;
-import com.loopers.application.brand.dto.BrandsResult;
-import com.loopers.domain.brand.dto.command.BrandCreateCommand;
-import com.loopers.fixture.infra.brand.BrandFixture;
-import com.loopers.utils.DatabaseCleanUp;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,21 +13,26 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
+import com.loopers.application.brand.BrandService;
+import com.loopers.application.brand.dto.BrandResult;
+import com.loopers.application.brand.dto.BrandsCondition;
+import com.loopers.application.brand.dto.BrandsResult;
+import com.loopers.domain.brand.dto.command.BrandCreateCommand;
+import com.loopers.fixture.infra.brand.BrandFixture;
+import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest
 public class BrandServiceIntegrationTest {
 
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
+
     @Autowired
     private BrandService brandService;
+
     @Autowired
     private BrandRepository brandRepository;
+
     @Autowired
     private BrandFixture brandFixture;
 
@@ -91,8 +95,10 @@ public class BrandServiceIntegrationTest {
         @Test
         void returnsAllBrandsWhenBrandsExist() {
             // given
-            Brand nike = brandRepository.save(Brand.create(new BrandCreateCommand("Nike", "http://example.com/nike.png", "Just do it.")));
-            Brand adidas = brandRepository.save(Brand.create(new BrandCreateCommand("Adidas", "http://example.com/adidas.png", "Impossible is nothing.")));
+            Brand nike = brandRepository.save(
+                    Brand.create(new BrandCreateCommand("Nike", "http://example.com/nike.png", "Just do it.")));
+            Brand adidas = brandRepository.save(Brand.create(
+                    new BrandCreateCommand("Adidas", "http://example.com/adidas.png", "Impossible is nothing.")));
 
             // when
             List<BrandsResult> brandsResults = brandService.getAll(new BrandsCondition());
@@ -100,11 +106,11 @@ public class BrandServiceIntegrationTest {
             // then
             assertThat(brandsResults).hasSize(2);
             assertThat(brandsResults)
-                    .extracting(BrandsResult::id, BrandsResult::brandName, BrandsResult::logoUrl, BrandsResult::description)
+                    .extracting(
+                            BrandsResult::id, BrandsResult::brandName, BrandsResult::logoUrl, BrandsResult::description)
                     .containsExactlyInAnyOrder(
                             tuple(nike.getId(), "Nike", "http://example.com/nike.png", "Just do it."),
-                            tuple(adidas.getId(), "Adidas", "http://example.com/adidas.png", "Impossible is nothing.")
-                    );
+                            tuple(adidas.getId(), "Adidas", "http://example.com/adidas.png", "Impossible is nothing."));
         }
 
         @DisplayName("브랜드가 하나도 존재하지 않을 경우, null 이 아닌 빈 리스트가 반환된다.")
@@ -132,7 +138,8 @@ public class BrandServiceIntegrationTest {
 
             // then
             assertThat(brandsResults).hasSize(2);
-            assertThat(brandsResults).extracting(BrandsResult::id)
+            assertThat(brandsResults)
+                    .extracting(BrandsResult::id)
                     .containsExactly(saved.get(2).getId(), saved.get(3).getId());
         }
 

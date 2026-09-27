@@ -1,6 +1,8 @@
 package com.loopers.config.redis;
 
-import io.lettuce.core.ReadFrom;
+import java.util.List;
+import java.util.function.Consumer;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -13,19 +15,18 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.util.List;
-import java.util.function.Consumer;
+import io.lettuce.core.ReadFrom;
 
 @EnableCaching
 @Configuration
 @EnableConfigurationProperties(RedisProperties.class)
-public class RedisConfig{
+public class RedisConfig {
     private static final String CONNECTION_MASTER = "redisConnectionMaster";
     public static final String REDIS_TEMPLATE_MASTER = "redisTemplateMaster";
 
     private final RedisProperties redisProperties;
 
-    public RedisConfig(RedisProperties redisProperties){
+    public RedisConfig(RedisProperties redisProperties) {
         this.redisProperties = redisProperties;
     }
 
@@ -35,10 +36,7 @@ public class RedisConfig{
         int database = redisProperties.database();
         RedisNodeInfo master = redisProperties.master();
         List<RedisNodeInfo> replicas = redisProperties.replicas();
-        return lettuceConnectionFactory(
-                database, master, replicas,
-                b -> b.readFrom(ReadFrom.REPLICA_PREFERRED)
-        );
+        return lettuceConnectionFactory(database, master, replicas, b -> b.readFrom(ReadFrom.REPLICA_PREFERRED));
     }
 
     @Qualifier(CONNECTION_MASTER)
@@ -47,10 +45,7 @@ public class RedisConfig{
         int database = redisProperties.database();
         RedisNodeInfo master = redisProperties.master();
         List<RedisNodeInfo> replicas = redisProperties.replicas();
-        return lettuceConnectionFactory(
-                database, master, replicas,
-                b -> b.readFrom(ReadFrom.MASTER)
-        );
+        return lettuceConnectionFactory(database, master, replicas, b -> b.readFrom(ReadFrom.MASTER));
     }
 
     @Primary
@@ -63,34 +58,30 @@ public class RedisConfig{
     @Qualifier(REDIS_TEMPLATE_MASTER)
     @Bean
     public RedisTemplate<String, String> masterRedisTemplate(
-            @Qualifier(CONNECTION_MASTER) LettuceConnectionFactory lettuceConnectionFactory
-    ) {
+            @Qualifier(CONNECTION_MASTER) LettuceConnectionFactory lettuceConnectionFactory) {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         return defaultRedisTemplate(redisTemplate, lettuceConnectionFactory);
     }
-
 
     private LettuceConnectionFactory lettuceConnectionFactory(
             int database,
             RedisNodeInfo master,
             List<RedisNodeInfo> replicas,
-            Consumer<LettuceClientConfiguration.LettuceClientConfigurationBuilder> customizer
-    ){
+            Consumer<LettuceClientConfiguration.LettuceClientConfigurationBuilder> customizer) {
         LettuceClientConfiguration.LettuceClientConfigurationBuilder builder = LettuceClientConfiguration.builder();
-        if(customizer != null) customizer.accept(builder);
+        if (customizer != null) customizer.accept(builder);
         LettuceClientConfiguration clientConfig = builder.build();
-        RedisStaticMasterReplicaConfiguration masterReplicaConfig = new RedisStaticMasterReplicaConfiguration(master.host(), master.port());
+        RedisStaticMasterReplicaConfiguration masterReplicaConfig =
+                new RedisStaticMasterReplicaConfiguration(master.host(), master.port());
         masterReplicaConfig.setDatabase(database);
-        for(RedisNodeInfo r : replicas){
+        for (RedisNodeInfo r : replicas) {
             masterReplicaConfig.addNode(r.host(), r.port());
         }
         return new LettuceConnectionFactory(masterReplicaConfig, clientConfig);
     }
 
-    private <K,V> RedisTemplate<K,V> defaultRedisTemplate(
-            RedisTemplate<K,V> template,
-            LettuceConnectionFactory connectionFactory
-    ){
+    private <K, V> RedisTemplate<K, V> defaultRedisTemplate(
+            RedisTemplate<K, V> template, LettuceConnectionFactory connectionFactory) {
         StringRedisSerializer s = new StringRedisSerializer();
         template.setKeySerializer(s);
         template.setValueSerializer(s);

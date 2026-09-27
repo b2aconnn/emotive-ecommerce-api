@@ -1,17 +1,19 @@
 package com.loopers.domain.product;
 
+import static jakarta.persistence.FetchType.LAZY;
+import static lombok.AccessLevel.PROTECTED;
+
+import jakarta.persistence.*;
+
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.dto.command.ProductCreateCommand;
 import com.loopers.domain.productlike.ProductLikeCount;
-import jakarta.persistence.*;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import static jakarta.persistence.FetchType.LAZY;
-import static lombok.AccessLevel.PROTECTED;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)

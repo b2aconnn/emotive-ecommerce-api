@@ -1,10 +1,12 @@
 package com.loopers.domain.coupon;
 
-import com.loopers.domain.order.Discount;
-import lombok.RequiredArgsConstructor;
+import static com.loopers.domain.order.DiscountType.COUPON;
+
 import org.springframework.stereotype.Service;
 
-import static com.loopers.domain.order.DiscountType.COUPON;
+import com.loopers.domain.order.Discount;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -13,7 +15,8 @@ public class CouponRedemption {
     private final CouponRepository couponRepository;
 
     public Discount calculateDiscount(Long userId, Long couponId, Long orderAmount) {
-        Coupon coupon = couponRepository.findByIdAndUserId(couponId, userId)
+        Coupon coupon = couponRepository
+                .findByIdAndUserId(couponId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않는 쿠폰입니다."));
 
         Long discountAmount = coupon.calculateDiscount(orderAmount);
@@ -22,7 +25,8 @@ public class CouponRedemption {
     }
 
     public void useCoupon(Long userId, Long couponId) {
-        Coupon coupon = couponRepository.findByIdAndUserId(couponId, userId)
+        Coupon coupon = couponRepository
+                .findByIdAndUserId(couponId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않는 쿠폰입니다."));
 
         coupon.use();

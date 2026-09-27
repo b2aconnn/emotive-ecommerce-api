@@ -1,12 +1,14 @@
 package com.loopers.domain.point;
 
-import com.loopers.domain.BaseEntity;
+import static lombok.AccessLevel.PROTECTED;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+
+import com.loopers.domain.BaseEntity;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import static lombok.AccessLevel.PROTECTED;
 
 @NoArgsConstructor(access = PROTECTED)
 @Getter

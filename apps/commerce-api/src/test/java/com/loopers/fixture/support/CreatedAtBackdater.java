@@ -1,11 +1,12 @@
 package com.loopers.fixture.support;
 
+import java.time.ZonedDateTime;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.ZonedDateTime;
 
 /**
  * {@code BaseEntity.createdAt}은 {@code @PrePersist}에서 항상 현재 시각으로 채워지고
@@ -20,7 +21,8 @@ public class CreatedAtBackdater {
 
     @Transactional
     public void backdate(String tableName, Long id, ZonedDateTime createdAt) {
-        entityManager.createNativeQuery("UPDATE `" + tableName + "` SET created_at = :createdAt WHERE id = :id")
+        entityManager
+                .createNativeQuery("UPDATE `" + tableName + "` SET created_at = :createdAt WHERE id = :id")
                 .setParameter("createdAt", createdAt)
                 .setParameter("id", id)
                 .executeUpdate();

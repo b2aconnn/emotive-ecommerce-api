@@ -1,11 +1,11 @@
 package com.loopers.domain.point;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PointTest {
     @DisplayName("포인트를 충전할 때, ")
@@ -20,8 +20,7 @@ class PointTest {
             Point point = Point.create(userId);
 
             // assert
-            assertThatThrownBy(() -> point.charge(amount))
-                    .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> point.charge(amount)).isInstanceOf(IllegalArgumentException.class);
         }
     }
 }

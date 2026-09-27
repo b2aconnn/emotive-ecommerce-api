@@ -1,19 +1,21 @@
 package com.loopers.infrastructure.productlike.jpa;
 
+import static com.loopers.domain.productlike.QProductLikeCount.productLikeCount;
+import static java.util.Collections.emptyList;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
+import java.util.List;
+import java.util.Optional;
+
+import jakarta.persistence.EntityManager;
+
+import org.springframework.stereotype.Component;
+
 import com.loopers.domain.productlike.ProductLikeCount;
 import com.loopers.domain.productlike.ProductLikeCountRepository;
 import com.loopers.domain.productlike.dto.result.ProductLikeCountResult;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Optional;
-
-import static com.loopers.domain.productlike.QProductLikeCount.productLikeCount;
-import static java.util.Collections.emptyList;
-import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Component
 public class ProductLikeCountRepositoryImpl implements ProductLikeCountRepository {
@@ -21,8 +23,8 @@ public class ProductLikeCountRepositoryImpl implements ProductLikeCountRepositor
     private final ProductLikeCountJpaRepository productLikeCountJpaRepository;
     private final JPAQueryFactory queryFactory;
 
-    public ProductLikeCountRepositoryImpl(ProductLikeCountJpaRepository productLikeCountJpaRepository,
-                                          EntityManager em) {
+    public ProductLikeCountRepositoryImpl(
+            ProductLikeCountJpaRepository productLikeCountJpaRepository, EntityManager em) {
         this.productLikeCountJpaRepository = productLikeCountJpaRepository;
         this.queryFactory = new JPAQueryFactory(em);
     }

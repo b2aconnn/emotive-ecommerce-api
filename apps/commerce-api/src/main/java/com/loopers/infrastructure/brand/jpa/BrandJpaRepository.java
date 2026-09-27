@@ -1,9 +1,10 @@
 package com.loopers.infrastructure.brand.jpa;
 
-import com.loopers.domain.brand.Brand;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import com.loopers.domain.brand.Brand;
 
 public interface BrandJpaRepository extends JpaRepository<Brand, Long> {
     Optional<Brand> findById(Long brandId);

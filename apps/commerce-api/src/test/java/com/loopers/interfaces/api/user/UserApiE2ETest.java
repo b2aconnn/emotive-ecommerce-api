@@ -1,13 +1,12 @@
 package com.loopers.interfaces.api.user;
 
-import com.loopers.domain.user.User;
-import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.command.UserCreateInfo;
-import com.loopers.domain.user.type.GenderType;
-import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.user.dto.UserCreateResponse;
-import com.loopers.interfaces.api.user.dto.UserMyInfoResponse;
-import com.loopers.utils.DatabaseCleanUp;
+import static com.loopers.domain.user.type.GenderType.MALE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,12 +17,14 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
-import java.time.LocalDate;
-
-import static com.loopers.domain.user.type.GenderType.MALE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.loopers.domain.user.User;
+import com.loopers.domain.user.UserRepository;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
+import com.loopers.domain.user.type.GenderType;
+import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.interfaces.api.user.dto.UserCreateResponse;
+import com.loopers.interfaces.api.user.dto.UserMyInfoResponse;
+import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserApiE2ETest {
@@ -36,10 +37,7 @@ class UserApiE2ETest {
 
     @Autowired
     public UserApiE2ETest(
-        TestRestTemplate testRestTemplate,
-        UserRepository userRepository,
-        DatabaseCleanUp databaseCleanUp
-    ) {
+            TestRestTemplate testRestTemplate, UserRepository userRepository, DatabaseCleanUp databaseCleanUp) {
         this.testRestTemplate = testRestTemplate;
         this.userRepository = userRepository;
         this.databaseCleanUp = databaseCleanUp;
@@ -70,18 +68,18 @@ class UserApiE2ETest {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<UserCreateInfo> requestEntity = new HttpEntity<>(userCreateInfo, headers);
 
-            ParameterizedTypeReference<ApiResponse<UserCreateResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ParameterizedTypeReference<ApiResponse<UserCreateResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<UserCreateResponse>> response =
-                testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, responseType);
+                    testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, responseType);
 
             // assert
             assertAll(
-                () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                () -> assertThat(response.getBody().data().id()).isNotNull(),
-                () -> assertThat(response.getBody().data().name()).isEqualTo(userCreateInfo.name()),
-                () -> assertThat(response.getBody().data().email()).isEqualTo(userCreateInfo.email()),
-                () -> assertThat(response.getBody().data().birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
-            );
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().id()).isNotNull(),
+                    () -> assertThat(response.getBody().data().name()).isEqualTo(userCreateInfo.name()),
+                    () -> assertThat(response.getBody().data().email()).isEqualTo(userCreateInfo.email()),
+                    () -> assertThat(response.getBody().data().birthDate()).isEqualTo(LocalDate.of(2000, 1, 1)));
         }
 
         @DisplayName("회원 가입 시에 성별이 없을 경우, 400 Bad Request 응답을 반환한다.")
@@ -101,7 +99,8 @@ class UserApiE2ETest {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<UserCreateInfo> requestEntity = new HttpEntity<>(userCreateInfo, headers);
 
-            ParameterizedTypeReference<ApiResponse<UserCreateResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ParameterizedTypeReference<ApiResponse<UserCreateResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<UserCreateResponse>> response =
                     testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, responseType);
 
@@ -117,18 +116,15 @@ class UserApiE2ETest {
         @Test
         void returnsUserInfoOnSuccessfulRetrievalOfMyInfo() {
             // arrange
-            UserCreateInfo userCreateInfo = new UserCreateInfo(
-                    "park",
-                    "user@domain.com",
-                    "2000-01-01",
-                    MALE);
+            UserCreateInfo userCreateInfo = new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE);
             User saveUser = userRepository.save(User.create(userCreateInfo));
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-USER-ID", String.valueOf(saveUser.getId()));
 
             // act
-            ParameterizedTypeReference<ApiResponse<UserMyInfoResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ParameterizedTypeReference<ApiResponse<UserMyInfoResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<UserMyInfoResponse>> response =
                     testRestTemplate.exchange(ENDPOINT_GET_ME, HttpMethod.GET, new HttpEntity<>(headers), responseType);
 
@@ -138,8 +134,7 @@ class UserApiE2ETest {
                     () -> assertThat(response.getBody().data().id()).isEqualTo(saveUser.getId()),
                     () -> assertThat(response.getBody().data().name()).isEqualTo(userCreateInfo.name()),
                     () -> assertThat(response.getBody().data().email()).isEqualTo(userCreateInfo.email()),
-                    () -> assertThat(response.getBody().data().birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
-            );
+                    () -> assertThat(response.getBody().data().birthDate()).isEqualTo(LocalDate.of(2000, 1, 1)));
         }
 
         @DisplayName("존재하지 않는 X-USER-ID 로 조회할 경우, 401 Unauthorized 응답을 반환한다.")
@@ -150,7 +145,8 @@ class UserApiE2ETest {
             headers.set("X-USER-ID", "999999");
 
             // act
-            ParameterizedTypeReference<ApiResponse<UserMyInfoResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ParameterizedTypeReference<ApiResponse<UserMyInfoResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<UserMyInfoResponse>> response =
                     testRestTemplate.exchange(ENDPOINT_GET_ME, HttpMethod.GET, new HttpEntity<>(headers), responseType);
 

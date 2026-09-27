@@ -1,9 +1,9 @@
 package com.loopers.domain.productlike;
 
-import com.loopers.domain.productlike.dto.result.ProductLikeCountResult;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.loopers.domain.productlike.dto.result.ProductLikeCountResult;
 
 public interface ProductLikeCountRepository {
     ProductLikeCount save(ProductLikeCount productLikeCount);

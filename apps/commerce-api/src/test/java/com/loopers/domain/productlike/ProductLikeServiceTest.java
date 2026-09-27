@@ -1,11 +1,11 @@
 package com.loopers.domain.productlike;
 
-import com.loopers.domain.brand.Brand;
-import com.loopers.domain.brand.dto.command.BrandCreateCommand;
-import com.loopers.domain.product.Product;
-import com.loopers.domain.product.dto.command.ProductCreateCommand;
-import com.loopers.domain.user.User;
-import com.loopers.domain.user.dto.command.UserCreateInfo;
+import static com.loopers.domain.user.type.GenderType.MALE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,11 +13,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
-import static com.loopers.domain.user.type.GenderType.MALE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import com.loopers.domain.brand.Brand;
+import com.loopers.domain.brand.dto.command.BrandCreateCommand;
+import com.loopers.domain.product.Product;
+import com.loopers.domain.product.dto.command.ProductCreateCommand;
+import com.loopers.domain.user.User;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductLikeServiceTest {
@@ -31,32 +32,23 @@ public class ProductLikeServiceTest {
     @DisplayName("특정 사용자는 좋아요를 하지 않은 하나의 상품에 대해 좋아요를 할 수 있다.")
     void userCanLikeProductOnce() {
         // arrange
-        UserCreateInfo userCreateInfo = new UserCreateInfo(
-                "park",
-                "user@domain.com",
-                "2000-01-01",
-                MALE);
+        UserCreateInfo userCreateInfo = new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE);
         User user = User.create(userCreateInfo);
 
-        Brand brand = Brand.create(new BrandCreateCommand(
-                "Test Brand",
-                "http://example.com/logo.png",
-                "This is a test brand."));
+        Brand brand = Brand.create(
+                new BrandCreateCommand("Test Brand", "http://example.com/logo.png", "This is a test brand."));
 
         Product product = Product.create(new ProductCreateCommand(
-                "Test Product 1",
-                "http://example.com/product1.png",
-                "This is a test product 1.",
-                10_000L,
-                brand));
+                "Test Product 1", "http://example.com/product1.png", "This is a test product 1.", 10_000L, brand));
 
-        when(productLikeRepository.existsUserLikedProduct(user.getId(), product.getId())).thenReturn(false);
+        when(productLikeRepository.existsUserLikedProduct(user.getId(), product.getId()))
+                .thenReturn(false);
         when(productLikeCountRepository.findByProductId(product.getId())).thenReturn(Optional.empty());
 
         ArgumentCaptor<ProductLikeCount> productLikeCountCaptor = ArgumentCaptor.forClass(ProductLikeCount.class);
 
         // act
-//        productLikeService.likeProduct(user, product);
+        //        productLikeService.likeProduct(user, product);
 
         // assert
         verify(productLikeRepository, times(1)).existsUserLikedProduct(user.getId(), product.getId());
@@ -73,29 +65,20 @@ public class ProductLikeServiceTest {
     @DisplayName("특정 사용자는 좋아요를 한 하나의 상품에 대해 다시 좋아요를 할 수 없다.")
     void userCannotLikeProductTwice() {
         // arrange
-        UserCreateInfo userCreateInfo = new UserCreateInfo(
-                "park",
-                "user@domain.com",
-                "2000-01-01",
-                MALE);
+        UserCreateInfo userCreateInfo = new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE);
         User user = User.create(userCreateInfo);
 
-        Brand brand = Brand.create(new BrandCreateCommand(
-                "Test Brand",
-                "http://example.com/logo.png",
-                "This is a test brand."));
+        Brand brand = Brand.create(
+                new BrandCreateCommand("Test Brand", "http://example.com/logo.png", "This is a test brand."));
 
         Product product = Product.create(new ProductCreateCommand(
-                "Test Product 1",
-                "http://example.com/product1.png",
-                "This is a test product 1.",
-                10_000L,
-                brand));
+                "Test Product 1", "http://example.com/product1.png", "This is a test product 1.", 10_000L, brand));
 
-        when(productLikeRepository.existsUserLikedProduct(user.getId(), product.getId())).thenReturn(true);
+        when(productLikeRepository.existsUserLikedProduct(user.getId(), product.getId()))
+                .thenReturn(true);
 
         // act
-//        productLikeService.likeProduct(user, product);
+        //        productLikeService.likeProduct(user, product);
 
         // assert
         verify(productLikeRepository, times(1)).existsUserLikedProduct(user.getId(), product.getId());
@@ -107,24 +90,14 @@ public class ProductLikeServiceTest {
     @DisplayName("특정 사용자는 좋아요를 한 하나의 상품에 대해 좋아요를 취소할 수 있다.")
     void userCanUnlikeProduct() {
         // arrange
-        UserCreateInfo userCreateInfo = new UserCreateInfo(
-                "park",
-                "user@domain.com",
-                "2000-01-01",
-                MALE);
+        UserCreateInfo userCreateInfo = new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE);
         User user = User.create(userCreateInfo);
 
-        Brand brand = Brand.create(new BrandCreateCommand(
-                "Test Brand",
-                "http://example.com/logo.png",
-                "This is a test brand."));
+        Brand brand = Brand.create(
+                new BrandCreateCommand("Test Brand", "http://example.com/logo.png", "This is a test brand."));
 
         Product product = Product.create(new ProductCreateCommand(
-                "Test Product 1",
-                "http://example.com/product1.png",
-                "This is a test product 1.",
-                10_000L,
-                brand));
+                "Test Product 1", "http://example.com/product1.png", "This is a test product 1.", 10_000L, brand));
 
         // arrange
         when(productLikeRepository.findByUserIdAndProductId(user.getId(), product.getId()))
@@ -132,11 +105,10 @@ public class ProductLikeServiceTest {
 
         ProductLikeCount productLikeCount = spy(ProductLikeCount.create(product));
         productLikeCount.increase();
-        when(productLikeCountRepository.findByProductId(product.getId()))
-                .thenReturn(Optional.of(productLikeCount));
+        when(productLikeCountRepository.findByProductId(product.getId())).thenReturn(Optional.of(productLikeCount));
 
         // act
-//        productLikeService.unlikeProduct(user, product);
+        //        productLikeService.unlikeProduct(user, product);
 
         // assert
         verify(productLikeRepository, times(1)).findByUserIdAndProductId(user.getId(), product.getId());
@@ -148,31 +120,21 @@ public class ProductLikeServiceTest {
     @DisplayName("특정 사용자는 좋아요를 취소하지 않은 하나의 상품에 대해 좋아요를 취소할 수 없다.")
     void userCannotUnlikeProductIfNotLiked() {
         // arrange
-        UserCreateInfo userCreateInfo = new UserCreateInfo(
-                "park",
-                "user@domain.com",
-                "2000-01-01",
-                MALE);
+        UserCreateInfo userCreateInfo = new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE);
         User user = User.create(userCreateInfo);
 
-        Brand brand = Brand.create(new BrandCreateCommand(
-                "Test Brand",
-                "http://example.com/logo.png",
-                "This is a test brand."));
+        Brand brand = Brand.create(
+                new BrandCreateCommand("Test Brand", "http://example.com/logo.png", "This is a test brand."));
 
         Product product = Product.create(new ProductCreateCommand(
-                "Test Product 1",
-                "http://example.com/product1.png",
-                "This is a test product 1.",
-                10_000L,
-                brand));
+                "Test Product 1", "http://example.com/product1.png", "This is a test product 1.", 10_000L, brand));
 
         ProductLikeCount spyProductLikeCount = spy(ProductLikeCount.class);
         when(productLikeRepository.findByUserIdAndProductId(user.getId(), product.getId()))
                 .thenReturn(Optional.empty());
 
         // act
-//        productLikeService.unlikeProduct(user, product);
+        //        productLikeService.unlikeProduct(user, product);
 
         // assert
         verify(productLikeRepository, times(1)).findByUserIdAndProductId(user.getId(), product.getId());

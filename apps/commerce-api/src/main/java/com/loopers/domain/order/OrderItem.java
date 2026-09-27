@@ -1,17 +1,19 @@
 package com.loopers.domain.order;
 
-import com.loopers.domain.BaseEntity;
-import com.loopers.domain.product.Product;
+import static jakarta.persistence.FetchType.LAZY;
+import static lombok.AccessLevel.PROTECTED;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
+import com.loopers.domain.BaseEntity;
+import com.loopers.domain.product.Product;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-
-import static jakarta.persistence.FetchType.LAZY;
-import static lombok.AccessLevel.PROTECTED;
 
 @Getter
 @RequiredArgsConstructor(access = PROTECTED)

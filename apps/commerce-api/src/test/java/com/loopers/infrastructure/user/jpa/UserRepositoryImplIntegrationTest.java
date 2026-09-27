@@ -1,9 +1,9 @@
 package com.loopers.infrastructure.user.jpa;
 
-import com.loopers.domain.user.User;
-import com.loopers.domain.user.UserRepository;
-import com.loopers.fixture.user.UserFixture;
-import com.loopers.utils.DatabaseCleanUp;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,9 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.loopers.domain.user.User;
+import com.loopers.domain.user.UserRepository;
+import com.loopers.fixture.user.UserFixture;
+import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest
 class UserRepositoryImplIntegrationTest {
@@ -46,8 +47,7 @@ class UserRepositoryImplIntegrationTest {
             List<User> users = userRepository.findAllByIdIn(List.of(user.getId(), anotherUser.getId()));
 
             // then
-            assertThat(users).extracting(User::getId)
-                    .containsExactlyInAnyOrder(user.getId(), anotherUser.getId());
+            assertThat(users).extracting(User::getId).containsExactlyInAnyOrder(user.getId(), anotherUser.getId());
         }
 
         @DisplayName("존재하지 않는 PK 가 섞여 있으면, 존재하는 사용자만 반환한다.")

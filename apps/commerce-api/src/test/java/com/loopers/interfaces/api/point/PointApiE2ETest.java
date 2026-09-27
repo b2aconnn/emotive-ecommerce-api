@@ -1,5 +1,20 @@
 package com.loopers.interfaces.api.point;
 
+import static com.loopers.domain.user.type.GenderType.MALE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
+
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.user.User;
@@ -11,20 +26,6 @@ import com.loopers.interfaces.api.point.dto.PointChargeResponse;
 import com.loopers.interfaces.api.point.dto.PointInfoResponse;
 import com.loopers.interfaces.api.user.dto.UserMyInfoResponse;
 import com.loopers.utils.DatabaseCleanUp;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
-
-import static com.loopers.domain.user.type.GenderType.MALE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PointApiE2ETest {
@@ -38,11 +39,10 @@ class PointApiE2ETest {
 
     @Autowired
     public PointApiE2ETest(
-        TestRestTemplate testRestTemplate,
-        UserRepository userRepository,
-        PointRepository pointRepository,
-        DatabaseCleanUp databaseCleanUp
-    ) {
+            TestRestTemplate testRestTemplate,
+            UserRepository userRepository,
+            PointRepository pointRepository,
+            DatabaseCleanUp databaseCleanUp) {
         this.testRestTemplate = testRestTemplate;
         this.userRepository = userRepository;
         this.pointRepository = pointRepository;
@@ -61,11 +61,7 @@ class PointApiE2ETest {
         @Test
         void returnsTotalPointsAfterSuccessfulCharge() {
             // arrange
-            UserCreateInfo userCreateInfo = new UserCreateInfo(
-                    "park",
-                    "user@domain.com",
-                    "2000-01-01",
-                    MALE);
+            UserCreateInfo userCreateInfo = new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE);
             User saveUser = userRepository.save(User.create(userCreateInfo));
 
             Long amount = 10_000L;
@@ -79,15 +75,15 @@ class PointApiE2ETest {
             headers.set("X-USER-ID", String.valueOf(saveUser.getId()));
             HttpEntity<PointChargeRequest> requestEntity = new HttpEntity<>(chargeRequest, headers);
 
-            ParameterizedTypeReference<ApiResponse<PointChargeResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ParameterizedTypeReference<ApiResponse<PointChargeResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<PointChargeResponse>> response =
                     testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, responseType);
 
             // assert
             assertAll(
-                () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                () -> assertThat(response.getBody().data().amount()).isGreaterThanOrEqualTo(amount)
-            );
+                    () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
+                    () -> assertThat(response.getBody().data().amount()).isGreaterThanOrEqualTo(amount));
         }
 
         @DisplayName("존재하지 않는 유저로 요청할 경우, 404 Not Found 응답을 반환한다.")
@@ -105,7 +101,8 @@ class PointApiE2ETest {
             headers.set("X-USER-ID", "999999");
             HttpEntity<PointChargeRequest> requestEntity = new HttpEntity<>(chargeRequest, headers);
 
-            ParameterizedTypeReference<ApiResponse<PointChargeResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ParameterizedTypeReference<ApiResponse<PointChargeResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<PointChargeResponse>> response =
                     testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, responseType);
 
@@ -121,11 +118,7 @@ class PointApiE2ETest {
         @Test
         void returnsUserPointsOnSuccessfulRetrieval() {
             // arrange
-            UserCreateInfo userCreateInfo = new UserCreateInfo(
-                    "park",
-                    "user@domain.com",
-                    "2000-01-01",
-                    MALE);
+            UserCreateInfo userCreateInfo = new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE);
             User saveUser = userRepository.save(User.create(userCreateInfo));
 
             Point point = Point.create(saveUser.getId());
@@ -139,7 +132,8 @@ class PointApiE2ETest {
             headers.set("X-USER-ID", String.valueOf(saveUser.getId()));
             HttpEntity requestEntity = new HttpEntity<>(headers);
 
-            ParameterizedTypeReference<ApiResponse<PointInfoResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ParameterizedTypeReference<ApiResponse<PointInfoResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<PointInfoResponse>> response =
                     testRestTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, responseType);
 
@@ -147,8 +141,7 @@ class PointApiE2ETest {
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data().userId()).isEqualTo(saveUser.getId()),
-                    () -> assertThat(response.getBody().data().amount()).isEqualTo(point.getBalance())
-            );
+                    () -> assertThat(response.getBody().data().amount()).isEqualTo(point.getBalance()));
         }
 
         @DisplayName("X-USER-ID 헤더가 없을 경우, 400 Bad Request 응답을 반환한다.")

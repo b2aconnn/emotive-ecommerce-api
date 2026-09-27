@@ -1,15 +1,16 @@
 package com.loopers.domain.order;
 
-import com.loopers.domain.order.dto.result.UserOrderCountResult;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import com.loopers.domain.order.dto.result.UserOrderCountResult;
 
 public interface OrderRepository {
     Order save(Order order);
 
     Optional<Order> findById(Long id);
+
     List<Order> findAllByUserId(Long userId);
 
     /**

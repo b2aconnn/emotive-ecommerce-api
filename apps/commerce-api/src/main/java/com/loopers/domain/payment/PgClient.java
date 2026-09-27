@@ -6,5 +6,6 @@ import com.loopers.domain.payment.vo.PGTransactionInfoResult;
 
 public interface PgClient {
     PGRequestResult requestPayment(PGRequest request);
+
     PGTransactionInfoResult getTransaction(String transactionKey);
 }

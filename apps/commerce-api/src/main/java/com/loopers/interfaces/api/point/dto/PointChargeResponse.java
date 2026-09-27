@@ -4,8 +4,6 @@ import com.loopers.application.point.dto.PointResult;
 
 public record PointChargeResponse(Long amount) {
     public static PointChargeResponse from(PointResult result) {
-        return new PointChargeResponse(
-                result.amount()
-        );
+        return new PointChargeResponse(result.amount());
     }
 }

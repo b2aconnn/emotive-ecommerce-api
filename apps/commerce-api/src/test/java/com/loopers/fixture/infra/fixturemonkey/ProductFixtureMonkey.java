@@ -1,17 +1,18 @@
 package com.loopers.fixture.infra.fixturemonkey;
 
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.product.ProductStock;
 import com.loopers.domain.product.ProductStockRepository;
 import com.loopers.fixture.product.ProductWithStockFixture;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Objects;
 
 @Component
 public class ProductFixtureMonkey implements ProductWithStockFixture {
@@ -22,7 +23,8 @@ public class ProductFixtureMonkey implements ProductWithStockFixture {
     private ProductStockRepository productStockRepository;
 
     private List<Product> createProduct(Brand brand, Long productPrice, int count) {
-        return FixtureMonkeyFactory.create().giveMeBuilder(Product.class)
+        return FixtureMonkeyFactory.create()
+                .giveMeBuilder(Product.class)
                 .set("brand", brand)
                 .set("price", productPrice)
                 .set("id", 0L)

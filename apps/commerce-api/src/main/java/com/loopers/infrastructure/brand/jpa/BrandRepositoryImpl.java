@@ -1,17 +1,19 @@
 package com.loopers.infrastructure.brand.jpa;
 
-import com.loopers.domain.brand.Brand;
-import com.loopers.domain.brand.BrandRepository;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import org.springframework.stereotype.Component;
+import static com.loopers.domain.brand.QBrand.brand;
+import static org.springframework.util.StringUtils.hasText;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.loopers.domain.brand.QBrand.brand;
-import static org.springframework.util.StringUtils.hasText;
+import jakarta.persistence.EntityManager;
+
+import org.springframework.stereotype.Component;
+
+import com.loopers.domain.brand.Brand;
+import com.loopers.domain.brand.BrandRepository;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @Component
 public class BrandRepositoryImpl implements BrandRepository {
@@ -31,7 +33,8 @@ public class BrandRepositoryImpl implements BrandRepository {
 
     @Override
     public List<Brand> findAll(String searchKeyword, Integer offset, Integer size) {
-        return queryFactory.select(brand)
+        return queryFactory
+                .select(brand)
                 .from(brand)
                 .where(searchKeywordContains(searchKeyword))
                 .orderBy(brand.id.asc())

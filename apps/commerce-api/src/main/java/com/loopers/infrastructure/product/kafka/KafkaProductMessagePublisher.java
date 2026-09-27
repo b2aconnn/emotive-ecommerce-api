@@ -1,14 +1,16 @@
 package com.loopers.infrastructure.product.kafka;
 
-import com.loopers.domain.product.message.ProductMessagePublisher;
-import com.loopers.domain.product.message.model.*;
-import lombok.RequiredArgsConstructor;
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import java.time.ZonedDateTime;
-import java.util.UUID;
+import com.loopers.domain.product.message.ProductMessagePublisher;
+import com.loopers.domain.product.message.model.*;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component
@@ -16,10 +18,10 @@ public class KafkaProductMessagePublisher implements ProductMessagePublisher {
 
     private final KafkaTemplate kafkaTemplate;
 
-    @Value( "${kafka.topics.product}")
+    @Value("${kafka.topics.product}")
     private String productTopic;
 
-    @Value( "${kafka.topics.audit}")
+    @Value("${kafka.topics.audit}")
     private String auditTopic;
 
     @Override
@@ -30,8 +32,7 @@ public class KafkaProductMessagePublisher implements ProductMessagePublisher {
                 Long.toString(message.productId()),
                 "PRODUCT",
                 ZonedDateTime.now(),
-                message
-        );
+                message);
 
         kafkaTemplate.send(productTopic, Long.toString(message.productId()), messageEnvelope);
         kafkaTemplate.send(auditTopic, messageEnvelope);
@@ -45,8 +46,7 @@ public class KafkaProductMessagePublisher implements ProductMessagePublisher {
                 Long.toString(message.productId()),
                 "PRODUCT",
                 ZonedDateTime.now(),
-                message
-        );
+                message);
 
         kafkaTemplate.send(productTopic, Long.toString(message.productId()), messageEnvelope);
         kafkaTemplate.send(auditTopic, messageEnvelope);
@@ -60,8 +60,7 @@ public class KafkaProductMessagePublisher implements ProductMessagePublisher {
                 Long.toString(message.productId()),
                 "PRODUCT",
                 ZonedDateTime.now(),
-                message
-        );
+                message);
 
         kafkaTemplate.send(productTopic, Long.toString(message.productId()), messageEnvelope);
         kafkaTemplate.send(auditTopic, messageEnvelope);

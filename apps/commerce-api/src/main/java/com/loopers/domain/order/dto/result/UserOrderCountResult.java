@@ -6,7 +6,4 @@ package com.loopers.domain.order.dto.result;
  * @param userId     사용자 내부 PK
  * @param orderCount 해당 사용자의 주문 건수
  */
-public record UserOrderCountResult(
-        Long userId,
-        Long orderCount
-) {}
+public record UserOrderCountResult(Long userId, Long orderCount) {}

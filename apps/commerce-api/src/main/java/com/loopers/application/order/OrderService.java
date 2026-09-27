@@ -1,13 +1,21 @@
 package com.loopers.application.order;
 
+import java.util.List;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.loopers.application.order.dto.OrderCreateCommand;
 import com.loopers.application.order.dto.OrderDetailResult;
 import com.loopers.application.order.dto.OrderLineItem;
 import com.loopers.application.order.dto.OrderResult;
 import com.loopers.application.order.dto.OrderStatusResult;
+import com.loopers.application.order.event.model.OrderCanceledEvent;
 import com.loopers.application.order.event.model.OrderCompletedEvent;
 import com.loopers.application.order.event.model.OrderCreatedEvent;
-import com.loopers.application.order.event.model.OrderCanceledEvent;
 import com.loopers.domain.coupon.CouponRedemption;
 import com.loopers.domain.order.Discount;
 import com.loopers.domain.order.Order;
@@ -17,14 +25,9 @@ import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.ProductStockAllocation;
 import com.loopers.domain.product.vo.Products;
-import jakarta.persistence.EntityNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,7 +46,6 @@ public class OrderService {
     private final CouponRedemption couponRedemption;
 
     private final ApplicationEventPublisher applicationEventPublisher;
-
 
     /**
      * ### 주문 프로세스 V2
@@ -65,20 +67,18 @@ public class OrderService {
      */
     @Transactional
     public Order order(Long userId, OrderCreateCommand createCommand) {
-        List<Long> productIds = createCommand.items().stream()
-                .map(OrderLineItem::productId).toList();
+        List<Long> productIds =
+                createCommand.items().stream().map(OrderLineItem::productId).toList();
         Products products = productStockAllocation.reserveProducts(productIds);
 
         Order saveOrder = orderProcessing.saveOrder(userId, createCommand, products);
 
-        Discount couponDiscount = couponRedemption.calculateDiscount(
-                userId,
-                createCommand.couponId(),
-                saveOrder.getItemTotalAmount());
+        Discount couponDiscount =
+                couponRedemption.calculateDiscount(userId, createCommand.couponId(), saveOrder.getItemTotalAmount());
 
-        Point point = pointRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "포인트 정보가 없습니다. userId: " + userId));
+        Point point = pointRepository
+                .findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("포인트 정보가 없습니다. userId: " + userId));
         point.use(createCommand.usedPoints());
 
         saveOrder.applyDiscount(List.of(couponDiscount));
@@ -94,15 +94,14 @@ public class OrderService {
                 saveOrder.getTotalAmount(),
                 createCommand.paymentMethod(),
                 createCommand.cardType(),
-                createCommand.cardNo()
-        ));
+                createCommand.cardNo()));
 
         return saveOrder;
     }
 
     public OrderStatusResult getOrderStatus(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
+        Order order =
+                orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
 
         return new OrderStatusResult(order.getId(), order.getStatus());
     }
@@ -114,7 +113,8 @@ public class OrderService {
     }
 
     public OrderDetailResult getOrder(Long userId, Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository
+                .findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("[orderId = " + orderId + "] 주문을 찾을 수 없습니다."));
 
         if (!order.getUserId().equals(userId)) {
@@ -126,33 +126,28 @@ public class OrderService {
 
     @Transactional
     public void cancelOrderWithRestoration(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
+        Order order =
+                orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
 
         orderProcessing.restoreProductStocks(order.getOrderItems());
 
-        Point point = pointRepository.findByUserId(order.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "포인트 정보가 없습니다. userId: " + order.getUserId()));
+        Point point = pointRepository
+                .findByUserId(order.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("포인트 정보가 없습니다. userId: " + order.getUserId()));
         point.restorePoint(order.getUsedPoints());
 
         order.cancel();
 
-        applicationEventPublisher.publishEvent(new OrderCanceledEvent(
-                order.getCouponId(),
-                order.getUserId()));
+        applicationEventPublisher.publishEvent(new OrderCanceledEvent(order.getCouponId(), order.getUserId()));
     }
 
     @Transactional
     public void completeOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
+        Order order =
+                orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
 
         order.complete();
 
-        applicationEventPublisher.publishEvent(new OrderCompletedEvent(
-                orderId,
-                order.getOrderItems()
-        ));
+        applicationEventPublisher.publishEvent(new OrderCompletedEvent(orderId, order.getOrderItems()));
     }
 }

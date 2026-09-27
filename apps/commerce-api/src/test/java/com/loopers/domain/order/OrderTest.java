@@ -1,6 +1,11 @@
 package com.loopers.domain.order;
 
-import com.loopers.domain.order.dto.OrderCreateInfo;
+import static com.loopers.domain.order.OrderStatus.CREATED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,11 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.stream.Stream;
-
-import static com.loopers.domain.order.OrderStatus.CREATED;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import com.loopers.domain.order.dto.OrderCreateInfo;
 
 public class OrderTest {
     @DisplayName("주문을 생성할 때, ")
@@ -23,13 +24,8 @@ public class OrderTest {
         void createOrderWithMissingUserInfo() {
             // act
             // assert
-            assertThatThrownBy(() -> Order.create(new OrderCreateInfo(
-                    null,
-                    "홍길동",
-                    "서울시 강남구",
-                    "010-1234-5678",
-                    5000L,
-                    null)))
+            assertThatThrownBy(() ->
+                            Order.create(new OrderCreateInfo(null, "홍길동", "서울시 강남구", "010-1234-5678", 5000L, null)))
                     .isInstanceOf(NullPointerException.class);
         }
 
@@ -40,46 +36,35 @@ public class OrderTest {
                     Arguments.of(1L, "홍길동", null, "010-1234-5678"),
                     Arguments.of(1L, "홍길동", " ", "010-1234-5678"),
                     Arguments.of(1L, "홍길동", "서울시 강남구", null),
-                    Arguments.of(1L, "홍길동", "서울시 강남구", " ")
-            );
+                    Arguments.of(1L, "홍길동", "서울시 강남구", " "));
         }
 
         @DisplayName("주문자명, 배송지, 주문자 연락처 정보가 누락된 경우 주문 생성이 실패한다.")
         @MethodSource("invalidOrderParameters")
         @ParameterizedTest
-        void createOrderWithMissingUserInfo(Long userId, String userName, String deliveryAddress, String contactNumber) {
+        void createOrderWithMissingUserInfo(
+                Long userId, String userName, String deliveryAddress, String contactNumber) {
             // act
             // assert
-            assertThatThrownBy(() -> Order.create(new OrderCreateInfo(
-                    userId,
-                    userName,
-                    deliveryAddress,
-                    contactNumber,
-                    5000L,
-                    null
-            ))).isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> Order.create(
+                            new OrderCreateInfo(userId, userName, deliveryAddress, contactNumber, 5000L, null)))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         private static Stream<Arguments> validOrderParameters() {
             return Stream.of(
                     Arguments.of(1L, "홍길동", "서울시 강남구", "010-1234-5678"),
-                    Arguments.of(2L, "김철수", "부산시 해운대구", "010-9876-5432")
-            );
+                    Arguments.of(2L, "김철수", "부산시 해운대구", "010-9876-5432"));
         }
 
         @DisplayName("주문 항목이 비어있지 않은 경우 주문 생성된다.")
         @MethodSource("validOrderParameters")
         @ParameterizedTest
-        void createOrderWithValidParameters(Long userId, String userName, String deliveryAddress, String contactNumber) {
+        void createOrderWithValidParameters(
+                Long userId, String userName, String deliveryAddress, String contactNumber) {
             // act
-            Order order = Order.create(new OrderCreateInfo(
-                    userId,
-                    userName,
-                    deliveryAddress,
-                    contactNumber,
-                    5000L,
-                    null
-            ));
+            Order order =
+                    Order.create(new OrderCreateInfo(userId, userName, deliveryAddress, contactNumber, 5000L, null));
 
             // assert
             assertThat(order).isNotNull();

@@ -1,5 +1,17 @@
 package com.loopers.domain.order;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.loopers.application.order.OrderService;
 import com.loopers.application.order.dto.OrderCreateCommand;
 import com.loopers.application.order.dto.OrderLineItem;
@@ -13,17 +25,6 @@ import com.loopers.fixture.point.PointFixture;
 import com.loopers.fixture.product.ProductWithStockFixture;
 import com.loopers.fixture.user.UserFixture;
 import com.loopers.utils.DatabaseCleanUp;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 public class OrderServiceIntegrationTest {
@@ -67,22 +68,21 @@ public class OrderServiceIntegrationTest {
 
             Long productPrice = 100L;
             Long stockQuantity = 1L;
-            Product saveProduct = productWithStockFixture.save(
-                    brandFixture.save(),
-                    productPrice,
-                    stockQuantity);
+            Product saveProduct = productWithStockFixture.save(brandFixture.save(), productPrice, stockQuantity);
 
             // when
-            Order order = orderService.order(user.getId(), new OrderCreateCommand(
-                    "주문자",
-                    "seoul gangnam",
-                    "010-0000-0000",
-                    List.of(new OrderLineItem(saveProduct.getId(), 1L)),
-                    100L,
-            null,
-                    PaymentMethod.CARD,
-                    null,
-                    null));
+            Order order = orderService.order(
+                    user.getId(),
+                    new OrderCreateCommand(
+                            "주문자",
+                            "seoul gangnam",
+                            "010-0000-0000",
+                            List.of(new OrderLineItem(saveProduct.getId(), 1L)),
+                            100L,
+                            null,
+                            PaymentMethod.CARD,
+                            null,
+                            null));
 
             // then
             assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);

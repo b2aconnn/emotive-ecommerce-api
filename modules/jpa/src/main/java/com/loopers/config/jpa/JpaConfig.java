@@ -9,5 +9,4 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EntityScan({"com.loopers"})
 @EnableJpaRepositories({"com.loopers.infrastructure", "com.loopers.domain.*"})
-public class JpaConfig {
-}
+public class JpaConfig {}

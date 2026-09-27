@@ -1,5 +1,22 @@
 package com.loopers.infrastructure.order.jpa;
 
+import static com.loopers.domain.order.OrderStatus.CANCELED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.order.OrderItemRepository;
 import com.loopers.domain.order.dto.result.UserOrderedProductResult;
@@ -10,29 +27,14 @@ import com.loopers.fixture.order.CompletedOrderFixture;
 import com.loopers.fixture.product.ProductWithStockFixture;
 import com.loopers.fixture.user.UserFixture;
 import com.loopers.utils.DatabaseCleanUp;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import static com.loopers.domain.order.OrderStatus.CANCELED;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 @SpringBootTest
 class OrderItemRepositoryImplIntegrationTest {
 
     private static final ZoneId ZONE = ZoneId.systemDefault();
     private static final ZonedDateTime PERIOD_START = LocalDate.of(2026, 7, 6).atStartOfDay(ZONE);
-    private static final ZonedDateTime PERIOD_END_EXCLUSIVE = LocalDate.of(2026, 7, 7).atStartOfDay(ZONE);
+    private static final ZonedDateTime PERIOD_END_EXCLUSIVE =
+            LocalDate.of(2026, 7, 7).atStartOfDay(ZONE);
 
     @Autowired
     private OrderItemRepository orderItemRepository;
@@ -79,8 +81,8 @@ class OrderItemRepositoryImplIntegrationTest {
             completedOrderFixture.save(buyer.getId(), PERIOD_START.plusHours(2), product);
 
             // when
-            List<UserOrderedProductResult> results = orderItemRepository
-                    .findDistinctCompletedOrderedProductsByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
+            List<UserOrderedProductResult> results =
+                    orderItemRepository.findDistinctCompletedOrderedProductsByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
 
             // then
             assertThat(results).containsExactly(new UserOrderedProductResult(buyer.getId(), product.getId()));
@@ -94,8 +96,8 @@ class OrderItemRepositoryImplIntegrationTest {
             completedOrderFixture.save(buyer.getId(), PERIOD_START.plusHours(1), product, product);
 
             // when
-            List<UserOrderedProductResult> results = orderItemRepository
-                    .findDistinctCompletedOrderedProductsByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
+            List<UserOrderedProductResult> results =
+                    orderItemRepository.findDistinctCompletedOrderedProductsByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
 
             // then
             assertThat(results).containsExactly(new UserOrderedProductResult(buyer.getId(), product.getId()));
@@ -111,8 +113,8 @@ class OrderItemRepositoryImplIntegrationTest {
             completedOrderFixture.save(anotherBuyer.getId(), PERIOD_START.plusHours(2), anotherProduct);
 
             // when
-            List<UserOrderedProductResult> results = orderItemRepository
-                    .findDistinctCompletedOrderedProductsByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
+            List<UserOrderedProductResult> results =
+                    orderItemRepository.findDistinctCompletedOrderedProductsByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
 
             // then
             assertThat(results)
@@ -120,8 +122,7 @@ class OrderItemRepositoryImplIntegrationTest {
                     .containsExactlyInAnyOrder(
                             tuple(buyer.getId(), product.getId()),
                             tuple(buyer.getId(), anotherProduct.getId()),
-                            tuple(anotherBuyer.getId(), anotherProduct.getId())
-                    );
+                            tuple(anotherBuyer.getId(), anotherProduct.getId()));
         }
 
         @DisplayName("기간은 주문의 생성 시각을 기준으로 판단하며, [start, end) 반개구간을 따른다.")
@@ -134,8 +135,8 @@ class OrderItemRepositoryImplIntegrationTest {
             completedOrderFixture.save(onEnd.getId(), PERIOD_END_EXCLUSIVE, anotherProduct);
 
             // when
-            List<UserOrderedProductResult> results = orderItemRepository
-                    .findDistinctCompletedOrderedProductsByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
+            List<UserOrderedProductResult> results =
+                    orderItemRepository.findDistinctCompletedOrderedProductsByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
 
             // then
             assertThat(results).containsExactly(new UserOrderedProductResult(onStart.getId(), product.getId()));
@@ -149,8 +150,8 @@ class OrderItemRepositoryImplIntegrationTest {
             completedOrderFixture.save(buyer.getId(), PERIOD_START.plusHours(1), CANCELED, product);
 
             // when
-            List<UserOrderedProductResult> results = orderItemRepository
-                    .findDistinctCompletedOrderedProductsByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
+            List<UserOrderedProductResult> results =
+                    orderItemRepository.findDistinctCompletedOrderedProductsByUser(PERIOD_START, PERIOD_END_EXCLUSIVE);
 
             // then
             assertThat(results).isEmpty();

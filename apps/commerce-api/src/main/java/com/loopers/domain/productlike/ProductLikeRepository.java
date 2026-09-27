@@ -1,16 +1,18 @@
 package com.loopers.domain.productlike;
 
-import com.loopers.domain.productlike.dto.result.UserLikedProductResult;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.loopers.domain.productlike.dto.result.UserLikedProductResult;
+
 public interface ProductLikeRepository {
     ProductLike save(ProductLike productLike);
+
     void delete(ProductLike productLike);
 
     boolean existsUserLikedProduct(Long userId, Long productId);
+
     Optional<ProductLike> findByUserIdAndProductId(Long userId, Long productId);
 
     /**

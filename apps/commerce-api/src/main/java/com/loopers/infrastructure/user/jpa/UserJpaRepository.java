@@ -1,9 +1,10 @@
 package com.loopers.infrastructure.user.jpa;
 
-import com.loopers.domain.user.User;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import com.loopers.domain.user.User;
 
 public interface UserJpaRepository extends JpaRepository<User, Long> {
     List<User> findAllByIdIn(List<Long> ids);

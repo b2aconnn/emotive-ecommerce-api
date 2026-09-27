@@ -1,11 +1,17 @@
 package com.loopers.domain.user;
 
-import com.loopers.application.user.UserService;
-import com.loopers.application.user.dto.UserResult;
-import com.loopers.domain.user.dto.command.UserCreateInfo;
-import com.loopers.domain.user.type.GenderType;
-import com.loopers.utils.DatabaseCleanUp;
+import static com.loopers.domain.user.type.GenderType.MALE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.time.LocalDate;
+
 import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,15 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import java.time.LocalDate;
-
-import static com.loopers.domain.user.type.GenderType.MALE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import com.loopers.application.user.UserService;
+import com.loopers.application.user.dto.UserResult;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
+import com.loopers.domain.user.type.GenderType;
+import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest
 class UserServiceIntegrationTest {
@@ -59,12 +61,11 @@ class UserServiceIntegrationTest {
 
             // assert
             assertAll(
-                () -> assertThat(userInfo).isNotNull(),
-                () -> assertThat(userInfo.id()).isNotNull(),
-                () -> assertThat(userInfo.name()).isEqualTo(userCreateInfo.name()),
-                () -> assertThat(userInfo.email()).isEqualTo(userCreateInfo.email()),
-                () -> assertThat(userInfo.birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
-            );
+                    () -> assertThat(userInfo).isNotNull(),
+                    () -> assertThat(userInfo.id()).isNotNull(),
+                    () -> assertThat(userInfo.name()).isEqualTo(userCreateInfo.name()),
+                    () -> assertThat(userInfo.email()).isEqualTo(userCreateInfo.email()),
+                    () -> assertThat(userInfo.birthDate()).isEqualTo(LocalDate.of(2000, 1, 1)));
 
             verify(userRepository, times(1)).save(any(User.class));
         }
@@ -77,11 +78,7 @@ class UserServiceIntegrationTest {
         @Test
         void returnsUserInfoWhenUserExists() {
             // arrange
-            UserCreateInfo userCreateInfo = new UserCreateInfo(
-                    "park",
-                    "user@domain.com",
-                    "2000-01-01",
-                    MALE);
+            UserCreateInfo userCreateInfo = new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE);
             User saveUser = userRepository.save(User.create(userCreateInfo));
 
             // act
@@ -93,8 +90,7 @@ class UserServiceIntegrationTest {
                     () -> assertThat(userInfo.id()).isEqualTo(saveUser.getId()),
                     () -> assertThat(userInfo.name()).isEqualTo(userCreateInfo.name()),
                     () -> assertThat(userInfo.email()).isEqualTo(userCreateInfo.email()),
-                    () -> assertThat(userInfo.birthDate()).isEqualTo(LocalDate.of(2000, 1, 1))
-            );
+                    () -> assertThat(userInfo.birthDate()).isEqualTo(LocalDate.of(2000, 1, 1)));
         }
 
         @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, 예외가 발생한다.")
@@ -102,8 +98,7 @@ class UserServiceIntegrationTest {
         void throwsExceptionWhenUserDoesNotExist() {
             // act
             // assert
-            assertThatThrownBy(() -> userService.get(999L))
-                    .isInstanceOf(EntityNotFoundException.class);
+            assertThatThrownBy(() -> userService.get(999L)).isInstanceOf(EntityNotFoundException.class);
         }
     }
 }

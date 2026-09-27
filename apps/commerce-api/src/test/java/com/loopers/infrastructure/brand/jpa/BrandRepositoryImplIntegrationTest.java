@@ -1,9 +1,10 @@
 package com.loopers.infrastructure.brand.jpa;
 
-import com.loopers.domain.brand.Brand;
-import com.loopers.domain.brand.BrandRepository;
-import com.loopers.fixture.infra.brand.BrandFixture;
-import com.loopers.utils.DatabaseCleanUp;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,10 +15,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.loopers.domain.brand.Brand;
+import com.loopers.domain.brand.BrandRepository;
+import com.loopers.fixture.infra.brand.BrandFixture;
+import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest
 public class BrandRepositoryImplIntegrationTest {
@@ -62,10 +63,11 @@ public class BrandRepositoryImplIntegrationTest {
 
             // then
             assertThat(brands).hasSize(3);
-            assertThat(brands).extracting(Brand::getId)
-                    .containsExactlyInAnyOrderElementsOf(saved.stream().map(Brand::getId).toList());
-            assertThat(brands).extracting(Brand::getName)
-                    .containsExactlyInAnyOrder("Nike", "Adidas", "Puma");
+            assertThat(brands)
+                    .extracting(Brand::getId)
+                    .containsExactlyInAnyOrderElementsOf(
+                            saved.stream().map(Brand::getId).toList());
+            assertThat(brands).extracting(Brand::getName).containsExactlyInAnyOrder("Nike", "Adidas", "Puma");
         }
 
         @DisplayName("저장된 브랜드가 하나도 없으면, null 이 아닌 빈 리스트가 반환된다.")
@@ -110,7 +112,8 @@ public class BrandRepositoryImplIntegrationTest {
 
             // then
             assertThat(brands).hasSize(2);
-            assertThat(brands).extracting(Brand::getId)
+            assertThat(brands)
+                    .extracting(Brand::getId)
                     .containsExactly(saved.get(2).getId(), saved.get(3).getId());
         }
 
@@ -135,7 +138,8 @@ public class BrandRepositoryImplIntegrationTest {
             assertThat(page2).hasSize(2);
             assertThat(page3).hasSize(1);
             assertThat(collectedIds).doesNotHaveDuplicates();
-            assertThat(collectedIds).containsExactlyElementsOf(saved.stream().map(Brand::getId).toList());
+            assertThat(collectedIds)
+                    .containsExactlyElementsOf(saved.stream().map(Brand::getId).toList());
         }
 
         @DisplayName("offset 이 전체 건수를 넘어가면, 빈 리스트가 반환된다.")

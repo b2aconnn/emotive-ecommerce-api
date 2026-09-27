@@ -1,12 +1,14 @@
 package com.loopers.application.coupon.event;
 
-import com.loopers.application.coupon.CouponService;
-import com.loopers.application.order.event.model.OrderCreatedEvent;
-import com.loopers.application.order.event.model.OrderCanceledEvent;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import com.loopers.application.coupon.CouponService;
+import com.loopers.application.order.event.model.OrderCanceledEvent;
+import com.loopers.application.order.event.model.OrderCreatedEvent;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor

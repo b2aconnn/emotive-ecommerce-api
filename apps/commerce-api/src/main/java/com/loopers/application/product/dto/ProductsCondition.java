@@ -1,11 +1,7 @@
 package com.loopers.application.product.dto;
 
 public record ProductsCondition(
-        String searchKeyword,
-        Long brandId,
-        ProductsSortType sortBy,
-        Integer offset,
-        Integer size) {
+        String searchKeyword, Long brandId, ProductsSortType sortBy, Integer offset, Integer size) {
     private static final Integer DEFAULT_OFFSET = 0;
     private static final Integer DEFAULT_SIZE = 20;
 

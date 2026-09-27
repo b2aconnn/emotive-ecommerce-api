@@ -1,18 +1,20 @@
 package com.loopers.infrastructure.payment.pgclient;
 
+import static com.loopers.application.payment.dto.PaymentResultStatus.FAILED;
+
+import org.springframework.stereotype.Component;
+
 import com.loopers.domain.payment.PgClient;
 import com.loopers.domain.payment.dto.PGRequest;
 import com.loopers.domain.payment.vo.PGRequestResult;
 import com.loopers.domain.payment.vo.PGTransactionInfoResult;
 import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorRequestResponse;
 import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorTransactionInfoResponse;
+
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
-import static com.loopers.application.payment.dto.PaymentResultStatus.FAILED;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +37,8 @@ public class PgSimulatorClient implements PgClient {
     @Retry(name = "defaultConfig", fallbackMethod = "getTransactionFallback")
     @Override
     public PGTransactionInfoResult getTransaction(String transactionKey) {
-        PGSimulatorTransactionInfoResponse transactionInfoResponse = pgSimulatorFeignClient.getTransaction(transactionKey);
+        PGSimulatorTransactionInfoResponse transactionInfoResponse =
+                pgSimulatorFeignClient.getTransaction(transactionKey);
         return PGTransactionInfoResult.from(transactionInfoResponse);
     }
 
@@ -46,14 +49,6 @@ public class PgSimulatorClient implements PgClient {
 
     public PGTransactionInfoResult getTransactionFallback(String transactionKey, Throwable throwable) {
         log.error("거래 조회 실패: transactionKey : {}, error : {}", transactionKey, throwable.getMessage());
-        return new PGTransactionInfoResult(
-                "",
-                null,
-                null,
-                null,
-                null,
-                FAILED,
-                "거래 조회 실패");
+        return new PGTransactionInfoResult("", null, null, null, null, FAILED, "거래 조회 실패");
     }
 }
-

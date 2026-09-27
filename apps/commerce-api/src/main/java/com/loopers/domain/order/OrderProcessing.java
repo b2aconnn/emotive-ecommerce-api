@@ -1,16 +1,18 @@
 package com.loopers.domain.order;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.loopers.application.order.dto.OrderCreateCommand;
 import com.loopers.application.order.dto.OrderLineItem;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductStockAllocation;
 import com.loopers.domain.product.vo.Products;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component
@@ -47,12 +49,7 @@ public class OrderProcessing {
             }
 
             Long totalPrice = calculateTotalPrice(product.getPrice(), item.quantity());
-            OrderItem orderItem = OrderItem.create(
-                    order,
-                    product,
-                    item.quantity(),
-                    totalPrice
-            );
+            OrderItem orderItem = OrderItem.create(order, product, item.quantity(), totalPrice);
             orderItems.add(orderItem);
         }
 
@@ -64,7 +61,8 @@ public class OrderProcessing {
     }
 
     public void restoreProductStocks(List<OrderItem> orderItems) {
-        List<Long> productIds = orderItems.stream().map(e -> e.getProduct().getId()).toList();
+        List<Long> productIds =
+                orderItems.stream().map(e -> e.getProduct().getId()).toList();
         Products products = productStockAllocation.reserveProducts(productIds);
         for (OrderItem orderItem : orderItems) {
             Product product = products.get(orderItem.getProduct().getId());

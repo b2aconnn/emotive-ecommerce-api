@@ -8,5 +8,4 @@ public record OrderMessageEnvelope<T>(
         String aggregateId,
         String aggregateType,
         ZonedDateTime occurredAt,
-        T payload
-) {}
+        T payload) {}

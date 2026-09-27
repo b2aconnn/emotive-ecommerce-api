@@ -1,17 +1,15 @@
 package com.loopers.interfaces.api.brand;
 
-import com.loopers.domain.brand.Brand;
-import com.loopers.domain.brand.dto.command.BrandCreateCommand;
-import com.loopers.domain.brand.BrandRepository;
-import com.loopers.domain.user.User;
-import com.loopers.domain.user.UserRepository;
-import com.loopers.domain.user.dto.command.UserCreateInfo;
-import com.loopers.fixture.infra.brand.BrandFixture;
-import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.brand.dto.BrandsResponse;
-import com.loopers.interfaces.api.brand.dto.BrandInfoResponse;
-import com.loopers.interfaces.api.point.dto.PointChargeRequest;
-import com.loopers.utils.DatabaseCleanUp;
+import static com.loopers.domain.user.type.GenderType.MALE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,15 +20,18 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
-import static com.loopers.domain.user.type.GenderType.MALE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import com.loopers.domain.brand.Brand;
+import com.loopers.domain.brand.BrandRepository;
+import com.loopers.domain.brand.dto.command.BrandCreateCommand;
+import com.loopers.domain.user.User;
+import com.loopers.domain.user.UserRepository;
+import com.loopers.domain.user.dto.command.UserCreateInfo;
+import com.loopers.fixture.infra.brand.BrandFixture;
+import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.interfaces.api.brand.dto.BrandInfoResponse;
+import com.loopers.interfaces.api.brand.dto.BrandsResponse;
+import com.loopers.interfaces.api.point.dto.PointChargeRequest;
+import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BrandApiE2ETest {
@@ -45,12 +46,11 @@ class BrandApiE2ETest {
 
     @Autowired
     public BrandApiE2ETest(
-        TestRestTemplate testRestTemplate,
-        BrandRepository brandRepository,
-        BrandFixture brandFixture,
-        UserRepository userRepository,
-        DatabaseCleanUp databaseCleanUp
-    ) {
+            TestRestTemplate testRestTemplate,
+            BrandRepository brandRepository,
+            BrandFixture brandFixture,
+            UserRepository userRepository,
+            DatabaseCleanUp databaseCleanUp) {
         this.testRestTemplate = testRestTemplate;
         this.brandRepository = brandRepository;
         this.brandFixture = brandFixture;
@@ -70,11 +70,7 @@ class BrandApiE2ETest {
         @Test
         void returnsBrandInfoOnSuccessfulRetrievalOfBrandInfo() {
             // given
-            UserCreateInfo userCreateInfo = new UserCreateInfo(
-                    "park",
-                    "user@domain.com",
-                    "2000-01-01",
-                    MALE);
+            UserCreateInfo userCreateInfo = new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE);
             User saveUser = userRepository.save(User.create(userCreateInfo));
 
             String brandName = "Test Brand";
@@ -92,7 +88,8 @@ class BrandApiE2ETest {
             HttpEntity<PointChargeRequest> requestEntity = new HttpEntity<>(headers);
 
             // when
-            ParameterizedTypeReference<ApiResponse<BrandInfoResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ParameterizedTypeReference<ApiResponse<BrandInfoResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<BrandInfoResponse>> response =
                     testRestTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, responseType);
 
@@ -102,19 +99,14 @@ class BrandApiE2ETest {
                     () -> assertThat(response.getBody().data().brandId()).isEqualTo(saveBrand.getId()),
                     () -> assertThat(response.getBody().data().brandName()).isEqualTo(saveBrand.getName()),
                     () -> assertThat(response.getBody().data().logoUrl()).isEqualTo(saveBrand.getLogoUrl()),
-                    () -> assertThat(response.getBody().data().description()).isEqualTo(saveBrand.getDescription())
-            );
+                    () -> assertThat(response.getBody().data().description()).isEqualTo(saveBrand.getDescription()));
         }
 
         @DisplayName("존재하지 않는 ID 로 조회할 경우, 404 Not Found 응답을 반환한다.")
         @Test
         void returnsNotFoundResponseWhenIdDoesNotExist() {
             // given
-            UserCreateInfo userCreateInfo = new UserCreateInfo(
-                    "park",
-                    "user@domain.com",
-                    "2000-01-01",
-                    MALE);
+            UserCreateInfo userCreateInfo = new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE);
             User saveUser = userRepository.save(User.create(userCreateInfo));
 
             Long brandId = 999L;
@@ -127,7 +119,8 @@ class BrandApiE2ETest {
             HttpEntity<PointChargeRequest> requestEntity = new HttpEntity<>(headers);
 
             // when
-            ParameterizedTypeReference<ApiResponse<BrandInfoResponse>> responseType = new ParameterizedTypeReference<>() {};
+            ParameterizedTypeReference<ApiResponse<BrandInfoResponse>> responseType =
+                    new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<BrandInfoResponse>> response =
                     testRestTemplate.exchange(requestUrl, HttpMethod.GET, requestEntity, responseType);
 
@@ -140,8 +133,8 @@ class BrandApiE2ETest {
     @Nested
     class GET_ALL {
         private HttpEntity<Void> authorizedRequest() {
-            User saveUser = userRepository.save(User.create(
-                    new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE)));
+            User saveUser =
+                    userRepository.save(User.create(new UserCreateInfo("park", "user@domain.com", "2000-01-01", MALE)));
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -153,9 +146,12 @@ class BrandApiE2ETest {
             return requestBrands(requestEntity, "");
         }
 
-        private ResponseEntity<ApiResponse<List<BrandsResponse>>> requestBrands(HttpEntity<Void> requestEntity, String queryString) {
-            ParameterizedTypeReference<ApiResponse<List<BrandsResponse>>> responseType = new ParameterizedTypeReference<>() {};
-            return testRestTemplate.exchange(ENDPOINT_GET_ALL + queryString, HttpMethod.GET, requestEntity, responseType);
+        private ResponseEntity<ApiResponse<List<BrandsResponse>>> requestBrands(
+                HttpEntity<Void> requestEntity, String queryString) {
+            ParameterizedTypeReference<ApiResponse<List<BrandsResponse>>> responseType =
+                    new ParameterizedTypeReference<>() {};
+            return testRestTemplate.exchange(
+                    ENDPOINT_GET_ALL + queryString, HttpMethod.GET, requestEntity, responseType);
         }
 
         private List<Brand> saveBrands(String... names) {
@@ -182,12 +178,18 @@ class BrandApiE2ETest {
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data()).hasSize(2),
                     () -> assertThat(response.getBody().data())
-                            .extracting(BrandsResponse::id, BrandsResponse::brandName, BrandsResponse::logoUrl, BrandsResponse::description)
+                            .extracting(
+                                    BrandsResponse::id,
+                                    BrandsResponse::brandName,
+                                    BrandsResponse::logoUrl,
+                                    BrandsResponse::description)
                             .containsExactlyInAnyOrder(
                                     tuple(nike.getId(), nike.getName(), nike.getLogoUrl(), nike.getDescription()),
-                                    tuple(adidas.getId(), adidas.getName(), adidas.getLogoUrl(), adidas.getDescription())
-                            )
-            );
+                                    tuple(
+                                            adidas.getId(),
+                                            adidas.getName(),
+                                            adidas.getLogoUrl(),
+                                            adidas.getDescription())));
         }
 
         @DisplayName("브랜드가 하나도 존재하지 않을 경우, 200 응답과 함께 빈 배열을 반환한다.")
@@ -204,8 +206,7 @@ class BrandApiE2ETest {
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data()).isNotNull(),
-                    () -> assertThat(response.getBody().data()).isEmpty()
-            );
+                    () -> assertThat(response.getBody().data()).isEmpty());
         }
 
         @DisplayName("offset 과 size 쿼리 파라미터를 넘길 경우, 해당 구간의 브랜드만 반환된다.")
@@ -216,15 +217,16 @@ class BrandApiE2ETest {
             List<Brand> saved = saveBrands("Brand1", "Brand2", "Brand3", "Brand4", "Brand5");
 
             // when
-            ResponseEntity<ApiResponse<List<BrandsResponse>>> response = requestBrands(requestEntity, "?offset=2&size=2");
+            ResponseEntity<ApiResponse<List<BrandsResponse>>> response =
+                    requestBrands(requestEntity, "?offset=2&size=2");
 
             // then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data()).hasSize(2),
-                    () -> assertThat(response.getBody().data()).extracting(BrandsResponse::id)
-                            .containsExactly(saved.get(2).getId(), saved.get(3).getId())
-            );
+                    () -> assertThat(response.getBody().data())
+                            .extracting(BrandsResponse::id)
+                            .containsExactly(saved.get(2).getId(), saved.get(3).getId()));
         }
 
         @DisplayName("searchKeyword 쿼리 파라미터를 넘길 경우, 브랜드명이 부분 일치하는 브랜드만 반환된다.")
@@ -235,14 +237,15 @@ class BrandApiE2ETest {
             saveBrands("Nike", "Adidas", "Puma");
 
             // when
-            ResponseEntity<ApiResponse<List<BrandsResponse>>> response = requestBrands(requestEntity, "?searchKeyword=nike");
+            ResponseEntity<ApiResponse<List<BrandsResponse>>> response =
+                    requestBrands(requestEntity, "?searchKeyword=nike");
 
             // then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data()).extracting(BrandsResponse::brandName)
-                            .containsExactly("Nike")
-            );
+                    () -> assertThat(response.getBody().data())
+                            .extracting(BrandsResponse::brandName)
+                            .containsExactly("Nike"));
         }
 
         @DisplayName("searchKeyword 가 빈 문자열일 경우, 검색 조건 없이 전체 브랜드가 반환된다.")
@@ -253,13 +256,13 @@ class BrandApiE2ETest {
             saveBrands("Nike", "Adidas", "Puma");
 
             // when
-            ResponseEntity<ApiResponse<List<BrandsResponse>>> response = requestBrands(requestEntity, "?searchKeyword=");
+            ResponseEntity<ApiResponse<List<BrandsResponse>>> response =
+                    requestBrands(requestEntity, "?searchKeyword=");
 
             // then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data()).hasSize(3)
-            );
+                    () -> assertThat(response.getBody().data()).hasSize(3));
         }
 
         @DisplayName("searchKeyword 에 일치하는 브랜드가 없을 경우, 200 응답과 함께 빈 배열을 반환한다.")
@@ -270,14 +273,14 @@ class BrandApiE2ETest {
             saveBrands("Nike", "Adidas");
 
             // when
-            ResponseEntity<ApiResponse<List<BrandsResponse>>> response = requestBrands(requestEntity, "?searchKeyword=존재하지않는브랜드");
+            ResponseEntity<ApiResponse<List<BrandsResponse>>> response =
+                    requestBrands(requestEntity, "?searchKeyword=존재하지않는브랜드");
 
             // then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(response.getBody().data()).isNotNull(),
-                    () -> assertThat(response.getBody().data()).isEmpty()
-            );
+                    () -> assertThat(response.getBody().data()).isEmpty());
         }
 
         @DisplayName("쿼리 파라미터를 넘기지 않을 경우, 기본값(offset=0, size=20)으로 조회된다.")
@@ -293,8 +296,7 @@ class BrandApiE2ETest {
             // then
             assertAll(
                     () -> assertTrue(response.getStatusCode().is2xxSuccessful()),
-                    () -> assertThat(response.getBody().data()).hasSize(3)
-            );
+                    () -> assertThat(response.getBody().data()).hasSize(3));
         }
 
         @DisplayName("목록 조회 경로가 추가되어도, 단건 조회 경로는 그대로 동작한다. (라우팅 충돌 없음)")
@@ -308,9 +310,10 @@ class BrandApiE2ETest {
             // when
             ResponseEntity<ApiResponse<List<BrandsResponse>>> listResponse = requestBrands(requestEntity);
 
-            ParameterizedTypeReference<ApiResponse<BrandInfoResponse>> singleResponseType = new ParameterizedTypeReference<>() {};
-            ResponseEntity<ApiResponse<BrandInfoResponse>> singleResponse =
-                    testRestTemplate.exchange(ENDPOINT_GET.apply(nike.getId()), HttpMethod.GET, requestEntity, singleResponseType);
+            ParameterizedTypeReference<ApiResponse<BrandInfoResponse>> singleResponseType =
+                    new ParameterizedTypeReference<>() {};
+            ResponseEntity<ApiResponse<BrandInfoResponse>> singleResponse = testRestTemplate.exchange(
+                    ENDPOINT_GET.apply(nike.getId()), HttpMethod.GET, requestEntity, singleResponseType);
 
             // then
             assertAll(
@@ -318,8 +321,8 @@ class BrandApiE2ETest {
                     () -> assertThat(listResponse.getBody().data()).hasSize(2),
                     () -> assertTrue(singleResponse.getStatusCode().is2xxSuccessful()),
                     () -> assertThat(singleResponse.getBody().data().brandId()).isEqualTo(nike.getId()),
-                    () -> assertThat(singleResponse.getBody().data().brandName()).isEqualTo(nike.getName())
-            );
+                    () -> assertThat(singleResponse.getBody().data().brandName())
+                            .isEqualTo(nike.getName()));
         }
     }
 }

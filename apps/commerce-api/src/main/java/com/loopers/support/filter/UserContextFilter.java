@@ -1,11 +1,13 @@
 package com.loopers.support.filter;
 
-import com.loopers.support.resolver.UserContextHolder;
+import java.io.IOException;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import com.loopers.support.resolver.UserContextHolder;
 
 @Component
 public class UserContextFilter implements Filter {

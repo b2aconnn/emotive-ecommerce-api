@@ -1,18 +1,20 @@
 package com.loopers.infrastructure.productlike.jpa;
 
-import com.loopers.domain.productlike.ProductLike;
-import com.loopers.domain.productlike.ProductLikeRepository;
-import com.loopers.domain.productlike.dto.result.UserLikedProductResult;
-import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import org.springframework.stereotype.Component;
+import static com.loopers.domain.productlike.QProductLike.productLike;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.loopers.domain.productlike.QProductLike.productLike;
+import jakarta.persistence.EntityManager;
+
+import org.springframework.stereotype.Component;
+
+import com.loopers.domain.productlike.ProductLike;
+import com.loopers.domain.productlike.ProductLikeRepository;
+import com.loopers.domain.productlike.dto.result.UserLikedProductResult;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @Component
 public class ProductLikeRepositoryImpl implements ProductLikeRepository {
@@ -54,10 +56,7 @@ public class ProductLikeRepositoryImpl implements ProductLikeRepository {
                 .select(Projections.constructor(
                         UserLikedProductResult.class, productLike.user.id, productLike.product.id))
                 .from(productLike)
-                .where(
-                        productLike.createdAt.goe(periodStartInclusive),
-                        productLike.createdAt.lt(periodEndExclusive)
-                )
+                .where(productLike.createdAt.goe(periodStartInclusive), productLike.createdAt.lt(periodEndExclusive))
                 .fetch();
     }
 }

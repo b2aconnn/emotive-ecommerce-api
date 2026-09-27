@@ -1,15 +1,15 @@
 package com.loopers.fixture.infra.fixturemonkey;
 
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.brand.dto.command.BrandCreateCommand;
 import com.loopers.fixture.infra.brand.BrandFixture;
-import com.navercorp.fixturemonkey.FixtureMonkey;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Objects;
 
 @Component
 public class BrandFixtureMonkey implements BrandFixture {
@@ -17,7 +17,8 @@ public class BrandFixtureMonkey implements BrandFixture {
     private BrandRepository brandRepository;
 
     private List<Brand> create(int count) {
-        return FixtureMonkeyFactory.create().giveMeBuilder(Brand.class)
+        return FixtureMonkeyFactory.create()
+                .giveMeBuilder(Brand.class)
                 .set("id", 0L)
                 .sampleList(count);
     }
@@ -34,7 +35,8 @@ public class BrandFixtureMonkey implements BrandFixture {
 
     @Override
     public Brand save(String name) {
-        Brand brand = Brand.create(new BrandCreateCommand(name, "http://example.com/" + name + ".png", name + " description"));
+        Brand brand = Brand.create(
+                new BrandCreateCommand(name, "http://example.com/" + name + ".png", name + " description"));
         return brandRepository.save(brand);
     }
 }
