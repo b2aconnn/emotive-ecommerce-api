@@ -15,7 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import com.loopers.domain.user.User;
 import com.loopers.domain.user.UserRepository;
@@ -27,7 +32,7 @@ import com.loopers.interfaces.api.user.dto.UserMyInfoResponse;
 import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class UserApiE2ETest {
+class UserApiE2eTest {
     private static final String ENDPOINT_CREATE = "/api/users";
     private static final String ENDPOINT_GET_ME = "/api/users/me";
 
@@ -36,7 +41,7 @@ class UserApiE2ETest {
     private final DatabaseCleanUp databaseCleanUp;
 
     @Autowired
-    public UserApiE2ETest(
+    public UserApiE2eTest(
             TestRestTemplate testRestTemplate, UserRepository userRepository, DatabaseCleanUp databaseCleanUp) {
         this.testRestTemplate = testRestTemplate;
         this.userRepository = userRepository;
@@ -50,7 +55,7 @@ class UserApiE2ETest {
 
     @DisplayName("POST /api/users")
     @Nested
-    class POST {
+    class Post {
         @DisplayName("회원 가입이 성공할 경우, 생성된 유저 정보를 응답으로 반환한다.")
         @Test
         void returnsCreatedUserInfoOnSuccessfulRegistration() {
@@ -111,7 +116,7 @@ class UserApiE2ETest {
 
     @DisplayName("GET /api/users/me")
     @Nested
-    class GET {
+    class Get {
         @DisplayName("내 정보 조회에 성공할 경우, 해당하는 유저 정보를 응답으로 반환한다.")
         @Test
         void returnsUserInfoOnSuccessfulRetrievalOfMyInfo() {

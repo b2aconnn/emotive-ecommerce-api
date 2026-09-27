@@ -1,25 +1,29 @@
 package com.loopers.domain.user;
 
-import static lombok.AccessLevel.PROTECTED;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.user.dto.command.UserCreateInfo;
 import com.loopers.domain.user.type.GenderType;
 import com.loopers.support.converter.DateConverter;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "member")
 @Entity
 public class User extends BaseEntity {
+
+    private static final String VALID_EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
 
     private String name;
 
@@ -29,9 +33,6 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private GenderType gender;
-
-    @Transient
-    private final String VALID_EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
 
     private User(UserCreateInfo userCreateInfo) {
         validateEmailFormat(userCreateInfo.email());

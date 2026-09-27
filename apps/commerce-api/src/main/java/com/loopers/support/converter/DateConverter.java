@@ -1,15 +1,14 @@
 package com.loopers.support.converter;
 
-import static lombok.AccessLevel.PRIVATE;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DateConverter {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 

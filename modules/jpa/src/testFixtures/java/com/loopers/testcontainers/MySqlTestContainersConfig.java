@@ -7,10 +7,10 @@ import org.testcontainers.utility.DockerImageName;
 @Configuration
 public class MySqlTestContainersConfig {
 
-    private static final MySQLContainer<?> mySqlContainer;
+    private static final MySQLContainer<?> MYSQL_CONTAINER;
 
     static {
-        mySqlContainer = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
+        MYSQL_CONTAINER = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
                 .withDatabaseName("loopers")
                 .withUsername("test")
                 .withPassword("test")
@@ -19,14 +19,14 @@ public class MySqlTestContainersConfig {
                         "--character-set-server=utf8mb4",
                         "--collation-server=utf8mb4_general_ci",
                         "--skip-character-set-client-handshake");
-        mySqlContainer.start();
+        MYSQL_CONTAINER.start();
 
         String mySqlJdbcUrl = String.format(
                 "jdbc:mysql://%s:%d/%s",
-                mySqlContainer.getHost(), mySqlContainer.getFirstMappedPort(), mySqlContainer.getDatabaseName());
+                MYSQL_CONTAINER.getHost(), MYSQL_CONTAINER.getFirstMappedPort(), MYSQL_CONTAINER.getDatabaseName());
 
         System.setProperty("datasource.mysql-jpa.main.jdbc-url", mySqlJdbcUrl);
-        System.setProperty("datasource.mysql-jpa.main.username", mySqlContainer.getUsername());
-        System.setProperty("datasource.mysql-jpa.main.password", mySqlContainer.getPassword());
+        System.setProperty("datasource.mysql-jpa.main.username", MYSQL_CONTAINER.getUsername());
+        System.setProperty("datasource.mysql-jpa.main.password", MYSQL_CONTAINER.getPassword());
     }
 }

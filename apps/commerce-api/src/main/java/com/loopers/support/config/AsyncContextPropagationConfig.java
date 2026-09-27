@@ -14,12 +14,16 @@ import com.loopers.support.resolver.UserContextHolder;
 @EnableAsync
 public class AsyncContextPropagationConfig implements AsyncConfigurer {
 
+    private static final int CORE_POOL_SIZE = 10;
+    private static final int MAX_POOL_SIZE = 20;
+    private static final int QUEUE_CAPACITY = 500;
+
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(20);
-        executor.setQueueCapacity(500);
+        executor.setCorePoolSize(CORE_POOL_SIZE);
+        executor.setMaxPoolSize(MAX_POOL_SIZE);
+        executor.setQueueCapacity(QUEUE_CAPACITY);
         executor.setThreadNamePrefix("async-task-");
         executor.setTaskDecorator(new UserContextTaskDecorator());
         executor.initialize();

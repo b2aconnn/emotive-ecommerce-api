@@ -1,8 +1,7 @@
 package com.loopers.application.payment.event;
 
-import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
-
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -21,7 +20,7 @@ public class PaymentEventListener {
 
     private final PaymentService paymentService;
 
-    @Transactional(propagation = REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener
     public void handleCreatePayment(OrderCreatedEvent event) {
         log.info("Payment requested for orderId: {}", event.orderId());

@@ -8,7 +8,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import com.loopers.domain.product.message.ProductMessagePublisher;
-import com.loopers.domain.product.message.model.*;
+import com.loopers.domain.product.message.model.ProductLikeAddedMessage;
+import com.loopers.domain.product.message.model.ProductLikeRemovedMessage;
+import com.loopers.domain.product.message.model.ProductMessageEnvelope;
+import com.loopers.domain.product.message.model.ProductMessageType;
+import com.loopers.domain.product.message.model.ProductViewedMessage;
 
 import lombok.RequiredArgsConstructor;
 

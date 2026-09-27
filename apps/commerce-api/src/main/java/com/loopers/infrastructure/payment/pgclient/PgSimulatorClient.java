@@ -1,15 +1,14 @@
 package com.loopers.infrastructure.payment.pgclient;
 
-import static com.loopers.application.payment.dto.PaymentResultStatus.FAILED;
-
 import org.springframework.stereotype.Component;
 
+import com.loopers.application.payment.dto.PaymentResultStatus;
 import com.loopers.domain.payment.PgClient;
-import com.loopers.domain.payment.dto.PGRequest;
-import com.loopers.domain.payment.vo.PGRequestResult;
-import com.loopers.domain.payment.vo.PGTransactionInfoResult;
-import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorRequestResponse;
-import com.loopers.infrastructure.payment.pgclient.dto.PGSimulatorTransactionInfoResponse;
+import com.loopers.domain.payment.dto.PgRequest;
+import com.loopers.domain.payment.vo.PgRequestResult;
+import com.loopers.domain.payment.vo.PgTransactionInfoResult;
+import com.loopers.infrastructure.payment.pgclient.dto.PgSimulatorRequestResponse;
+import com.loopers.infrastructure.payment.pgclient.dto.PgSimulatorTransactionInfoResponse;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -26,29 +25,29 @@ public class PgSimulatorClient implements PgClient {
     @CircuitBreaker(name = "pgRequestPaymentConfig", fallbackMethod = "requestPaymentFallback")
     @Retry(name = "pgRequestPaymentRetryConfig", fallbackMethod = "requestPaymentFallback")
     @Override
-    public PGRequestResult requestPayment(PGRequest request) {
-        PGSimulatorRequestResponse pgSimulatorRequestResponse =
+    public PgRequestResult requestPayment(PgRequest request) {
+        PgSimulatorRequestResponse pgSimulatorRequestResponse =
                 pgSimulatorFeignClient.requestPayment(request.toSimulatorRequest());
 
-        return PGRequestResult.from(pgSimulatorRequestResponse);
+        return PgRequestResult.from(pgSimulatorRequestResponse);
     }
 
     @CircuitBreaker(name = "defaultConfig", fallbackMethod = "getTransactionFallback")
     @Retry(name = "defaultConfig", fallbackMethod = "getTransactionFallback")
     @Override
-    public PGTransactionInfoResult getTransaction(String transactionKey) {
-        PGSimulatorTransactionInfoResponse transactionInfoResponse =
+    public PgTransactionInfoResult getTransaction(String transactionKey) {
+        PgSimulatorTransactionInfoResponse transactionInfoResponse =
                 pgSimulatorFeignClient.getTransaction(transactionKey);
-        return PGTransactionInfoResult.from(transactionInfoResponse);
+        return PgTransactionInfoResult.from(transactionInfoResponse);
     }
 
-    public PGRequestResult requestPaymentFallback(PGRequest request, Throwable throwable) {
+    public PgRequestResult requestPaymentFallback(PgRequest request, Throwable throwable) {
         log.error("결제 요청 실패: {}", throwable.getMessage());
-        return new PGRequestResult("", FAILED, "결제 요청 실패");
+        return new PgRequestResult("", PaymentResultStatus.FAILED, "결제 요청 실패");
     }
 
-    public PGTransactionInfoResult getTransactionFallback(String transactionKey, Throwable throwable) {
+    public PgTransactionInfoResult getTransactionFallback(String transactionKey, Throwable throwable) {
         log.error("거래 조회 실패: transactionKey : {}, error : {}", transactionKey, throwable.getMessage());
-        return new PGTransactionInfoResult("", null, null, null, null, FAILED, "거래 조회 실패");
+        return new PgTransactionInfoResult("", null, null, null, null, PaymentResultStatus.FAILED, "거래 조회 실패");
     }
 }

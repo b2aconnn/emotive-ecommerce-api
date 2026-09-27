@@ -1,21 +1,19 @@
 package com.loopers.domain.payment;
 
-import static com.loopers.domain.order.PaymentStatus.PENDING;
-import static com.loopers.support.validation.TextValidator.requireText;
-import static jakarta.persistence.EnumType.STRING;
-import static lombok.AccessLevel.PROTECTED;
-
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.order.PaymentStatus;
+import com.loopers.support.validation.TextValidator;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "payment")
 @Entity
@@ -27,10 +25,10 @@ public class Payment extends BaseEntity {
 
     private String transactionKey;
 
-    @Enumerated(STRING)
+    @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
-    @Enumerated(STRING)
+    @Enumerated(EnumType.STRING)
     private PaymentMethod method;
 
     private Long amount;
@@ -40,7 +38,7 @@ public class Payment extends BaseEntity {
     private Payment(Long orderId, String pgOrderId, PaymentMethod method, Long amount) {
         this.orderId = orderId;
         this.pgOrderId = pgOrderId;
-        this.status = PENDING;
+        this.status = PaymentStatus.PENDING;
         this.method = method;
         this.amount = amount;
     }
@@ -55,7 +53,7 @@ public class Payment extends BaseEntity {
             throw new IllegalArgumentException("주문 ID는 필수입니다.");
         }
 
-        requireText(pgOrderId, "유효하지 않는 PG 주문 ID입니다.");
+        TextValidator.requireText(pgOrderId, "유효하지 않는 PG 주문 ID입니다.");
 
         if (method == null) {
             throw new IllegalArgumentException("결제 방법은 필수입니다.");

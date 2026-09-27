@@ -13,7 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
@@ -28,7 +33,7 @@ import com.loopers.interfaces.api.user.dto.UserMyInfoResponse;
 import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class PointApiE2ETest {
+class PointApiE2eTest {
     private static final String ENDPOINT_CREATE = "/api/points/charge";
     private static final String ENDPOINT_GET = "/api/points";
 
@@ -38,7 +43,7 @@ class PointApiE2ETest {
     private final DatabaseCleanUp databaseCleanUp;
 
     @Autowired
-    public PointApiE2ETest(
+    public PointApiE2eTest(
             TestRestTemplate testRestTemplate,
             UserRepository userRepository,
             PointRepository pointRepository,
@@ -56,7 +61,7 @@ class PointApiE2ETest {
 
     @DisplayName("POST /api/points/chage")
     @Nested
-    class POST {
+    class Post {
         @DisplayName("존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.")
         @Test
         void returnsTotalPointsAfterSuccessfulCharge() {
@@ -113,7 +118,7 @@ class PointApiE2ETest {
 
     @DisplayName("GET /api/points")
     @Nested
-    class GET {
+    class Get {
         @DisplayName("포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다.")
         @Test
         void returnsUserPointsOnSuccessfulRetrieval() {

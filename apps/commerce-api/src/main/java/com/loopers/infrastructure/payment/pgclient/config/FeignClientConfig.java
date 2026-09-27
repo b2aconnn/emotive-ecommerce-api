@@ -10,12 +10,15 @@ import feign.RequestInterceptor;
 @Configuration
 public class FeignClientConfig {
 
+    private static final int CONNECT_TIMEOUT_MILLIS = 1000;
+    private static final int READ_TIMEOUT_MILLIS = 3000;
+
     @Value("${pg.auth.client-id}")
     private String pgClientId;
 
     @Bean
     public Request.Options feignOptions() {
-        return new Request.Options(1000, 3000); // 연결/응답 타임아웃 (ms)
+        return new Request.Options(CONNECT_TIMEOUT_MILLIS, READ_TIMEOUT_MILLIS);
     }
 
     @Bean

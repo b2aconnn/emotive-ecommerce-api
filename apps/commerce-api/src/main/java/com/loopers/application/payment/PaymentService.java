@@ -13,8 +13,8 @@ import com.loopers.domain.payment.Payment;
 import com.loopers.domain.payment.PaymentReconciliation;
 import com.loopers.domain.payment.PaymentRepository;
 import com.loopers.domain.payment.PgClient;
-import com.loopers.domain.payment.vo.PGRequestResult;
-import com.loopers.domain.payment.vo.PGTransactionInfoResult;
+import com.loopers.domain.payment.vo.PgRequestResult;
+import com.loopers.domain.payment.vo.PgTransactionInfoResult;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,8 +43,8 @@ public class PaymentService {
                 .orElseThrow(() -> new IllegalStateException("결제 정보가 없습니다."));
 
         String pgOrderId = payment.getPgOrderId();
-        PGRequestResult pgRequestResult =
-                pgClient.requestPayment(paymentCommand.toPGRequest(pgOrderId, payment.getAmount(), callbackUrl));
+        PgRequestResult pgRequestResult =
+                pgClient.requestPayment(paymentCommand.toPgRequest(pgOrderId, payment.getAmount(), callbackUrl));
 
         payment.updateTransactionKey(pgRequestResult.transactionKey());
     }
@@ -55,7 +55,7 @@ public class PaymentService {
                 .findByPgOrderId(resultCommand.orderId())
                 .orElseThrow(() -> new IllegalStateException("결제 정보가 없습니다."));
 
-        PGTransactionInfoResult transactionInfoResult = pgClient.getTransaction(payment.getTransactionKey());
+        PgTransactionInfoResult transactionInfoResult = pgClient.getTransaction(payment.getTransactionKey());
         paymentReconciliation.handlePaymentResult(payment, transactionInfoResult);
 
         applicationEventPublisher.publishEvent(

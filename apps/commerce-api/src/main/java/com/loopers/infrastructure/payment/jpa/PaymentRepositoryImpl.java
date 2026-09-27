@@ -1,7 +1,5 @@
 package com.loopers.infrastructure.payment.jpa;
 
-import static com.loopers.domain.payment.QPayment.payment;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.loopers.domain.order.PaymentStatus;
 import com.loopers.domain.payment.Payment;
 import com.loopers.domain.payment.PaymentRepository;
+import com.loopers.domain.payment.QPayment;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @Component
@@ -51,10 +50,10 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     public Optional<List<Payment>> findByStatusAndCreatedAtBefore(
             PaymentStatus status, ZonedDateTime dateTime, int size, int offset) {
         return Optional.ofNullable(queryFactory
-                .select(payment)
-                .from(payment)
-                .where(payment.status.eq(status).and(payment.createdAt.before(dateTime)))
-                .orderBy(payment.createdAt.asc())
+                .select(QPayment.payment)
+                .from(QPayment.payment)
+                .where(QPayment.payment.status.eq(status).and(QPayment.payment.createdAt.before(dateTime)))
+                .orderBy(QPayment.payment.createdAt.asc())
                 .offset(offset)
                 .limit(size)
                 .fetch());

@@ -1,9 +1,5 @@
 package com.loopers.infrastructure.order.jpa;
 
-import static com.loopers.domain.order.OrderStatus.COMPLETED;
-import static com.loopers.domain.order.QOrder.order;
-import static com.loopers.domain.order.QOrderItem.orderItem;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -13,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import com.loopers.domain.order.OrderItem;
 import com.loopers.domain.order.OrderItemRepository;
+import com.loopers.domain.order.OrderStatus;
+import com.loopers.domain.order.QOrder;
+import com.loopers.domain.order.QOrderItem;
 import com.loopers.domain.order.dto.result.UserOrderedProductResult;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -36,15 +35,16 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
     public List<UserOrderedProductResult> findDistinctCompletedOrderedProductsByUser(
             ZonedDateTime periodStartInclusive, ZonedDateTime periodEndExclusive) {
         return queryFactory
-                .select(Projections.constructor(UserOrderedProductResult.class, order.userId, orderItem.product.id))
+                .select(Projections.constructor(
+                        UserOrderedProductResult.class, QOrder.order.userId, QOrderItem.orderItem.product.id))
                 .distinct()
-                .from(orderItem)
-                .join(orderItem.order, order)
+                .from(QOrderItem.orderItem)
+                .join(QOrderItem.orderItem.order, QOrder.order)
                 .where(
-                        order.status.eq(COMPLETED),
-                        // 기간은 주문 상품이 아니라 주문(order)의 생성 시각 기준이다.
-                        order.createdAt.goe(periodStartInclusive),
-                        order.createdAt.lt(periodEndExclusive))
+                        QOrder.order.status.eq(OrderStatus.COMPLETED),
+                        // 기간은 주문 상품이 아니라 주문(QOrder.order)의 생성 시각 기준이다.
+                        QOrder.order.createdAt.goe(periodStartInclusive),
+                        QOrder.order.createdAt.lt(periodEndExclusive))
                 .fetch();
     }
 }

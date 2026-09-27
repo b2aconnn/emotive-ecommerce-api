@@ -1,7 +1,5 @@
 package com.loopers.infrastructure.productlike.jpa;
 
-import static com.loopers.domain.productlike.QProductLike.productLike;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.loopers.domain.productlike.ProductLike;
 import com.loopers.domain.productlike.ProductLikeRepository;
+import com.loopers.domain.productlike.QProductLike;
 import com.loopers.domain.productlike.dto.result.UserLikedProductResult;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -54,9 +53,13 @@ public class ProductLikeRepositoryImpl implements ProductLikeRepository {
         // 기간 조건만으로 "기간 중 눌렀고 집계 시점까지 살아있는 좋아요" 스냅샷이 그대로 나온다.
         return queryFactory
                 .select(Projections.constructor(
-                        UserLikedProductResult.class, productLike.user.id, productLike.product.id))
-                .from(productLike)
-                .where(productLike.createdAt.goe(periodStartInclusive), productLike.createdAt.lt(periodEndExclusive))
+                        UserLikedProductResult.class,
+                        QProductLike.productLike.user.id,
+                        QProductLike.productLike.product.id))
+                .from(QProductLike.productLike)
+                .where(
+                        QProductLike.productLike.createdAt.goe(periodStartInclusive),
+                        QProductLike.productLike.createdAt.lt(periodEndExclusive))
                 .fetch();
     }
 }

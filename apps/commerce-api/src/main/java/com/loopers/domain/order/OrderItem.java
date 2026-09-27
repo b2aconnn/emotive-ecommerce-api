@@ -1,9 +1,7 @@
 package com.loopers.domain.order;
 
-import static jakarta.persistence.FetchType.LAZY;
-import static lombok.AccessLevel.PROTECTED;
-
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -11,21 +9,20 @@ import jakarta.persistence.Table;
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.product.Product;
 
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "order_item")
 @Entity
 public class OrderItem extends BaseEntity {
-    @Setter
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 

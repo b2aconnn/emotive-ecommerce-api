@@ -44,7 +44,7 @@ public class ProductFixtureMonkey implements ProductWithStockFixture {
     public Product save(Brand brand, Long productPrice, Long stockQuantity) {
         Product saveProduct = productRepository.save(createProduct(brand, productPrice));
         ProductStock saveProductStock = productStockRepository.save(ProductStock.create(saveProduct, stockQuantity));
-        saveProduct.setProductStock(saveProductStock);
+        saveProduct.assignStock(saveProductStock);
         return saveProduct;
     }
 }

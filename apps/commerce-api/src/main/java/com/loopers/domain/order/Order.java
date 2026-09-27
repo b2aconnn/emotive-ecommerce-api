@@ -1,27 +1,25 @@
 package com.loopers.domain.order;
 
-import static com.loopers.domain.order.OrderStatus.*;
-import static com.loopers.support.validation.TextValidator.requireText;
-import static jakarta.persistence.EnumType.STRING;
-import static java.util.Objects.requireNonNull;
-import static lombok.AccessLevel.PROTECTED;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.order.dto.OrderCreateInfo;
+import com.loopers.support.validation.TextValidator;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")
 @Entity
 public class Order extends BaseEntity {
@@ -43,7 +41,7 @@ public class Order extends BaseEntity {
 
     private Long totalAmount;
 
-    @Enumerated(STRING)
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     private Order(OrderCreateInfo createInfo) {
@@ -54,7 +52,7 @@ public class Order extends BaseEntity {
         this.couponId = createInfo.couponId();
         this.usedPoints = createInfo.usedPoints();
         this.totalAmount = 0L;
-        this.status = CREATED;
+        this.status = OrderStatus.CREATED;
     }
 
     public static Order create(OrderCreateInfo createInfo) {
@@ -63,10 +61,10 @@ public class Order extends BaseEntity {
     }
 
     private static void validateRequiredOrderInfo(OrderCreateInfo createInfo) {
-        requireNonNull(createInfo.userId());
-        requireText(createInfo.orderer(), "주문자명을 입력해주세요.");
-        requireText(createInfo.deliveryAddress(), "배송지를 입력해주세요.");
-        requireText(createInfo.contactNumber(), "주문자 연락처를 입력해주세요.");
+        Objects.requireNonNull(createInfo.userId());
+        TextValidator.requireText(createInfo.orderer(), "주문자명을 입력해주세요.");
+        TextValidator.requireText(createInfo.deliveryAddress(), "배송지를 입력해주세요.");
+        TextValidator.requireText(createInfo.contactNumber(), "주문자 연락처를 입력해주세요.");
     }
 
     public void calculateTotalAmount(Long usePoint) {
@@ -84,29 +82,29 @@ public class Order extends BaseEntity {
         if (!checkCreateStatus()) {
             throw new IllegalStateException("주문이 생성되지 않았습니다. 먼저 주문을 생성해주세요.");
         }
-        this.status = PENDING;
+        this.status = OrderStatus.PENDING;
     }
 
     public void complete() {
         if (!checkCreateStatus() && !checkPendingStatus()) {
             return;
         }
-        this.status = COMPLETED;
+        this.status = OrderStatus.COMPLETED;
     }
 
     public void cancel() {
         if (!checkCreateStatus() && !checkPendingStatus()) {
             return;
         }
-        this.status = CANCELED;
+        this.status = OrderStatus.CANCELED;
     }
 
     private boolean checkCreateStatus() {
-        return this.status == CREATED;
+        return this.status == OrderStatus.CREATED;
     }
 
     private boolean checkPendingStatus() {
-        return this.status == PENDING;
+        return this.status == OrderStatus.PENDING;
     }
 
     public Long getItemTotalAmount() {

@@ -52,7 +52,7 @@ public class BrandServiceIntegrationTest {
 
     @DisplayName("브랜드를 조회할 때, ")
     @Nested
-    class GET {
+    class Get {
         @DisplayName("브랜드가 존재하지 않은 경우, null이 반환된다.")
         @Test
         void getFail() {
@@ -90,7 +90,7 @@ public class BrandServiceIntegrationTest {
 
     @DisplayName("브랜드 전체 목록을 조회할 때, ")
     @Nested
-    class GET_ALL {
+    class GetAll {
         @DisplayName("브랜드가 여러 건 존재할 경우, 모든 브랜드 정보가 반환된다.")
         @Test
         void returnsAllBrandsWhenBrandsExist() {
