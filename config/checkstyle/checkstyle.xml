@@ -118,25 +118,25 @@
             <property name="id" value="controllerSuffix"/>
             <property name="query" value="//CLASS_DEF[MODIFIERS/ANNOTATION/IDENT[@text='RestController' or @text='Controller']]
                 /IDENT[not(ends-with(@text, 'Controller'))]"/>
-            <message key="matchxpath.match" value="Controller 클래스명은 'Controller' 로 끝나야 합니다. (3.2)"/>
+            <message key="matchxpath.match" value="Controller 클래스명은 ''Controller'' 로 끝나야 합니다. (3.2)"/>
         </module>
         <module name="MatchXpath">
             <property name="id" value="configSuffix"/>
             <property name="query" value="//CLASS_DEF[MODIFIERS/ANNOTATION/IDENT[@text='Configuration']]
                 /IDENT[not(ends-with(@text, 'Config'))]"/>
-            <message key="matchxpath.match" value="설정 클래스명은 'Config' 로 끝나야 합니다. (3.2)"/>
+            <message key="matchxpath.match" value="설정 클래스명은 ''Config'' 로 끝나야 합니다. (3.2)"/>
         </module>
         <module name="MatchXpath">
             <property name="id" value="jpaRepositorySuffix"/>
             <property name="query" value="//INTERFACE_DEF[EXTENDS_CLAUSE/IDENT[@text='JpaRepository']]
                 /IDENT[not(ends-with(@text, 'JpaRepository'))]"/>
-            <message key="matchxpath.match" value="Spring Data Repository 는 'JpaRepository' 로 끝나야 합니다. (3.2)"/>
+            <message key="matchxpath.match" value="Spring Data Repository 는 ''JpaRepository'' 로 끝나야 합니다. (3.2)"/>
         </module>
         <module name="MatchXpath">
             <property name="id" value="exceptionSuffix"/>
             <property name="query" value="//CLASS_DEF[EXTENDS_CLAUSE/IDENT[ends-with(@text, 'Exception')]]
                 /IDENT[not(ends-with(@text, 'Exception'))]"/>
-            <message key="matchxpath.match" value="예외 클래스명은 'Exception' 으로 끝나야 합니다. (3.2)"/>
+            <message key="matchxpath.match" value="예외 클래스명은 ''Exception'' 으로 끝나야 합니다. (3.2)"/>
         </module>
 
         <!-- ===================== 4.3 선언 순서 ===================== -->
@@ -239,7 +239,7 @@
             <property name="query" value="//METHOD_CALL
                 [DOT[IDENT[1][@text='log'] and IDENT[2][matches(@text, '^(trace|debug|info|warn|error)$')]]]
                 /ELIST/EXPR[1][PLUS]"/>
-            <message key="matchxpath.match" value="로그 메시지는 문자열 연결 대신 {} 플레이스홀더를 사용합니다. (13)"/>
+            <message key="matchxpath.match" value="로그 메시지는 문자열 연결 대신 '{}' 플레이스홀더를 사용합니다. (13)"/>
         </module>
         <module name="MatchXpath">
             <property name="id" value="logInLoop"/>
