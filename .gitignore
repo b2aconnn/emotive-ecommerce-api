@@ -46,4 +46,5 @@ infra/*/terraform/terraform.tfstate.backup
 infra/*/terraform/*.tfplan
 
 ### Docs ###
-docs/
+docs/*
+!docs/architecture/
