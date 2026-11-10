@@ -1,4 +1,3 @@
-import com.diffplug.gradle.spotless.SpotlessExtension
 import org.gradle.api.Project.DEFAULT_VERSION
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
@@ -16,7 +15,6 @@ plugins {
     java
     id("org.springframework.boot") apply false
     id("io.spring.dependency-management")
-    id("com.diffplug.spotless") apply false
 }
 
 java {
@@ -40,8 +38,6 @@ subprojects {
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "jacoco")
-    apply(plugin = "checkstyle")
-    apply(plugin = "com.diffplug.spotless")
 
     dependencyManagement {
         imports {
@@ -78,32 +74,6 @@ subprojects {
         // resilience4j
         implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
         implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
-    }
-
-    // 코드 포맷: docs/convention/backend-convention.md 4.1 ~ 4.2
-    configure<SpotlessExtension> {
-        java {
-            target("src/**/*.java")
-            targetExclude("src/*/generated/**")
-            palantirJavaFormat(project.properties["palantirJavaFormatVersion"] as String)
-            importOrder("\\#", "java", "javax|jakarta", "org", "com", "")
-            removeUnusedImports()
-            trimTrailingWhitespace()
-            endWithNewline()
-        }
-    }
-
-    // 코드 컨벤션 검사: config/checkstyle/checkstyle.xml
-    configure<CheckstyleExtension> {
-        toolVersion = project.properties["checkstyleVersion"] as String
-        configDirectory = rootProject.layout.projectDirectory.dir("config/checkstyle")
-        isIgnoreFailures = false
-        maxWarnings = Int.MAX_VALUE
-    }
-
-    // Checkstyle 14.x 는 Java 21 런타임이 필요하다.
-    tasks.withType<Checkstyle>().configureEach {
-        javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
     }
 
     tasks.withType(Jar::class) { enabled = true }
