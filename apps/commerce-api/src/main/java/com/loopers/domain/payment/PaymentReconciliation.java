@@ -42,8 +42,6 @@ public class PaymentReconciliation {
         }
     }
 
-    // 복구 배치는 건별 실패 원인(스택트레이스)을 남겨야 하므로 반복문 내 ERROR 로그를 허용한다.
-    @SuppressWarnings("checkstyle:logInLoop")
     public void recoverPendingPayments() {
         log.info("Starting recovery of pending payments");
 
