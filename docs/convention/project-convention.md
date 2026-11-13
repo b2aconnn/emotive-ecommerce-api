@@ -1,7 +1,7 @@
-# Emotive Ecommerce 백엔드 개발 컨벤션
+# Project Convention
 
 > 이 문서는 DDD(Domain-Driven Design)를 적용한 Java + Spring Boot 기반 백엔드 프로젝트의 아키텍처·코드·API·DB·Git 컨벤션을 정의한다.
-> - 대상은 Java 로 작성된 `apps/commerce-api` 와 `modules/*`, `supports/*` 다. Kotlin 으로 작성된 `apps/commerce-streamer`, `apps/pg-simulator`, `modules/kafka` 는 Checkstyle/Spotless 검사 대상이 아니며, 이 문서에서는 구조와 연동 규약만 다룬다.
+> - 대상은 Java 로 작성된 `apps/commerce-api` 와 `modules/*`, `supports/*` 다. Kotlin 으로 작성된 `apps/commerce-streamer`, `apps/pg-simulator`, `modules/kafka` 는 Linter·Formatter 검사 대상이 아니며, 이 문서에서는 구조와 연동 규약만 다룬다.
 
 ---
 
@@ -44,7 +44,6 @@
 | 외부 호출 | Spring Cloud OpenFeign, Resilience4j (CircuitBreaker, Retry) | 2.2.0 |
 | Test | JUnit 5, AssertJ, Mockito, Testcontainers, Fixture Monkey, Instancio | 1.1.14 (Fixture Monkey) |
 | API 문서 | springdoc-openapi | 2.7.0 |
-| 정적 분석 | Checkstyle / Spotless (palantir-java-format) | 14.1.0 / 8.10.3 (2.99.0) |
 | 커버리지 | JaCoCo (XML 리포트) | - |
 | 모니터링 | Actuator, Micrometer (Prometheus, Brave tracing), Grafana | - |
 | 인프라 | Docker Compose (로컬), Terraform (AWS dev), k6 (부하 테스트) | - |
@@ -242,7 +241,6 @@ interfaces → application → domain ← infrastructure
 - infrastructure 는 domain 에 정의된 인터페이스(`OrderRepository`, `PgClient`, `OrderMessagePublisher`)를 구현한다.
 - application 은 구현체(`OrderRepositoryImpl`, `OrderJpaRepository`)가 아닌 domain 인터페이스에만 의존한다.
 - 다른 도메인의 상태를 바꿔야 하면 그 도메인의 Service 를 직접 호출하지 않고 **이벤트**를 발행한다. ([2.9](#29-이벤트와-메시지)) 단, 요구사항이 "함께 바뀐다"를 요구하면 [2.2](#22-설계-규모와-ddd) 의 "여러 Aggregate 가 함께 바뀔 때"를 따른다.
-- 이 규칙은 Checkstyle `ImportControl` (`config/checkstyle/import-control.xml`) 이 검사한다. 부록 A 의 기존 위반은 파일 단위 허용 목록으로 관리하며, 새 위반을 허용 목록에 추가하지 않는다.
 
 ### 2.8 전술적 설계 규칙
 
@@ -402,7 +400,6 @@ public class PgSimulatorClient implements PgClient {
 
 - 약어는 일반 단어처럼 취급한다: `PgClient` (O), `PGClient` (X), `userId` (O), `userID` (X)
 - 의미 없는 축약 금지: `ord`, `mbr`, `tmp`, `data`, `info` 단독 사용 지양
-- 위 규칙은 Checkstyle 이 검사한다. (`PackageName`, `AbbreviationAsWordInName`, `enumConstantName`, `booleanPrefix`)
 
 ### 3.2 클래스 접미사
 
@@ -435,7 +432,6 @@ public class PgSimulatorClient implements PgClient {
 | 설정 바인딩 | `Properties` | `RedisProperties` | 설정 클래스와 같은 패키지 |
 | 예외 | `Exception` | `CoreException` | `support/error` |
 
-- `Controller`, `Config`, `JpaRepository`, `Exception` 접미사는 Checkstyle 이 검사한다.
 - 목록 조회용 DTO 는 복수형으로 구분한다: `ProductResult`(단건) / `ProductsResult`(목록의 한 행), `OrdersResponse`
 
 ### 3.3 메서드 네이밍
@@ -462,35 +458,20 @@ public class PgSimulatorClient implements PgClient {
 
 ### 4.1 포맷
 
-- 포맷은 **Spotless + palantir-java-format** 이 담당한다. 손으로 맞추지 않고 `./gradlew spotlessApply` 를 실행한다.
+- Formatter 가 있으면 포맷은 Formatter 로 적용한다. 손으로 맞추지 않는다.
 - 들여쓰기: **스페이스 4칸** (탭 금지)
 - 한 줄 최대 길이: **120자** (`package`, `import` 줄 제외)
 - 파일 끝 개행 필수, 줄 끝 공백 금지, 줄바꿈 문자는 LF, 인코딩은 UTF-8 (`.editorconfig`)
 - 중괄호는 K&R 스타일, 한 줄 `if` 문도 중괄호 생략 금지
-- 포매터가 고치지 못하는 네이밍·구조·금지 패턴은 **Checkstyle** 이 검사한다.
-
-| 파일 | 역할 |
-|---|---|
-| `config/checkstyle/checkstyle.xml` | 검사 규칙. 메시지 끝의 `(3.2)` 는 이 문서의 장 번호, `[id]` 는 규칙 id |
-| `config/checkstyle/import-control.xml` | 계층 의존 규칙 ([2.7](#27-의존-규칙)) |
-| `config/checkstyle/suppressions.xml` | main / test 차이, 특정 패키지에만 적용하는 규칙의 경로 설정 |
-
-- `error` 는 빌드를 실패시키고, `warning` 은 리포트(`build/reports/checkstyle/`)에만 남는다. 권장 사항과 부록 A 의 기존 위반이 남은 규칙이 `warning` 이다.
-
-```shell
-./gradlew spotlessApply                    # 포맷 자동 적용
-./gradlew spotlessCheck                    # 포맷 검사
-./gradlew checkstyleMain checkstyleTest    # 컨벤션 검사 (error 는 빌드 실패, warning 은 리포트만)
-```
+- Formatter 가 고치지 못하는 네이밍·구조·금지 패턴은 Linter 가 있으면 Linter 로, 없으면 코드 리뷰로 확인한다.
 
 - **자동화 도구가 있으면 문서와 함께 바꾼다.** 프로젝트에 그 규칙을 검사하거나 적용하는 도구(Linter, Code Formatter 등)가 있을 때만, 이 문서의 규칙을 추가·변경·삭제하면 그 도구 설정도 **같은 PR 에서** 맞춘다. 도구가 없으면 동기화할 것이 없다.
   - 반대로 도구 설정을 바꾸면 이 문서도 함께 고친다.
 
-- 불가피하게 규칙을 어겨야 하면 `@SuppressWarnings("checkstyle:{id}")` 로 범위를 좁혀 억제하고 **사유를 주석으로 남긴다.**
+- 불가피하게 규칙을 어겨야 하면 예외 범위를 메서드 단위로 좁히고 **사유를 주석으로 남긴다.**
 
 ```java
 // 복구 배치는 건별 실패 원인(스택트레이스)을 남겨야 하므로 반복문 내 ERROR 로그를 허용한다.
-@SuppressWarnings("checkstyle:logInLoop")
 public void recoverPendingPayments() { ... }
 ```
 
@@ -498,7 +479,7 @@ public void recoverPendingPayments() { ... }
 
 - 와일드카드 import(`*`) 금지
 - static import 는 **테스트 코드에서만** 허용
-- 사용하지 않는 import 금지 (Spotless 가 제거)
+- 사용하지 않는 import 금지
 - 순서: `static` → `java` → `javax|jakarta` → `org` → `com` → 기타 (`io`, `lombok` 등), 그룹 사이에 빈 줄
 
 ### 4.3 클래스 내부 선언 순서
@@ -519,13 +500,13 @@ public void recoverPendingPayments() { ... }
 |---|---|---|
 | `@Getter` | 허용 | 엔티티 기본 |
 | `@RequiredArgsConstructor` | 허용 | 생성자 주입용 |
-| `@NoArgsConstructor(access = PROTECTED)` | **엔티티 필수** | Checkstyle 검사 |
+| `@NoArgsConstructor(access = PROTECTED)` | **엔티티 필수** | JPA 기본 생성자 |
 | `@NoArgsConstructor(access = PRIVATE)` | 허용 | 유틸 클래스 (`DateConverter`) |
 | `@Slf4j` | 허용 | 로거는 이것만 사용 (`LoggerFactory` import 금지) |
 | `@Builder` | 지양 | 생성은 정적 팩토리 `create(...)` 로 통일 |
 | `@Setter` | **엔티티 금지** | DTO 에서도 지양 |
-| `@Data` | **금지** | import 자체가 Checkstyle 오류 |
-| `@AllArgsConstructor` | 지양 | Checkstyle warning |
+| `@Data` | **금지** | `@Setter`·`@EqualsAndHashCode` 까지 만든다 |
+| `@AllArgsConstructor` | 지양 | 생성은 정적 팩토리 `create(...)` 로 통일 |
 | `@ToString` | 엔티티 금지 | 연관관계 순환 참조 위험 |
 | `@EqualsAndHashCode` | 엔티티 금지 | `BaseEntity` 가 `id` 기준으로 이미 선언 |
 
@@ -907,7 +888,7 @@ public enum ErrorType {
 
 - 예외 → 응답 변환은 `interfaces/api/ApiControllerAdvice` 한 곳에서만 한다. Controller 에서 `try-catch` 로 응답을 만들지 않는다.
 - 요청 바인딩 오류(`HttpMessageNotReadableException`, `BindException`, `MethodArgumentTypeMismatchException`, `MissingServletRequestParameterException`)는 Advice 가 400 과 원인 필드를 담은 메시지로 변환한다.
-- 예외를 잡아서 아무 처리 없이 삼키지 않는다. 주석만 있는 `catch` 블록도 Checkstyle 오류다.
+- 예외를 잡아서 아무 처리 없이 삼키지 않는다. 주석만 있는 `catch` 블록도 금지한다.
 - 예외를 변환할 때는 **원인(cause)을 포함**한다.
 - `CoreException`·바인딩 오류 → `WARN`, 예상치 못한 예외(`Throwable`) → `ERROR` + 스택트레이스
 - 흐름 제어 목적으로 예외를 사용하지 않는다.
@@ -1034,13 +1015,13 @@ public abstract class BaseEntity {
 ```
 
 - `BaseEntity` 에는 생성/수정/삭제 정보 외의 컬럼이나 동작을 추가하지 않는다.
-- 모든 연관관계는 **`FetchType.LAZY`** 를 명시한다. (`@ManyToOne`, `@OneToOne` 은 Checkstyle 검사)
-- `@Enumerated(EnumType.STRING)` 필수 (`ORDINAL` 금지, Checkstyle 검사)
+- 모든 연관관계는 **`FetchType.LAZY`** 를 명시한다. (`@ManyToOne`, `@OneToOne` 은 기본값이 `EAGER` 이므로 특히 주의)
+- `@Enumerated(EnumType.STRING)` 필수 (`ORDINAL` 금지)
 - N+1 은 QueryDSL `fetchJoin()` 과 `default_batch_fetch_size: 100` 으로 해결한다.
 - 컬렉션 fetch join 과 페이징을 함께 사용하지 않는다.
 - 양방향 연관관계는 꼭 필요한 경우에만 사용한다.
 - `open-in-view: false` 다. 지연 로딩은 트랜잭션 안(Service 의 `Result.from(entity)`)에서 끝낸다.
-- 대량 변경은 벌크 쿼리를 사용하고 `@Modifying(clearAutomatically = true)` 로 영속성 컨텍스트를 정리한다. (Checkstyle 검사)
+- 대량 변경은 벌크 쿼리를 사용하고 `@Modifying(clearAutomatically = true)` 로 영속성 컨텍스트를 정리한다.
 - 네이티브 쿼리 사용 시 사유를 주석으로 남긴다.
 - QueryDSL Q 클래스는 annotation processor 가 생성한다. 생성 코드(`src/*/generated/**`)는 포맷 대상에서 제외된다.
 - 집계 조회는 엔티티가 아닌 `domain/{domain}/dto/result` 의 record 로 `Projections.constructor(...)` 프로젝션한다.
@@ -1147,7 +1128,7 @@ public record OrderMessageEnvelope<T>(
 
 ## 13. 로깅
 
-- `@Slf4j` 사용. `LoggerFactory` 직접 사용, `System.out` / `System.err`, `e.printStackTrace()` 금지 (Checkstyle 검사)
+- `@Slf4j` 사용. `LoggerFactory` 직접 사용, `System.out` / `System.err`, `e.printStackTrace()` 금지
 - 문자열 연결 대신 플레이스홀더 사용: `log.info("Payment requested for orderId: {}", event.orderId())`
 - 예외를 로그에 남길 때는 마지막 인자로 예외 객체를 넘겨 스택트레이스를 남긴다: `log.error("... {}", e.getMessage(), e)`
 - 요청 추적용 `traceId` / `spanId` 는 Micrometer Tracing(Brave)이 MDC 에 넣는다.
@@ -1160,7 +1141,7 @@ public record OrderMessageEnvelope<T>(
 | DEBUG | 개발/디버깅용 상세 정보 |
 
 - **개인정보·민감정보 로그 금지**: 카드번호, 연락처, 배송지 등. 필요 시 마스킹.
-- 반복문 내부에서 INFO 이상 로그를 남기지 않는다. (Checkstyle 검사, 예외는 사유와 함께 억제)
+- 반복문 내부에서 INFO 이상 로그를 남기지 않는다. (꼭 필요하면 사유를 주석으로 남긴다)
 
 프로파일별 출력 (`supports/logging/src/main/resources/logback/logback.xml`):
 
@@ -1194,7 +1175,7 @@ supports/monitoring/src/main/resources/monitoring.yml  # actuator(8081), prometh
 ### 14.2 규칙
 
 - 비밀 정보는 **레포에 커밋하지 않는다.** 환경 변수로 주입한다: `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PWD`, `REDIS_MASTER_HOST`, `BOOTSTRAP_SERVERS` ...
-- 커스텀 설정은 `@ConfigurationProperties` + **`record`** 로 바인딩한다. (`class` 로 작성하면 Checkstyle 오류, `@Value` 는 warning)
+- 커스텀 설정은 `@ConfigurationProperties` + **`record`** 로 바인딩한다. (`class`, `@Value` 는 쓰지 않는다)
 
 ```java
 @ConfigurationProperties(value = "datasource.redis")
@@ -1410,10 +1391,10 @@ refactor: API v1 프리픽스 제거 및 쿼리 파라미터 바인딩 예외 �
 | ✅ Checklist | 완료 여부 체크리스트. 미완료 항목은 `TODO -` 로 표기 |
 | 📎 References | 참고 문서·링크 (없으면 섹션 삭제) |
 
-- CI 가 구성되어 있지 않으므로 **PR 을 올리기 전 로컬에서 아래를 통과**시킨다.
+- CI 가 구성되어 있지 않으므로 **PR 을 올리기 전 로컬에서 아래를 통과**시킨다. Linter·Formatter 가 있으면 그 검사도 함께 통과시킨다.
 
 ```shell
-./gradlew spotlessApply checkstyleMain checkstyleTest test
+./gradlew test
 ```
 
 ---
@@ -1447,7 +1428,7 @@ refactor: API v1 프리픽스 제거 및 쿼리 파라미터 바인딩 예외 �
 - [ ] 엔티티 매핑 변경 시 적용할 DDL 이 PR 에 적혀 있는가
 - [ ] 테스트가 핵심 시나리오와 실패 케이스를 커버하는가
 - [ ] 컨벤션 문서를 바꿨고 관련 Linter·Formatter 가 있다면 그 설정도 함께 바꿨는가 ([4.1](#41-포맷))
-- [ ] `spotlessCheck`, `checkstyleMain`, `checkstyleTest`, `test` 가 통과하는가
+- [ ] `test` 가 통과하는가 (Linter·Formatter 가 있으면 그 검사도)
 
 ---
 
@@ -1475,29 +1456,5 @@ docs/
 ```
 
 - `.gitignore` 가 `docs/*` 를 무시하고 `docs/architecture/` 만 예외로 둔다. 그 밖의 새 문서를 레포에 올리려면 `git add -f` 를 쓰거나 `.gitignore` 예외를 추가한다.
-
----
-
-## 부록 A. 현재 코드와 규칙의 차이
-
-이 문서의 규칙과 현재 코드가 어긋나는 지점이다. 새 코드는 규칙을 따르고, 아래 항목은 해당 영역을 수정할 때 함께 정리한다.
-
-| 규칙 | 현재 코드 |
-|---|---|
-| domain 은 다른 계층에 의존하지 않는다 ([2.7](#27-의존-규칙)) | `OrderProcessing`, `ProductStockAllocation`, `ProductRepository`, `PaymentReconciliation` 이 `application.*.dto` 를 import 한다. `PgRequestResult` 는 `infrastructure.payment.pgclient.dto` 를 import 한다. |
-| 다른 도메인 엔티티는 ID 로 참조한다 ([5.4](#54-entity-domain)) | `OrderItem → Product`, `ProductLike → User/Product`, `Product → Brand/ProductLikeCount` 가 객체 참조다. |
-| 엔티티는 `BaseEntity` 를 상속한다 ([10](#10-영속성)) | `ProductStock`, `ProductLikeCount` 는 상속하지 않아 `created_at` 등이 없다. |
-| 생성은 `private` 생성자 + `create()` ([2.8](#28-전술적-설계-규칙)) | `Product` 의 생성자가 `public` 이다. |
-| Application Service 는 `@Service`, `Result` 를 반환한다 ([5.2](#52-application-service-application)) | `UserService`, `PointService` 는 `@Component` 다. `OrderService.order()` 는 `Order` 엔티티를 반환한다. |
-| `@Transactional` 은 application 계층에서 선언한다 ([9](#9-트랜잭션)) | `OrderProcessing.saveOrder`(domain), `PaymentRecoveryScheduler`(infrastructure)에 선언되어 있다. |
-| Request DTO 는 interfaces 에 둔다 ([5.5](#55-dto)) | `UserController.create` 가 `domain.user.dto.command.UserCreateInfo` 를 요청 본문으로 직접 받는다. `OrderCreateRequest` 가 `application` 의 `OrderLineItem` 을 필드로 쓴다. |
-| Bean Validation 은 `@Valid` 와 함께 쓴다 ([8](#8-검증validation)) | `PointChargeRequest` 에 `@NotNull` 이 있으나 `PointController.charge` 에 `@Valid` 가 없다. |
-| 조회 실패는 `EntityNotFoundException` → 404 ([7.3](#73-어떤-예외를-던지는가)) | `OrderService.getOrderStatus`, `ProductLikeService` 등은 `IllegalArgumentException` 을 던져 400 으로 응답한다. |
-| 모든 캐시 키에 TTL 을 설정한다 ([12.1](#121-redis)) | `products` 캐시는 별도 `CacheManager` 설정이 없어 TTL 이 없고, 상품 변경 시 evict 도 없다. |
-| 설정은 `@ConfigurationProperties` record 로 바인딩한다 ([14.2](#142-규칙)) | `PaymentService`, `FeignClientConfig`, `Kafka*MessagePublisher` 가 `@Value` 를 쓴다. `PgSimulatorFeignClient` 의 URL(`http://localhost:8082`)이 코드에 고정되어 있다. |
-| 이벤트 리스너는 `@TransactionalEventListener` 로 구독한다 ([2.9](#29-이벤트와-메시지)) | `ProductEventListener.handleProductView` 에 리스너 어노테이션이 없어 `ProductViewedEvent` 가 소비되지 않는다. `handleProductUnlike` 는 `ProductUnlikedEvent` 가 아닌 `ProductLikedEvent` 를 받는다. |
-| 메시지 타입과 컨슈머 분기를 맞춘다 ([12.2](#122-kafka)) | commerce-streamer 의 `productListener` 가 `eventType` 이 아닌 `aggregateType` 으로 분기한다. 이미 처리한 메시지는 `acknowledge()` 없이 반환한다. |
-| 테스트는 실제 동작을 검증한다 ([15](#15-테스트)) | `ProductLikeServiceTest` 는 act 구문이 주석 처리되어 있다. |
-| 자동 검증 | CI 워크플로, DB 마이그레이션 도구, Outbox/DLT 가 없다. 계층 의존은 ArchUnit 대신 Checkstyle `ImportControl` 로 검사하며, 위 domain 위반 7개 파일은 허용 목록에 있다. |
 
 ---
