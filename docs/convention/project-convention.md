@@ -483,6 +483,9 @@ public class PgSimulatorClient implements PgClient {
 ./gradlew checkstyleMain checkstyleTest    # 컨벤션 검사 (error 는 빌드 실패, warning 은 리포트만)
 ```
 
+- **자동화 도구가 있으면 문서와 함께 바꾼다.** 프로젝트에 그 규칙을 검사하거나 적용하는 도구(Linter, Code Formatter 등)가 있을 때만, 이 문서의 규칙을 추가·변경·삭제하면 그 도구 설정도 **같은 PR 에서** 맞춘다. 도구가 없으면 동기화할 것이 없다.
+  - 반대로 도구 설정을 바꾸면 이 문서도 함께 고친다.
+
 - 불가피하게 규칙을 어겨야 하면 `@SuppressWarnings("checkstyle:{id}")` 로 범위를 좁혀 억제하고 **사유를 주석으로 남긴다.**
 
 ```java
@@ -1443,6 +1446,7 @@ refactor: API v1 프리픽스 제거 및 쿼리 파라미터 바인딩 예외 �
 - [ ] Kafka 메시지 타입을 추가했다면 commerce-streamer 컨슈머와 멱등 처리가 함께 반영되었는가
 - [ ] 엔티티 매핑 변경 시 적용할 DDL 이 PR 에 적혀 있는가
 - [ ] 테스트가 핵심 시나리오와 실패 케이스를 커버하는가
+- [ ] 컨벤션 문서를 바꿨고 관련 Linter·Formatter 가 있다면 그 설정도 함께 바꿨는가 ([4.1](#41-포맷))
 - [ ] `spotlessCheck`, `checkstyleMain`, `checkstyleTest`, `test` 가 통과하는가
 
 ---
