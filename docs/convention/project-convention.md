@@ -170,6 +170,27 @@ Root (loopers-java-spring-template)
 | 결제 (`payment`) | PG 결제 요청, 콜백 처리, 상태 복구 | `Payment` | `payment` |
 | 포인트 (`point`) | 포인트 충전·사용·복원 | `Point` | `point` |
 | 쿠폰 (`coupon`) | 쿠폰 할인 계산, 사용·복원 | `Coupon` | `coupon` |
+| 알림 (`notification`) | 알림 수신 설정, 연락처 등록, 채널별 알림 발송 | `Notification`, `NotificationSetting`, `PhoneNumber`, `PushDevice` | `notification`, `notification_setting`, `phone_number`, `push_device` |
+
+알림 도메인 용어 (원본: `docs/spec/notification/requirements.md`):
+
+| 용어 | 영문 | 뜻 |
+|---|---|---|
+| 채널 | Channel | 알림을 전달하는 수단. 이메일(`EMAIL`), 푸시(`PUSH`), 알림톡(`KAKAO_ALIMTALK`) |
+| 알림 종류 | Notification Type | 알림을 보내는 계기. 주문 완료(`ORDER_COMPLETED`), 주문 취소(`ORDER_CANCELED`) |
+| 알림 수신 설정 | Notification Setting | 채널마다 알림을 받을지(켜짐 · 꺼짐) 정한 값 |
+| 수신 여부 | Enabled | 채널의 알림을 받을지 여부. 켜짐 · 꺼짐 |
+| 연락처 | Contact | 채널이 알림을 전달할 곳 (이메일 · 푸시 기기 · 휴대폰 번호) |
+| 휴대폰 번호 | Phone Number | 알림톡을 받을 번호. 회원마다 하나 |
+| 푸시 기기 | Push Device | 푸시를 받을 앱 설치 기기. 푸시 토큰으로 구분. 회원마다 하나 |
+| 푸시 토큰 | Push Token | 앱이 푸시 서비스에서 발급받은 기기 식별 값 |
+| 등록 일시 | Registered At | 휴대폰 번호나 푸시 기기를 마지막으로 등록한 일시 |
+| 알림 | Notification | 회원 한 명에게 채널 하나로 보내는 메시지 하나 |
+| 알림 내용 | Content | 회원에게 보내는 문구. 알림 종류마다 정해진 문구에 주문 번호를 넣음 |
+| 발송 대행사 | Notification Provider | 알림을 실제로 전달하는 외부 시스템 |
+| 발송 상태 | Send Status | 발송 대기(`PENDING`), 발송 완료(`SENT`), 발송 실패(`FAILED`), 결과 불명(`UNKNOWN`) |
+| 발송 실패 사유 | Fail Reason | 발송 대행사의 거절 사유, `PROVIDER_UNAVAILABLE`, `UNEXPECTED_ERROR` |
+| 주문 번호 | Order ID | 주문을 구분하는 번호 (`orders.id`) |
 
 ### 2.5 패키지 구조
 
