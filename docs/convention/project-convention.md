@@ -421,6 +421,8 @@ public class PgSimulatorClient implements PgClient {
 
 - 약어는 일반 단어처럼 취급한다: `PgClient` (O), `PGClient` (X), `userId` (O), `userID` (X)
 - 의미 없는 축약 금지: `ord`, `mbr`, `tmp`, `data`, `info` 단독 사용 지양
+- 클래스 이름은 **requirements 의 업무 용어**로 짓는다. 기획자가 이름만 보고 무슨 일을 하는지 알 수 있어야 한다. 계층 · 기술 역할을 나타내는 접미사(`Service`, `Controller`, `Repository`, `EventListener` …)는 [3.2](#32-클래스-접미사) 표에 있는 것만 쓴다.
+- 업무 의미가 없는 기술 용어는 이름에 쓰지 않는다: `Dispatcher`, `Manager`, `Handler`, `Processor`, `Helper`, `Executor`, `Coordinator`
 
 ### 3.2 클래스 접미사
 
@@ -436,6 +438,7 @@ public class PgSimulatorClient implements PgClient {
 | 조회 조건 | `Condition` | `ProductsCondition` | `application/{domain}/dto` |
 | 애플리케이션 이벤트 | `Event` (과거형) | `OrderCreatedEvent` | `application/{domain}/event/model` |
 | 이벤트 리스너 | `EventListener` | `OrderEventListener` | `application/{domain}/event` |
+| Application 보조 컴포넌트 (트랜잭션 경계 · 실행 흐름 분리) | 업무 용어 + 행위자 명사 (`-er`) | `OrderNotificationSender`, `NotificationRecorder` | `application/{domain}` |
 | Entity / VO | 도메인 용어 (접미사 없음) | `Order`, `OrderItem`, `Products` | `domain/{domain}` |
 | Domain Service | 도메인 용어 (행위 명사) | `OrderProcessing`, `CouponRedemption` | `domain/{domain}` |
 | 엔티티 생성 입력 | `CreateInfo` / `CreateCommand` | `OrderCreateInfo` | `domain/{domain}/dto` |
@@ -454,6 +457,9 @@ public class PgSimulatorClient implements PgClient {
 | 예외 | `Exception` | `CoreException` | `support/error` |
 
 - 목록 조회용 DTO 는 복수형으로 구분한다: `ProductResult`(단건) / `ProductsResult`(목록의 한 행), `OrdersResponse`
+- Application Service 는 도메인당 `{Domain}Service` 하나다. 트랜잭션 경계나 외부 호출 때문에 빈을 더 나누면 `Service` 를 붙이지 않고, requirements 의 Requirement 이름(업무 행위)으로 짓는다.
+  - 요구사항 "주문 알림 발송" → `OrderNotificationSender` (O), `NotificationDispatcher` (X), `NotificationClaimService` (X)
+  - 알림 상태를 저장 · 기록 → `NotificationRecorder` (O), `NotificationWriter` (X)
 
 ### 3.3 메서드 네이밍
 
@@ -974,7 +980,7 @@ public record CouponIssueRequest(
 ### 트랜잭션 경계 나누기
 
 - 트랜잭션은 **선언적 `@Transactional` 로만** 정한다. `TransactionTemplate` 은 쓰지 않는다.
-- 경계를 나눠야 하면 **별도 빈으로 분리**하고 그 빈의 `@Transactional` 메서드를 호출한다. 같은 클래스 안에서 부르면 프록시가 적용되지 않는다. 이 분리는 [2.2](#22-설계-규모와-ddd) 컴포넌트 분리 조건 1(트랜잭션 경계가 다르다)에 해당한다.
+- 경계를 나눠야 하면 **별도 빈으로 분리**하고 그 빈의 `@Transactional` 메서드를 호출한다. 같은 클래스 안에서 부르면 프록시가 적용되지 않는다. 이 분리는 [2.2](#22-설계-규모와-ddd) 컴포넌트 분리 조건 1(트랜잭션 경계가 다르다)에 해당한다. 분리한 빈의 이름은 [3.2](#32-클래스-접미사)의 "Application 보조 컴포넌트" 규칙을 따른다.
 - 전파 속성은 **기본 `REQUIRED`** 를 쓴다.
 - 외부 호출을 트랜잭션 밖에 두려면 `REQUIRES_NEW` 가 아니라 **호출하는 메서드에 `@Transactional` 을 달지 않고**, DB 변경만 짧은 `@Transactional` 메서드로 나눠 부른다.
 
